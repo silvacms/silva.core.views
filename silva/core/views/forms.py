@@ -3,7 +3,6 @@
 # See also LICENSE.txt
 # $Id$
 
-from zope.configuration.name import resolve
 from zope.component import queryAdapter
 from zope.formlib import form
 from zope import event
@@ -14,16 +13,13 @@ from Products.Five.formlib import formbase
 from Products.Silva.i18n import translate as _
 from Products.Silva.interfaces import IVersionedContent
 from Products.Silva.ViewCode import ViewCode
-from Products.Silva.ExtensionRegistry import extensionRegistry
 
 from grokcore.formlib import action
 from grokcore.formlib.components import GrokForm
-import grokcore.view
 
 from silva.core.views.baseforms import SilvaMixinForm, SilvaMixinAddForm, SilvaMixinEditForm
 from silva.core.views.views import SilvaGrokView
 from silva.core.views.interfaces import IDefaultAddFields, ISilvaFormlibForm
-from silva.core.conf.utils import getFactoryName
 from silva.core import conf as silvaconf
 
 # Forms
@@ -58,9 +54,6 @@ class AddForm(SilvaMixinAddForm, SilvaGrokForm, formbase.AddForm, SilvaGrokView)
 
     silvaconf.baseclass()
 
-    template = grokcore.view.PageTemplateFile('templates/add_form.pt')
-
-
     def setUpWidgets(self, ignore_request=False):
         # Add missing fields from IDefaultAddFields
         field_to_add = form.FormFields()
@@ -82,36 +75,6 @@ class AddForm(SilvaMixinAddForm, SilvaGrokForm, formbase.AddForm, SilvaGrokView)
         obj = self.createAndAdd(data)
         self.redirect('%s/edit' % obj.absolute_url())
 
-    def createAndAdd(self, data):
-        addable = filter(lambda a: a['name'] == self.__name__,
-                         extensionRegistry.get_addables())
-        if len(addable) != 1:
-            raise ValueError, "Content cannot be found. " \
-               "Check that the name of add is the meta type of your content." 
-        addable = addable[0]
-        factory = getattr(resolve(addable['instance'].__module__),
-                          getFactoryName(addable['instance']))
-        # Build the content
-        obj_id = str(data['id'])
-        factory(self.context, obj_id, data['title'])
-        obj = getattr(self.context, obj_id)
-
-        editable_obj = obj.get_editable()
-        for key, value in data.iteritems():
-            if key not in IDefaultAddFields:
-                setattr(editable_obj, key, value)
-
-        # Update last author information
-        obj.sec_update_last_author_info()
-        self.context.sec_update_last_author_info()
-
-        # Set status
-        self.status = _(u'Created ${meta_type} "${obj_id}".',
-                        mapping={'obj_id': obj_id,
-                                 'meta_type': obj.meta_type,})
-
-        return obj
-
 
 
 class EditForm(SilvaMixinEditForm, SilvaGrokForm, formbase.EditForm, SilvaGrokView):
@@ -119,10 +82,6 @@ class EditForm(SilvaMixinEditForm, SilvaGrokForm, formbase.EditForm, SilvaGrokVi
     """
 
     silvaconf.baseclass()
-    silvaconf.name(u'tab_edit')
-
-
-    template = grokcore.view.PageTemplateFile('templates/edit_form.pt')
 
     def setUpWidgets(self, ignore_request=False):
         self.adapters = {}

@@ -3,20 +3,23 @@
 # See also LICENSE.txt
 # $Id$
 
+from zope.configuration.name import resolve
 from zope.component import queryMultiAdapter
 from zope.component import getSiteManager
 from zope.component.interfaces import IFactory
 from zope import interface
 import zope.cachedescriptors.property
 
+from Products.Silva.i18n import translate as _
 from Products.Silva.interfaces import IVersionedContent
+from Products.Silva.ExtensionRegistry import extensionRegistry
 from AccessControl import getSecurityManager
 
 import grokcore.view
 import martian
 
-from silva.core.views.interfaces import IFeedbackView
-from silva.core.conf.utils import getSilvaViewFor
+from silva.core.views.interfaces import IFeedbackView, IDefaultAddFields
+from silva.core.conf.utils import getSilvaViewFor, getFactoryName
 from silva.core import conf as silvaconf
 
 class SilvaMixinForm(object):
@@ -80,12 +83,46 @@ class SilvaMixinAddForm(object):
     """Silva add form mixin.
     """
 
+    template = grokcore.view.PageTemplateFile('templates/add_form.pt')
+
     def _silvaView(self):
         view_registry = self.context.service_view_registry
         ## Then you add a element, you have the edit view of the
         ## container wrapped by the add view.
         parent_view = super(SilvaMixinAddForm, self)._silvaView()
         return view_registry.get_view('add', 'Five Content').__of__(parent_view)
+
+
+    def createAndAdd(self, data):
+        addable = filter(lambda a: a['name'] == self.__name__,
+                         extensionRegistry.get_addables())
+        if len(addable) != 1:
+            raise ValueError, "Content cannot be found. " \
+               "Check that the name of add is the meta type of your content." 
+        addable = addable[0]
+        factory = getattr(resolve(addable['instance'].__module__),
+                          getFactoryName(addable['instance']))
+        # Build the content
+        obj_id = str(data['id'])
+        factory(self.context, obj_id, data['title'])
+        obj = getattr(self.context, obj_id)
+
+        editable_obj = obj.get_editable()
+        for key, value in data.iteritems():
+            if key not in IDefaultAddFields:
+                setattr(editable_obj, key, value)
+
+        # Update last author information
+        obj.sec_update_last_author_info()
+        self.context.sec_update_last_author_info()
+
+        # Set status
+        self.status = _(u'Created ${meta_type} "${obj_id}".',
+                        mapping={'obj_id': obj_id,
+                                 'meta_type': obj.meta_type,})
+
+        return obj
+
 
 
 class SilvaMixinEditForm(object):
@@ -95,6 +132,10 @@ class SilvaMixinEditForm(object):
     ## If we refactor the Silva views correctly, we should be able to
     ## remove the two followings property, and use the same template
     ## than a PageForm. if.
+
+
+    template = grokcore.view.PageTemplateFile('templates/edit_form.pt')
+    silvaconf.name(u'tab_edit')
 
     versioned_content = False
     propose_new_version = False

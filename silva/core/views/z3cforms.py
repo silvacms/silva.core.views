@@ -9,14 +9,14 @@ from grokcore import component
 
 from Products.Silva.ViewCode import ViewCode
 
-from silva.core.views.interfaces import ISilvaZ3CFormForm
+from silva.core.views.interfaces import ISilvaZ3CFormForm, IDefaultAddFields
 from silva.core.views.views import SilvaGrokView
 from silva.core.views.baseforms import SilvaMixinForm, SilvaMixinAddForm, SilvaMixinEditForm
 from silva.core import conf as silvaconf
 
 from plone.z3cform.components import GrokForm
 from z3c.form.interfaces import IFormLayer
-from z3c.form import form, button
+from z3c.form import form, button, field
 
 
 # Base class to grok forms
@@ -35,6 +35,28 @@ class PageForm(SilvaGrokForm, form.Form, SilvaGrokView):
     silvaconf.baseclass()
     
 
+class AddForm(SilvaMixinAddForm, SilvaGrokForm, form.AddForm, SilvaGrokView):
+    """Add form.
+    """
+
+    silvaconf.baseclass()
+
+    def update_form(self):
+        field_to_add = field.Fields()
+        for name in IDefaultAddFields:
+            if self.fields.get(field) is None:
+                field_to_add += field.Fields(IDefaultAddFields[name])
+        if field_to_add:
+            self.fields = field_to_add + self.fields
+        # Setup widgets
+        super(AddForm, self).update_form()
+
+    def nextURL(self):
+        import pdb ; pdb.set_trace()
+        return '%s/edit' % self.context.absolute_url()
+
+
+
 class EditForm(SilvaMixinEditForm, SilvaGrokForm, form.EditForm, SilvaGrokView):
     """Edit form.
     """
@@ -45,13 +67,6 @@ class EditForm(SilvaMixinEditForm, SilvaGrokForm, form.EditForm, SilvaGrokView):
     def getContent(self):
         # Return the content to edit.
         return self.context.get_editable()
-
-
-class AddForm(SilvaMixinAddForm, SilvaGrokForm, form.AddForm, SilvaGrokView):
-    """Add form.
-    """
-
-    silvaconf.baseclass()
 
 
 # Macros to render z3c forms
