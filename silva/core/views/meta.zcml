@@ -1,0 +1,10 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:grok="http://namespaces.zope.org/grok"
+    xmlns:meta="http://namespaces.zope.org/meta">
+
+  <!-- Load z3cform grok stuff -->
+  <include package="plone.z3cform" file="meta.zcml" />
+  <grok:grok package=".forms" />
+
+</configure>

@@ -8,11 +8,11 @@ setup(name='silva.core.views',
       description="Views and forms support for Silva",
       long_description=open("README.txt").read() + "\n" +
                        open(os.path.join("docs", "HISTORY.txt")).read(),
-      # Get more strings from http://www.python.org/pypi?%3Aaction=list_classifiers
       classifiers=[
-        "Programming Language :: Python",
-        "Topic :: Software Development :: Libraries :: Python Modules",
-        ],
+              "Framework :: Zope2",
+              "Programming Language :: Python",
+              "Topic :: Software Development :: Libraries :: Python Modules",
+              ],
       keywords='silva core views',
       author='Infrae',
       author_email='info@infrae.com',
@@ -23,10 +23,15 @@ setup(name='silva.core.views',
       include_package_data=True,
       zip_safe=False,
       install_requires=[
-          'setuptools',
-          # -*- Extra requirements: -*-
-      ],
-      entry_points="""
-      # -*- Entry points: -*-
-      """,
+              'setuptools',
+              'five.grok',
+              'grokcore.security',
+              'grokcore.formlib',
+              'grokcore.component',
+              'grokcore.view',
+              'zope.interface',
+              'zope.schema',
+              'plone.z3cform',
+              'silva.core.conf',
+              ],
       )

@@ -1,0 +1,24 @@
+<configure
+   xmlns="http://namespaces.zope.org/zope"
+   xmlns:browser="http://namespaces.zope.org/browser">
+
+  <!-- Register macros for form implementation -->
+  <browser:page
+      name="form-macros"
+      for=".interfaces.ISilvaFormlibForm"
+      class=".forms.FormlibMacros"
+      allowed_interface="zope.interface.common.mapping.IItemMapping"
+      permission="zope.Public"
+      />
+  <browser:page
+      name="form-macros"
+      for=".interfaces.ISilvaZ3CFormForm"
+      class=".z3cforms.Z3CFormMacros"
+      allowed_interface="zope.interface.common.mapping.IItemMapping"
+      permission="zope.Public"
+      />
+
+  <!-- Include dependancy -->
+  <include package="plone.z3cform" />
+  
+</configure>
