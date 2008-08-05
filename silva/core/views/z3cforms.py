@@ -11,7 +11,7 @@ from Products.Silva.ViewCode import ViewCode
 
 from silva.core.views.interfaces import ISilvaZ3CFormForm
 from silva.core.views.views import SilvaGrokView
-from silva.core.views.forms import SilvaForm
+from silva.core.views.baseforms import SilvaMixinForm, SilvaMixinAddForm, SilvaMixinEditForm
 from silva.core import conf as silvaconf
 
 from plone.z3cform.components import GrokForm
@@ -21,7 +21,7 @@ from z3c.form import form, button
 
 # Base class to grok forms
 
-class SilvaGrokForm(SilvaForm, GrokForm, ViewCode):
+class SilvaGrokForm(SilvaMixinForm, GrokForm, ViewCode):
     """Silva Gork form for z3cform.
     """
 
@@ -35,7 +35,7 @@ class PageForm(SilvaGrokForm, form.Form, SilvaGrokView):
     silvaconf.baseclass()
     
 
-class EditForm(SilvaGrokForm, form.EditForm, SilvaGrokView):
+class EditForm(SilvaMixinEditForm, SilvaGrokForm, form.EditForm, SilvaGrokView):
     """Edit form.
     """
 
@@ -47,7 +47,7 @@ class EditForm(SilvaGrokForm, form.EditForm, SilvaGrokView):
         return self.context.get_editable()
 
 
-class AddForm(SilvaGrokForm, form.AddForm, SilvaGrokView):
+class AddForm(SilvaMixinAddForm, SilvaGrokForm, form.AddForm, SilvaGrokView):
     """Add form.
     """
 

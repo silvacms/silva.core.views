@@ -5,6 +5,6 @@
 
   <!-- Load z3cform grok stuff -->
   <include package="plone.z3cform" file="meta.zcml" />
-  <grok:grok package=".forms" />
+  <grok:grok package=".baseforms" />
 
 </configure>
