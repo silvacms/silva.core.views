@@ -10,6 +10,16 @@ from silva.core.conf.fields import ID
 
 from Products.Silva.i18n import translate as _
 
+
+class IFeedbackView(interface.Interface):
+
+    status = interface.Attribute(u"Feedback message")
+    status_type = interface.Attribute(u"Feedback type, error or feedback")
+
+
+# Silva forms
+
+
 class IDefaultAddFields(interface.Interface):
     """Default fields used in a add form. You don't have to defines this fields.
     """
@@ -24,13 +34,6 @@ class IDefaultAddFields(interface.Interface):
         required=True)
 
 
-
-class IFeedbackView(interface.Interface):
-
-    status = interface.Attribute(u"Feedback message")
-    status_type = interface.Attribute(u"Feedback type, error or feedback")
-
-
 class ISilvaForm(interface.Interface):
     """A Silva form.
     """
@@ -43,3 +46,20 @@ class ISilvaZ3CFormForm(ISilvaForm):
     """A Silva form built using z3c.form.
     """
 
+
+# z3c.form Silva support
+
+import z3c.form.interfaces
+
+class ICancelButton(z3c.form.interfaces.IButton):
+    """A button to cancel a form.
+    """
+
+class ISilvaStyle(interface.Interface):
+    """Adapter used to apply new style information on z3c.form
+    elements.
+    """
+
+    def style(widget):
+        """Apply Silva style to that element.
+        """

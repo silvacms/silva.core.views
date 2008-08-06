@@ -4,7 +4,10 @@
     xmlns:meta="http://namespaces.zope.org/meta">
 
   <!-- Load z3cform grok stuff -->
+  <include package="silva.core.conf" file="meta.zcml" />
   <include package="plone.z3cform" file="meta.zcml" />
-  <grok:grok package=".baseforms" />
+
+  <!-- Grok this package -->
+  <grok:grok package="." />
 
 </configure>

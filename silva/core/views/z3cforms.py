@@ -4,18 +4,20 @@
 # $Id$
 
 from zope import interface
-from zope.component import provideAdapter
+from zope.component import queryAdapter
 from grokcore import component
 
+from Products.Silva.i18n import translate as _
 from Products.Silva.ViewCode import ViewCode
 
 from silva.core.views.interfaces import ISilvaZ3CFormForm, IDefaultAddFields
+from silva.core.views.interfaces import ICancelButton, ISilvaStyle
 from silva.core.views.views import SilvaGrokView
 from silva.core.views.baseforms import SilvaMixinForm, SilvaMixinAddForm, SilvaMixinEditForm
 from silva.core import conf as silvaconf
 
 from plone.z3cform.components import GrokForm
-from z3c.form.interfaces import IFormLayer
+from z3c.form.interfaces import IFormLayer, IAction, IWidget
 from z3c.form import form, button, field
 
 
@@ -27,6 +29,21 @@ class SilvaGrokForm(SilvaMixinForm, GrokForm, ViewCode):
 
     interface.implements(ISilvaZ3CFormForm)
     silvaconf.baseclass()
+        
+    def updateWidgets(self):
+        super(SilvaGrokForm, self).updateWidgets()
+        for widget in self.widgets.values():
+            apply_style = queryAdapter(widget, ISilvaStyle)
+            if apply_style:
+                apply_style.style(widget)
+
+    def updateActions(self):
+        super(SilvaGrokForm, self).updateActions()
+        for action in self.actions.values():
+            apply_style = queryAdapter(action.field, ISilvaStyle)
+            if apply_style:
+                apply_style.style(action)
+
 
 class PageForm(SilvaGrokForm, form.Form, SilvaGrokView):
     """Generic form.
@@ -41,7 +58,7 @@ class AddForm(SilvaMixinAddForm, SilvaGrokForm, form.AddForm, SilvaGrokView):
 
     silvaconf.baseclass()
 
-    def update_form(self):
+    def updateForm(self):
         field_to_add = field.Fields()
         for name in IDefaultAddFields:
             if self.fields.get(field) is None:
@@ -49,7 +66,7 @@ class AddForm(SilvaMixinAddForm, SilvaGrokForm, form.AddForm, SilvaGrokView):
         if field_to_add:
             self.fields = field_to_add + self.fields
         # Setup widgets
-        super(AddForm, self).update_form()
+        super(AddForm, self).updateForm()
 
     def nextURL(self):
         import pdb ; pdb.set_trace()
@@ -84,9 +101,16 @@ class Z3CFormMacros(BrowserView):
         return self.template.macros[key]
 
 
-# Cancel button
+# Cancel button on every forms
 
-class SilvaFormActions(button.ButtonActions):
+class CancelButton(button.Button):
+    """A cancel button.
+    """
+
+    interface.implements(ICancelButton)
+    
+
+class SilvaFormActions(button.ButtonActions, component.MultiAdapter):
      component.adapts(ISilvaZ3CFormForm,
                       interface.Interface,
                       interface.Interface)
@@ -94,8 +118,8 @@ class SilvaFormActions(button.ButtonActions):
      def update(self):
          self.form.buttons = button.Buttons(
              self.form.buttons,
-             button.Button('cancel', u'Cancel'))
+             CancelButton('cancel', _(u'cancel'), accessKey=u'c'))
          super(SilvaFormActions, self).update()
 
 
-provideAdapter(SilvaFormActions)
+
