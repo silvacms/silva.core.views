@@ -40,6 +40,10 @@ class SilvaGrokForm(SilvaMixinForm, GrokForm, ViewCode):
             self.request, interface.Interface,
             name = self.module_info.package_dotted_name)
 
+    @property
+    def status_type(self):
+        return (self.errors and 'error' or 'feedback') or self._status_type
+
 
 class PageForm(SilvaGrokForm, formbase.PageForm, SilvaGrokView):
     """Generic form.
@@ -107,9 +111,6 @@ class EditForm(SilvaMixinEditForm, SilvaGrokForm, formbase.EditForm, SilvaGrokVi
                             mapping={'meta_type': self.context.meta_type,})
         else:
             self.status = _(u'No changes')
-
-
-
 
 
 # Macros to render formlib forms

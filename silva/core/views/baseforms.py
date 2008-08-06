@@ -74,9 +74,7 @@ class SilvaMixinForm(object):
 
     @property
     def status_type(self):
-        # Return message_type for status.
-        return (self.errors and 'error' or 'feedback') or self._status_type
-
+        return self._status_type
 
 
 class SilvaMixinAddForm(object):
@@ -120,7 +118,6 @@ class SilvaMixinAddForm(object):
         self.status = _(u'Created ${meta_type} "${obj_id}".',
                         mapping={'obj_id': obj_id,
                                  'meta_type': obj.meta_type,})
-
         return obj
 
 

@@ -29,7 +29,7 @@ class SilvaGrokForm(SilvaMixinForm, GrokForm, ViewCode):
 
     interface.implements(ISilvaZ3CFormForm)
     silvaconf.baseclass()
-        
+
     def updateWidgets(self):
         super(SilvaGrokForm, self).updateWidgets()
         for widget in self.widgets.values():
@@ -44,6 +44,15 @@ class SilvaGrokForm(SilvaMixinForm, GrokForm, ViewCode):
             if apply_style:
                 apply_style.style(action)
 
+    @property
+    def status_type(self):
+        if self._status_type:
+            return self._status_type
+        if hasattr(self, 'formErrorsMessage'):
+            if self.formErrorsMessage == self.status:
+                return 'error'
+        return 'feedback'
+
 
 class PageForm(SilvaGrokForm, form.Form, SilvaGrokView):
     """Generic form.
@@ -57,6 +66,7 @@ class AddForm(SilvaMixinAddForm, SilvaGrokForm, form.AddForm, SilvaGrokView):
     """
 
     silvaconf.baseclass()
+    form.extends(form.AddForm, ignoreButtons=True, ignoreHandlers=True)
 
     def updateForm(self):
         field_to_add = field.Fields()
@@ -68,10 +78,25 @@ class AddForm(SilvaMixinAddForm, SilvaGrokForm, form.AddForm, SilvaGrokView):
         # Setup widgets
         super(AddForm, self).updateForm()
 
-    def nextURL(self):
-        import pdb ; pdb.set_trace()
-        return '%s/edit' % self.context.absolute_url()
+    @button.buttonAndHandler(_('save + edit'), name='save_and_edit')
+    def handleSaveAndEdit(self, action):
+        data, errors = self.extractData()
+        if errors:
+            self.status = self.formErrorsMessage
+            return
+        obj = self.createAndAdd(data)
+        if obj is not None:
+            self.redirect('%s/edit' % obj.absolute_url())
 
+    @button.buttonAndHandler(_('save'), name='save')
+    def handleSave(self, action):
+        data, errors = self.extractData()
+        if errors:
+            self.status = self.formErrorsMessage
+            return
+        obj = self.createAndAdd(data)
+        if obj is not None:
+            self.redirect('%s/edit' % self.context.absolute_url())
 
 
 class EditForm(SilvaMixinEditForm, SilvaGrokForm, form.EditForm, SilvaGrokView):
@@ -80,10 +105,25 @@ class EditForm(SilvaMixinEditForm, SilvaGrokForm, form.EditForm, SilvaGrokView):
 
     silvaconf.baseclass()
     silvaconf.name(u"tab_edit")
+    form.extends(form.AddForm, ignoreButtons=True, ignoreHandlers=True)
 
     def getContent(self):
         # Return the content to edit.
         return self.context.get_editable()
+
+
+    @button.buttonAndHandler(_('save'), name='save')
+    def handleSave(self, action):
+        data, errors = self.extractData()
+        if errors:
+            self.status = self.formErrorsMessage
+            return
+        changes = self.applyChanges(data)
+        if changes:
+            self.status = _(u'${meta_type} changed.',
+                            mapping={'meta_type': self.context.meta_type,})
+        else:
+            self.status = _(u'No changes')
 
 
 # Macros to render z3c forms
@@ -111,15 +151,26 @@ class CancelButton(button.Button):
     
 
 class SilvaFormActions(button.ButtonActions, component.MultiAdapter):
-     component.adapts(ISilvaZ3CFormForm,
-                      interface.Interface,
-                      interface.Interface)
+    component.adapts(ISilvaZ3CFormForm,
+                     interface.Interface,
+                     interface.Interface)
                       
-     def update(self):
-         self.form.buttons = button.Buttons(
-             self.form.buttons,
-             CancelButton('cancel', _(u'cancel'), accessKey=u'c'))
-         super(SilvaFormActions, self).update()
+    def update(self):
+        self.form.buttons = button.Buttons(
+            self.form.buttons,
+            CancelButton('cancel', _(u'cancel'), accessKey=u'c'))
+        super(SilvaFormActions, self).update()
 
 
 
+class SilvaAddActionHandler(button.ButtonActionHandler, component.MultiAdapter):
+    component.adapts(ISilvaZ3CFormForm,
+                     interface.Interface,
+                     interface.Interface,
+                     button.ButtonAction)
+
+    def __call__(self):
+        if self.action.name == 'form.buttons.cancel':
+            self.form.redirect('%s/edit' % self.form.context.absolute_url())
+            return
+        super(SilvaAddActionHandler, self).__call__()
