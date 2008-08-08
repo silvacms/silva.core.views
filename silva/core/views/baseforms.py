@@ -115,7 +115,7 @@ class SilvaMixinAddForm(object):
         self.context.sec_update_last_author_info()
 
         # Set status
-        self.status = _(u'Created ${meta_type} "${obj_id}".',
+        self.status = _(u'Added ${meta_type} "${obj_id}".',
                         mapping={'obj_id': obj_id,
                                  'meta_type': obj.meta_type,})
         return obj
