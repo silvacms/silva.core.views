@@ -6,16 +6,16 @@
 import zope.cachedescriptors.property
 from zope.i18n import translate
 
-import five.grok
+from five import grok
 
 import urllib
 
-from silva.core.views.interfaces import IFeedbackView
+from silva.core.views.interfaces import IFeedbackView, IZMIView, ISilvaView
 from silva.core import conf as silvaconf
 
 # Simple views
 
-class SilvaGrokView(five.grok.View):
+class SilvaGrokView(grok.View):
     """Grok View on Silva objects.
     """
 
@@ -45,9 +45,19 @@ class SilvaGrokView(five.grok.View):
         super(SilvaGrokView, self).redirect(url)
 
 
+class ZMIView(SilvaGrokView):
+    """View in ZMI.
+    """
+
+    grok.implements(IZMIView)
+
+    silvaconf.baseclass()
+
 class View(SilvaGrokView):
     """View on Silva object, support view and preview
     """
+
+    grok.implements(ISilvaView)
 
     silvaconf.baseclass()
     silvaconf.name(u'public_view')

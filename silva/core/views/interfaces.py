@@ -6,6 +6,8 @@
 from zope import interface
 from zope import schema
 
+from grokcore.view.interfaces import IGrokView
+
 from silva.core.conf.fields import ID
 
 from Products.Silva.i18n import translate as _
@@ -33,6 +35,15 @@ class IDefaultAddFields(interface.Interface):
         description=_(u"The title will be publicly visible, and is used for the link in indexes."),
         required=True)
 
+
+
+class ISilvaView(IGrokView):
+    """A view in Silva.
+    """
+
+class IZMIView(IGrokView):
+    """A view in ZMI.
+    """
 
 class ISilvaForm(interface.Interface):
     """A Silva form.

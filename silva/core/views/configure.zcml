@@ -18,6 +18,13 @@
       permission="zope.Public"
       />
 
+  <browser:page
+     for="Products.Silva.interfaces.IZMIObject"
+     template="templates/zmi_template.pt"
+     name="five_template"
+     permission="zope.Public"
+     />
+
   <!-- Include dependancy -->
   <include package="plone.z3cform" />
   
