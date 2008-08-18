@@ -14,7 +14,6 @@ from Products.Silva.BaseService import SilvaService
 from Products.Silva.helpers import add_and_edit
 from Products.Silva import interfaces as silva_interfaces
 
-from five.customerize.browser import mangleAbsoluteFilename
 from silva.core.views.ttwtemplates import TTWViewTemplate
 
 from silva.core import conf as silvaconf
@@ -67,7 +66,7 @@ class ManageCustomTemplates(silvaviews.ZMIView):
                     config = u'Grok page template'
                 else:
                     template = reg.factory.index.filename
-                    config = mangleAbsoluteFilename(reg.info.file)
+                    config = reg.info.file
                 self.availableTemplates.append({
                         'name': reg.name,
                         'for': reg.required[0].__identifier__,
