@@ -76,6 +76,10 @@ class ISilvaNotCustomizable(interface.Interface):
     to customize.
     """
 
+class ISilvaCustomizedTemplate(interface.Interface):
+    """A already customized template.
+    """
+
 # z3c.form Silva support
 
 import z3c.form.interfaces

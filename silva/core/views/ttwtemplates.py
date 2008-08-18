@@ -3,6 +3,7 @@
 # See also LICENSE.txt
 # $Id$
 
+from zope.interface import implements
 import zope.component
 
 from AccessControl import getSecurityManager
@@ -13,7 +14,7 @@ from zope.app.container.interfaces import IObjectRemovedEvent
 
 from silva.core import conf as silvaconf
 
-from interfaces import ISilvaView
+from interfaces import ISilvaView, ISilvaCustomizedTemplate
 
 # Hackland. I am not responsible for that.
 
@@ -21,6 +22,9 @@ class TTWViewTemplate(ZopePageTemplate):
     """A template class used to generate Zope 3 views TTW"""
 
     meta_type="Silva TTW View Template"
+
+    implements(ISilvaCustomizedTemplate)
+
     manage_options = (
         ZopePageTemplate.manage_options[0],
         dict(label='Registrations', action='registrations.html'),

@@ -2,24 +2,29 @@
 # See also LICENSE.txt
 # $Id$
 
-from zope.app.apidoc.presentation import getViews
-from zope.publisher.interfaces.browser import IBrowserRequest, IDefaultBrowserLayer
+from zope.app.component.interfaces import ISite
+from zope.component import getGlobalSiteManager
 from zope.component import getUtility, getUtilitiesFor
+from zope.interface.interface import InterfaceClass
+from zope.publisher.interfaces.browser import IDefaultBrowserLayer
+from zope.traversing.interfaces import IContainmentRoot
 
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 from OFS.Folder import Folder
 
 from Products.Silva.BaseService import SilvaService
 from Products.Silva.helpers import add_and_edit
-from Products.Silva import interfaces as silva_interfaces
+from Products.Silva.interfaces import ISilvaObject
 from Products.SilvaLayout.interfaces import ISilvaLayer, ISilvaSkin
 
-from silva.core.views.ttwtemplates import TTWViewTemplate
+from five.localsitemanager.utils import get_parent
 
 from silva.core import conf as silvaconf
+from silva.core.views.ttwtemplates import TTWViewTemplate
 from silva.core.views import views as silvaviews
 
-from interfaces import ISilvaView, ISilvaCustomizableType, ISilvaLayerType
+from interfaces import ISilvaView, ISilvaCustomizableType, ISilvaLayerType 
+from interfaces import ISilvaCustomizedTemplate
 
 
 class CustomizationService(Folder, SilvaService):
@@ -49,7 +54,7 @@ class CustomizationManagementView(silvaviews.ZMIView):
         """
         base = self.interface
         if base is None:
-            base = silva_interfaces.ISilvaObject
+            base = ISilvaObject
         interfaces = getUtilitiesFor(ISilvaCustomizableType)
         return [name for name, interface in interfaces if interface.isOrExtends(base)]
 
@@ -63,6 +68,46 @@ class CustomizationManagementView(silvaviews.ZMIView):
         return [name for name, layer in layers if layer.isOrExtends(base)]
 
 
+def getViews(where, interface, layer):
+    """Get all view registrations for a particular interface.
+    """
+    def findNextSite(site):
+        container = site
+        while container:
+            if IContainmentRoot.providedBy(container):
+                return None
+            try:
+                container = get_parent(container)
+                if container is None:
+                    return None
+            except TypeError:
+                return None
+            if ISite.providedBy(container):
+                return container
+    
+    def viewsFor(sm, name):
+        for reg in sm.registeredAdapters():
+            if (len(reg.required) == 2 and
+                interface.isOrExtends(reg.required[0]) and
+                reg.required[0].isOrExtends(ISilvaObject) and
+                reg.required[1].isOrExtends(layer)):
+                yield (reg, name)
+
+    site = findNextSite(where)
+    views = []
+    while not (site is None):
+        views.extend(viewsFor(site.getSiteManager(), u'/'.join(site.getPhysicalPath())))
+        site = findNextSite(site)
+    views.extend(viewsFor(getGlobalSiteManager(), u'Global'))
+    return views
+
+
+def isAFiveTemplate(factory):
+    """There is no interfaces for Five templates. That's the hack to
+    guess it's an five template.
+    """
+    return (hasattr(factory, '__name__') and factory.__name__.startswith('SimpleViewClass'))
+
 class ManageCustomTemplates(CustomizationManagementView):
 
     silvaconf.name('manage_customization')
@@ -74,21 +119,14 @@ class ManageCustomTemplates(CustomizationManagementView):
 
         if self.selectedInterface:
 
-            templates = []
-
             interface = getUtility(ISilvaCustomizableType, name=self.selectedInterface)
             layer = getUtility(ISilvaLayerType, name=self.selectedLayer)
+            absolute_url = self.context.absolute_url()
+            templates = getViews(self.context, interface, layer)
 
-            for reg in getViews(interface, IBrowserRequest):
-                if ((hasattr(reg.factory, '__name__') and reg.factory.__name__.startswith('SimpleViewClass')) or
-                    ISilvaView.implementedBy(reg.factory)):
-                    templates.append(reg)
-
-            for reg in sorted(templates, key=lambda r: r.name):
-                if not (reg.required[0].isOrExtends(silva_interfaces.ISilvaObject) and
-                        reg.required[1].isOrExtends(layer)):
-                    continue
+            for reg, origin in sorted(templates, key=lambda r: r[0].name):
                 customizable = True
+                link = False
                 if ISilvaView.implementedBy(reg.factory):
                     if hasattr(reg.factory, 'template'):
                         template = reg.factory.template._template.filename
@@ -96,19 +134,28 @@ class ManageCustomTemplates(CustomizationManagementView):
                         template = u'direct rendering'
                         customizable = False
                     config = u'Grok page template'
-                else:
+                elif ISilvaCustomizedTemplate.providedBy(reg.factory):
+                    template = absolute_url + '/' + reg.factory.id + '/manage_workspace'
+                    config = u'Customized page template'
+                    link = reg.factory.id
+                    customizable = False
+                elif isAFiveTemplate(reg.factory):
                     template = reg.factory.index.filename
                     config = reg.info.file
+                else:           # Unknown view type.
+                    continue
                 self.availableTemplates.append({
                         'name': reg.name,
                         'for': reg.required[0].__identifier__,
                         'layer': reg.required[1].__identifier__,
                         'template': template,
                         'config': config,
-                        'customizable': customizable
+                        'origin': origin,
+                        'customizable': customizable,
+                        'link': link
                         })
         else:
-            self.selectedInterface = silva_interfaces.ISilvaObject.__identifier__
+            self.selectedInterface = ISilvaObject.__identifier__
         
 
 class ManageViewTemplate(CustomizationManagementView):
@@ -124,7 +171,7 @@ class ManageViewTemplate(CustomizationManagementView):
         self.interface = getUtility(ISilvaCustomizableType, name=self.request.form['for'])
 
         view = None
-        for reg in getViews(self.interface, IBrowserRequest):
+        for reg, origin in getViews(self.context, self.interface, self.layer):
             if (reg.name == self.name and 
                 reg.required[0] == self.interface and
                 reg.required[1] == self.layer):

@@ -66,8 +66,18 @@
           <td>
             <table>
               <tr>
-                <td>Template</td> 
-                <td><code tal:content="info/template">template</code></td>
+                <td>Template</td>
+                <td>
+                  <code tal:content="info/template"
+                        tal:condition="not: info/link">template</code>
+                  <a href="#"
+                     tal:attributes="href info/template"
+                     tal:condition="info/link">
+                    <code tal:content="info/link">
+                      template
+                    </code>
+                  </a>
+                </td>
               </tr>
               <tr>
                 <td>Object</td> 
@@ -80,6 +90,10 @@
               <tr>
                 <td>Definition</td>
                 <td><code tal:content="info/config">zcmlfile</code></td>
+              </tr>
+              <tr>
+                <td>Origin</td>
+                <td><code tal:content="info/origin">where</code></td>
               </tr>
             </table>
           </td>
