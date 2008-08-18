@@ -1,0 +1,36 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      metal:use-macro="context/@@standard_macros/page">
+    
+  <body>
+    <div metal:fill-slot="body">
+
+      <p i18n:translate="">This is the source of the
+        <code tal:content="view/name">viewname</code> for 
+        <code tal:content="view/for_name">for</code> in layer
+        <code tal:content="view/layer_name">layer</code>:
+      </p>
+
+      <pre style="background-color: #cccccc; border: 1px solid black; padding: 5px;"
+           tal:content="view/code">
+        template source
+      </pre>
+
+      <form action="#" method="post" class="form-text"
+            tal:attributes="action string:${context/absolute_url}/manage_createCustom">
+        <input name="for" value="#" type="hidden"
+               tal:attributes="value request/form/for" />
+        <input name="name" value="#" type="hidden"
+               tal:attributes="value request/form/name" />
+        <input name="layer" value="#" type="hidden"
+               tal:attributes="value request/form/layer" />
+
+        <input name="customize" value="Customize" type="submit" />
+      </form>
+
+    </div>
+  </body>
+</html>
+

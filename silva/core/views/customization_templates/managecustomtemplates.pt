@@ -1,0 +1,81 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      metal:use-macro="context/@@standard_macros/page">
+    
+  <body>
+    <div metal:fill-slot="body">
+
+      <form action="#" method="post" class="form-text"
+            tal:attributes="action string:${context/absolute_url}/manage_customization">
+        <table>
+          <tr>
+            <td>Interface</td>
+            <td>
+              <select name="interface">
+                <option tal:repeat="interface view/availablesInterfaces"
+                        tal:attributes="selected python:view.selectedInterface == interface and 'selected' or None"
+                        tal:content="interface">
+                  Interface
+                </option>
+              </select>
+          </tr>
+          <tr>
+            <td>
+            </td>
+            <td>
+              <input type="submit" name="view" value="View" class="form-element" />
+            </td>
+          </tr>
+        </table>
+      </form>
+
+      <table border="1"
+             tal:condition="view/availableTemplates">
+        <tr>
+          <th>Name of View</th>
+          <th>Registration Info</th>
+        </tr>
+        <tr tal:repeat="info view/availableTemplates">
+          <td valign="top">
+            <img src="misc_/PageTemplates/zpt.gif"
+                 tal:attributes="src string:${context/absolute_url}/misc_/PageTemplates/zpt.gif" />
+            <a href=""
+               tal:attributes="href string:${context/absolute_url}/manage_template?name=${info/name}&for=${info/for}&layer=${info/layer}"
+               tal:condition="info/customizable"
+               tal:content="info/name">
+              Name
+            </a>
+            <span tal:condition="not: info/customizable"
+                  tal:content="info/name">
+              Name
+            </span>
+          </td>
+          <td>
+            <table>
+              <tr>
+                <td>Template</td> 
+                <td><code tal:content="info/template">template</code></td>
+              </tr>
+              <tr>
+                <td>Object</td> 
+                <td><code tal:content="info/for">for</code></td>
+              </tr>
+              <tr>
+                <td>Layer</td>
+                <td><code tal:content="info/layer">type</code></td>
+              </tr>
+              <tr>
+                <td>Definition</td>
+                <td><code tal:content="info/config">zcmlfile</code></td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+
+    </div>
+  </body>
+</html>
+
