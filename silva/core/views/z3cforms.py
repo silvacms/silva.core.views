@@ -135,9 +135,6 @@ class Z3CFormMacros(BrowserView):
     template = ViewPageTemplateFile('templates/z3cform.pt')
     
     def __getitem__(self, key):
-        if not IFormLayer.providedBy(self.request):
-            # XXX the request forgets its layer. maybe it's due to silvalayout
-            interface.alsoProvides(self.request, IFormLayer)
         return self.template.macros[key]
 
 
