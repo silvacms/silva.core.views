@@ -5,6 +5,8 @@
   <h2 tal:define="manage_tabs_message options/manage_tabs_message | nothing"
       tal:replace="structure here/manage_tabs">Tabs</h2>
 
+  <h4><a href="../manage_services">Silva Services</a></h4>
+
   <metal:block define-slot="body">
   </metal:block>
 
