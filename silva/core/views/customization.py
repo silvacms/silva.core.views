@@ -167,11 +167,14 @@ class ManageViewTemplate(CustomizationManagementView):
         assert 'name' in self.request.form
 
         self.name = self.request.form['name']
+        self.origin = self.request.form['origin']
         self.layer = getUtility(ISilvaLayerType, self.request.form['layer'])
         self.interface = getUtility(ISilvaCustomizableType, name=self.request.form['for'])
 
         view = None
         for reg, origin in getViews(self.context, self.interface, self.layer):
+            if origin != self.origin:
+                continue
             if (reg.name == self.name and 
                 reg.required[0] == self.interface and
                 reg.required[1] == self.layer):

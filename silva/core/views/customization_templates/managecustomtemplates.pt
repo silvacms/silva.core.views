@@ -53,7 +53,7 @@
             <img src="misc_/PageTemplates/zpt.gif"
                  tal:attributes="src string:${context/absolute_url}/misc_/PageTemplates/zpt.gif" />
             <a href=""
-               tal:attributes="href string:${context/absolute_url}/manage_template?name=${info/name}&for=${info/for}&layer=${info/layer}"
+               tal:attributes="href string:${context/absolute_url}/manage_template?name=${info/name}&for=${info/for}&layer=${info/layer}&origin=${info/origin}"
                tal:condition="info/customizable"
                tal:content="info/name">
               Name

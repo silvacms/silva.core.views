@@ -26,6 +26,8 @@
                tal:attributes="value request/form/for" />
         <input name="layer" value="#" type="hidden"
                tal:attributes="value request/form/layer" />
+        <input name="origin" value="#" type="hidden"
+               tal:attributes="value request/form/origin" />
         <table>
           <tr>
             <td>For interface</td>
