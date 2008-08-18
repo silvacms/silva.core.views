@@ -22,6 +22,17 @@
               </select>
           </tr>
           <tr>
+            <td>Layer</td>
+            <td>
+              <select name="layer">
+                <option tal:repeat="layer view/availablesLayers"
+                        tal:attributes="selected python:view.selectedLayer == layer and 'selected' or None"
+                        tal:content="layer">
+                  Layer
+                </option>
+              </select>
+          </tr>
+          <tr>
             <td>
             </td>
             <td>
