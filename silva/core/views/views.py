@@ -7,8 +7,9 @@ import zope.cachedescriptors.property
 from zope.i18n import translate
 
 from five import grok
-
 import urllib
+
+from Products.SilvaLayout.interfaces import IPreviewLayer
 
 from silva.core.views.interfaces import IFeedbackView, IZMIView, ISilvaView
 from silva.core import conf as silvaconf
@@ -60,11 +61,11 @@ class View(SilvaGrokView):
     grok.implements(ISilvaView)
 
     silvaconf.baseclass()
-    silvaconf.name(u'public_view')
+    silvaconf.name(u'content.html')
 
-    def __call__(self, preview=False):
-        self.is_preview = preview
-        return super(View, self).__call__()
+    @zope.cachedescriptors.property.CachedProperty
+    def is_preview(self):
+        return IPreviewLayer.providedBy(self.request)
 
     @zope.cachedescriptors.property.CachedProperty
     def content(self):
