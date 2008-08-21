@@ -3,7 +3,6 @@
 # See also LICENSE.txt
 # $Id$
 
-from zope.interface.interfaces import IInterface
 from zope import interface
 from zope import schema
 
@@ -58,26 +57,9 @@ class ISilvaZ3CFormForm(ISilvaForm):
     """A Silva form built using z3c.form.
     """
 
-
-# customizable interfaces
-
-class ISilvaCustomizableType(IInterface):
-    """This type represent customizable interface in Silva. THIS IS
-    NOT AN INTERFACE TO PROVIDES OR IMPLEMENTS.
-    """
-
-class ISilvaLayerType(IInterface):
-    """This type represent Silva layer. THIS NOT AND INTERFACE TO
-    PROVIDES OR IMPLEMENTS.
-    """
-
-class ISilvaNotCustomizable(interface.Interface):
+class ISilvaViewNotCustomizable(Interface):
     """Marker interface to put on view that you don't people be able
     to customize.
-    """
-
-class ISilvaCustomizedTemplate(interface.Interface):
-    """A already customized template.
     """
 
 # z3c.form Silva support

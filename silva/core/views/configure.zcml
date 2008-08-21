@@ -37,5 +37,6 @@
 
   <!-- Include dependancy -->
   <include package="plone.z3cform" />
+  <include package="silva.core.layout" />
   
 </configure>

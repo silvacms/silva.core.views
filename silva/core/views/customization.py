@@ -24,7 +24,7 @@ from silva.core.views.ttwtemplates import TTWViewTemplate
 from silva.core.views import views as silvaviews
 
 from interfaces import ISilvaView, ISilvaCustomizableType, ISilvaLayerType 
-from interfaces import ISilvaCustomizedTemplate
+from interfaces import ISilvaCustomizedTemplate, ISilvaCustomizable
 
 
 class CustomizationService(Folder, SilvaService):
@@ -54,9 +54,9 @@ class CustomizationManagementView(silvaviews.ZMIView):
         """
         base = self.interface
         if base is None:
-            base = ISilvaObject
-        interfaces = getUtilitiesFor(ISilvaCustomizableType)
-        return [name for name, interface in interfaces if interface.isOrExtends(base)]
+            base = ISilvaCustomizable
+        interfaces = getUtilitiesFor(ISilvaCustomizableType, context=self.context)
+        return [name for name, interface in interfaces if interface.extends(base)]
 
     def availablesLayers(self):
         """This return available layers starting from base.
@@ -239,8 +239,10 @@ manage_addCustomizationServiceForm = PageTemplateFile(
     __name__='manage_addCustomizationServiceForm')
 
 def manage_addCustomizationService(self, id, REQUEST=None):
-    """Add a Customization Service."""
-    object = CustomizationService(id)
-    self._setObject(id, object)
+    """Add a Customization Service.
+    """
+
+    service = CustomizationService(id)
+    self._setObject(id, service)
     add_and_edit(self, id, REQUEST)
     return ''

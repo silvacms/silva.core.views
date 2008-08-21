@@ -4,13 +4,13 @@
 # $Id$
 
 from zope.interface import implements
+from zope.app.container.interfaces import IObjectRemovedEvent
 import zope.component
 
 from AccessControl import getSecurityManager
 from AccessControl import Unauthorized
 
 from Products.PageTemplates.ZopePageTemplate import ZopePageTemplate
-from zope.app.container.interfaces import IObjectRemovedEvent
 
 from silva.core import conf as silvaconf
 
