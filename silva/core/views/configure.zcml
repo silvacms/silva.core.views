@@ -28,13 +28,6 @@
      permission="zope.Public"
      />
 
-  <!-- Register the default layer as a Silva layer -->
-
-  <interface
-     interface=" zope.publisher.interfaces.browser.IDefaultBrowserLayer"
-     type=".interfaces.ISilvaLayerType"
-     />
-
   <!-- Include dependancy -->
   <include package="plone.z3cform" />
   <include package="silva.core.layout" />

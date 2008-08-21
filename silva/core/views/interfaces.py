@@ -57,10 +57,17 @@ class ISilvaZ3CFormForm(ISilvaForm):
     """A Silva form built using z3c.form.
     """
 
-class ISilvaViewNotCustomizable(Interface):
+class ISilvaViewNotCustomizable(interface.Interface):
     """Marker interface to put on view that you don't people be able
     to customize.
     """
+
+# TTW Templates.
+
+class ISilvaCustomizedTemplate(interface.Interface):
+    """A through the web template.
+    """
+
 
 # z3c.form Silva support
 
