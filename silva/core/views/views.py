@@ -11,7 +11,7 @@ import urllib
 
 from Products.SilvaLayout.interfaces import IPreviewLayer
 
-from silva.core.views.interfaces import IFeedbackView, IZMIView, ISilvaView
+from silva.core.views.interfaces import IFeedback, IZMIView, IView, ITemplate
 from silva.core import conf as silvaconf
 
 # Simple views
@@ -58,13 +58,15 @@ class Template(SilvaGrokView):
     """A view class not binded to a content.
     """
 
+    grok.implements(ITemplate)
+
     silvaconf.baseclass()
 
-class View(SilvaGrokView):
+class View(Template):
     """View on Silva object, support view and preview
     """
 
-    grok.implements(ISilvaView)
+    grok.implements(IView)
 
     silvaconf.baseclass()
     silvaconf.name(u'content.html')

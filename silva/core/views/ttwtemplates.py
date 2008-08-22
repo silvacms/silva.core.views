@@ -14,7 +14,7 @@ from Products.PageTemplates.ZopePageTemplate import ZopePageTemplate
 
 from silva.core import conf as silvaconf
 
-from interfaces import ISilvaView, ISilvaCustomizedTemplate
+from interfaces import ITemplate, ICustomizedTemplate
 
 # Hackland. I am not responsible for that.
 
@@ -23,7 +23,7 @@ class TTWViewTemplate(ZopePageTemplate):
 
     meta_type="Silva TTW View Template"
 
-    implements(ISilvaCustomizedTemplate)
+    implements(ICustomizedTemplate)
 
     manage_options = (
         ZopePageTemplate.manage_options[0],
@@ -115,8 +115,7 @@ class TTWViewTemplateRenderer(object):
 
             instance = TTWView(self.context, self.request)
             
-            if ISilvaView.implementedBy(view):
-                instance.is_preview = kwargs.get('view_method', 'view') == 'preview'
+            if ITemplate.implementedBy(view):
                 instance.update()
 
             return instance

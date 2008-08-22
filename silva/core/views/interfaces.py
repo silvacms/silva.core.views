@@ -3,7 +3,7 @@
 # See also LICENSE.txt
 # $Id$
 
-from zope import interface
+from zope.interface import Interface, Attribute
 from zope import schema
 
 from grokcore.view.interfaces import IGrokView
@@ -13,16 +13,46 @@ from silva.core.conf.fields import ID
 from Products.Silva.i18n import translate as _
 
 
-class IFeedbackView(interface.Interface):
+# View
 
-    status = interface.Attribute(u"Feedback message")
-    status_type = interface.Attribute(u"Feedback type, error or feedback")
+class IFeedback(Interface):
+    """Feedback information.
+    """
 
+    status = Attribute(u"Feedback message")
+    status_type = Attribute(u"Feedback type, error or feedback")
+
+
+class ITemplate(IGrokView):
+    """A template used in Silva which can be customized.
+    """
+
+class IView(ITemplate):
+    """A view in Silva.
+    """
+
+    is_preview = Attribute(u"Boolean which say if you're in preview mode.")
+    content = Attribute(u"Version of the content to render.")
+
+class IZMIView(IGrokView):
+    """A view in ZMI.
+    """
+
+class ITemplateNotCustomizable(Interface):
+    """Marker interface to put on view/template that you don't people be able
+    to customize.
+    """
+
+# TTW Templates
+
+class ICustomizedTemplate(Interface):
+    """A through the web template.
+    """
 
 # Silva forms
 
 
-class IDefaultAddFields(interface.Interface):
+class IDefaultAddFields(Interface):
     """Default fields used in a add form. You don't have to defines this fields.
     """
 
@@ -36,16 +66,7 @@ class IDefaultAddFields(interface.Interface):
         required=True)
 
 
-
-class ISilvaView(IGrokView):
-    """A view in Silva.
-    """
-
-class IZMIView(IGrokView):
-    """A view in ZMI.
-    """
-
-class ISilvaForm(interface.Interface):
+class ISilvaForm(Interface):
     """A Silva form.
     """
 
@@ -57,27 +78,15 @@ class ISilvaZ3CFormForm(ISilvaForm):
     """A Silva form built using z3c.form.
     """
 
-class ISilvaViewNotCustomizable(interface.Interface):
-    """Marker interface to put on view that you don't people be able
-    to customize.
-    """
-
-# TTW Templates.
-
-class ISilvaCustomizedTemplate(interface.Interface):
-    """A through the web template.
-    """
-
-
 # z3c.form Silva support
 
-import z3c.form.interfaces
+from z3c.form.interfaces import IButton
 
-class ICancelButton(z3c.form.interfaces.IButton):
+class ICancelButton(IButton):
     """A button to cancel a form.
     """
 
-class ISilvaStyle(interface.Interface):
+class ISilvaStyle(Interface):
     """Adapter used to apply new style information on z3c.form
     elements.
     """

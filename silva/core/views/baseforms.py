@@ -18,7 +18,7 @@ from AccessControl import getSecurityManager
 import grokcore.view
 import martian
 
-from silva.core.views.interfaces import IFeedbackView, IDefaultAddFields
+from silva.core.views.interfaces import IFeedback, IDefaultAddFields
 from silva.core.conf.utils import getSilvaViewFor, getFactoryName
 from silva.core import conf as silvaconf
 
@@ -26,7 +26,7 @@ class SilvaMixinForm(object):
     """Silva grok form mixin.
     """
 
-    interface.implements(IFeedbackView)
+    interface.implements(IFeedback)
 
     silvaconf.baseclass()
 
