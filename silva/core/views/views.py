@@ -31,7 +31,7 @@ class SilvaGrokView(grok.View):
 
     def redirect(self, url):
         # Override redirect to send status information if there is.
-        if IFeedbackView.providedBy(self):
+        if IFeedback.providedBy(self):
             message = self.status
             if message:
                 message = translate(message)

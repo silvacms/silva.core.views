@@ -17,7 +17,6 @@ from silva.core.views.baseforms import SilvaMixinForm, SilvaMixinAddForm, SilvaM
 from silva.core import conf as silvaconf
 
 from plone.z3cform.components import GrokForm
-from z3c.form.interfaces import IFormLayer
 from z3c.form import form, button, field
 
 
