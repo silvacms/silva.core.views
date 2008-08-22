@@ -54,6 +54,12 @@ class ZMIView(SilvaGrokView):
 
     silvaconf.baseclass()
 
+class Template(SilvaGrokView):
+    """A view class not binded to a content.
+    """
+
+    silvaconf.baseclass()
+
 class View(SilvaGrokView):
     """View on Silva object, support view and preview
     """
