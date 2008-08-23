@@ -3,7 +3,6 @@
 # See also LICENSE.txt
 # $Id$
 
-from zope.component import queryAdapter
 from zope.formlib import form
 from zope import event
 from zope import interface
@@ -14,8 +13,8 @@ from Products.Silva.i18n import translate as _
 from Products.Silva.interfaces import IVersionedContent
 from Products.Silva.ViewCode import ViewCode
 
-from grokcore.formlib import action
-from grokcore.formlib.components import GrokForm
+from five.grok import action
+from five.grok.components import GrokForm
 
 from silva.core.views.baseforms import SilvaMixinForm, SilvaMixinAddForm, SilvaMixinEditForm
 from silva.core.views.views import SilvaGrokView
@@ -31,14 +30,6 @@ class SilvaGrokForm(SilvaMixinForm, GrokForm, ViewCode):
 
     interface.implements(ISilvaFormlibForm)
     silvaconf.baseclass()
-
-    def __init__(self, context, request):
-        super(SilvaGrokForm, self).__init__(context, request)
-        # Missing init code of grokcore.view.components.Views
-        self.__name__ = self.__view_name__
-        self.static = queryAdapter(
-            self.request, interface.Interface,
-            name = self.module_info.package_dotted_name)
 
     @property
     def status_type(self):
