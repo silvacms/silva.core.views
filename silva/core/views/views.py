@@ -5,10 +5,12 @@
 
 import zope.cachedescriptors.property
 from zope.i18n import translate
+from zope.contentprovider.interfaces import IContentProvider
 
 from five import grok
 import urllib
 
+from Products.Silva.interfaces import ISilvaObject
 from Products.SilvaLayout.interfaces import IPreviewLayer
 
 from silva.core.views.interfaces import IFeedback, IZMIView, IView, ITemplate
@@ -83,4 +85,24 @@ class View(Template):
 
     def namespace(self):
         return {'content': self.content}
+
+
+class ContentProvider(object):
+
+    grok.implements(IContentProvider)
+
+    silvaconf.baseclass()
+    silvaconf.context(ISilvaObject)
+
+    def __init__(self, context, request, view):
+        self.context = context
+        self.request = request
+        self.__parent__ = view
+
+    def update(self):
+        pass
+
+    def render(self):
+        pass
+
 
