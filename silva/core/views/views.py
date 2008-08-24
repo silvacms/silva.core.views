@@ -100,11 +100,14 @@ class ContentProvider(Acquisition.Implicit):
     def __init__(self, context, request, view):
         self.context = context
         self.request = request
+        self.view = view
         self.__parent__ = view
         self.__name__ = self.__view_name__
 
     def default_namespace(self):
         namespace = {}
+        namespace['view'] = self.view
+        namespace['provider'] = self
         return namespace
 
     def namespace(self):
