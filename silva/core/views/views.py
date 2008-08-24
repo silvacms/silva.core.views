@@ -16,6 +16,8 @@ from Products.SilvaLayout.interfaces import IPreviewLayer
 from silva.core.views.interfaces import IFeedback, IZMIView, IView, ITemplate
 from silva.core import conf as silvaconf
 
+import Acquisition
+
 # Simple views
 
 class SilvaGrokView(grok.View):
@@ -63,6 +65,7 @@ class Template(SilvaGrokView):
     grok.implements(ITemplate)
 
     silvaconf.baseclass()
+    silvaconf.context(ISilvaObject)
 
 class View(Template):
     """View on Silva object, support view and preview
@@ -87,7 +90,7 @@ class View(Template):
         return {'content': self.content}
 
 
-class ContentProvider(object):
+class ContentProvider(Acquisition.Implicit):
 
     grok.implements(IContentProvider)
 
@@ -98,12 +101,20 @@ class ContentProvider(object):
         self.context = context
         self.request = request
         self.__parent__ = view
+        self.__name__ = self.__view_name__
+
+    def default_namespace(self):
+        namespace = {}
+        return namespace
+
+    def namespace(self):
+        return {}
 
     def update(self):
         pass
 
     def render(self):
-        pass
+        return self.template.render(self)
 
 
 from five.resourceinclude.provider import ResourceIncludeProvider
