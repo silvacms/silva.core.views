@@ -106,3 +106,8 @@ class ContentProvider(object):
         pass
 
 
+from five.resourceinclude.provider import ResourceIncludeProvider
+
+class ResourceContentProvider(ResourceIncludeProvider, ContentProvider):
+
+    silvaconf.name('resources')

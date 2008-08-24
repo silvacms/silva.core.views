@@ -7,7 +7,10 @@
   <include package="silva.core.conf" file="meta.zcml" />
   <include package="plone.z3cform" file="meta.zcml" />
 
+  <!-- Load z3cresourceinclude stuff -->
+  <include package="five.resourceinclude" file="meta.zcml" />
+
   <!-- Grok this package -->
   <grok:grok package="." />
-
+  
 </configure>
