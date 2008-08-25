@@ -4,7 +4,7 @@
 # $Id$
 
 from zope import interface
-from zope.component import queryAdapter
+from zope.component import queryAdapter, IFactory
 from grokcore import component
 
 from Products.Silva.i18n import translate as _
@@ -16,7 +16,7 @@ from silva.core.views.views import SilvaGrokView
 from silva.core.views.baseforms import SilvaMixinForm, SilvaMixinAddForm, SilvaMixinEditForm
 from silva.core import conf as silvaconf
 
-from plone.z3cform.components import GrokForm
+from five.megrok.z3cform.components import GrokForm
 from z3c.form import form, button, field
 
 
@@ -28,6 +28,14 @@ class SilvaGrokForm(SilvaMixinForm, GrokForm, ViewCode):
 
     interface.implements(ISilvaZ3CFormForm)
     silvaconf.baseclass()
+
+    def publishTraverse(self, request, name):
+        """In Zope2, if you give a name, index_html is appended to it.
+        """
+        if name == 'index_html':
+            return self
+        return super(View, self).publishTraverse(request, name)
+
 
     def updateWidgets(self):
         super(SilvaGrokForm, self).updateWidgets()
@@ -64,6 +72,7 @@ class AddForm(SilvaMixinAddForm, SilvaGrokForm, form.AddForm, SilvaGrokView):
     """Add form.
     """
 
+    interface.implements(IFactory)
     silvaconf.baseclass()
     form.extends(form.AddForm, ignoreButtons=True, ignoreHandlers=True)
 

@@ -3,11 +3,9 @@
     xmlns:grok="http://namespaces.zope.org/grok"
     xmlns:meta="http://namespaces.zope.org/meta">
 
-  <!-- Load z3cform grok stuff -->
+  <!-- Load dependencies -->
   <include package="silva.core.conf" file="meta.zcml" />
-  <include package="plone.z3cform" file="meta.zcml" />
-
-  <!-- Load z3cresourceinclude stuff -->
+  <include package="five.megrok.z3cform" file="meta.zcml" />
   <include package="five.resourceinclude" file="meta.zcml" />
 
   <!-- Grok this package -->
