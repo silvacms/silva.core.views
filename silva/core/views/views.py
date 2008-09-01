@@ -31,7 +31,7 @@ class SilvaGrokView(grok.View):
         """
         if name == 'index_html':
             return self
-        return super(View, self).publishTraverse(request, name)
+        return super(SilvaGrokView, self).publishTraverse(request, name)
 
     def redirect(self, url):
         # Override redirect to send status information if there is.
