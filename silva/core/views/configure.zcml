@@ -47,6 +47,13 @@
     allowed_interface=".interfaces.ISilvaURL"
   />
 
+  <!-- Default traverser for Silva views -->
+  <adapter
+    for="Products.Silva.interfaces.ISilvaObject 
+         zope.publisher.interfaces.browser.IBrowserRequest"
+    factory=".traverser.SilvaPublishTraverse"
+    provides="zope.publisher.interfaces.browser.IBrowserPublisher"
+    />
 
   <!-- Grok this package -->
   <grok:grok package="." />
