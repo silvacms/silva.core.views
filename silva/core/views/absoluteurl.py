@@ -33,7 +33,9 @@ class AbsoluteURL(BrowserView):
         if preview:
             root = self.context.get_root()
             root_path = root.getPhysicalPath()
-            path.insert(len(root_path), '++preview++')
+            virtual_path = self.request.other.get('VirtualRootPhysicalPath', ('',))
+            preview_pos = max(len(root_path), len(virtual_path))
+            path.insert(preview_pos, '++preview++')
         return self.request.physicalPathToURL(path)
 
     def preview(self):
@@ -42,7 +44,7 @@ class AbsoluteURL(BrowserView):
     def __str__(self):
         return self.url(preview=IPreviewLayer.providedBy(self.request))
 
-    __call__ = __repr__ = __str__
+    __call__ = __repr__ = __unicode__ = __str__
 
     def breadcrumbs(self):
         context = self.context.aq_inner
