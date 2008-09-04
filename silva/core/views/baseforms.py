@@ -5,8 +5,6 @@
 
 from zope.configuration.name import resolve
 from zope.component import queryMultiAdapter
-from zope.component import getSiteManager
-from zope.component.interfaces import IFactory
 from zope import interface
 import zope.cachedescriptors.property
 
@@ -16,7 +14,6 @@ from Products.Silva.ExtensionRegistry import extensionRegistry
 from AccessControl import getSecurityManager
 
 import grokcore.view
-import martian
 
 from silva.core.views.interfaces import IFeedback, IDefaultAddFields
 from silva.core.conf.utils import getSilvaViewFor, getFactoryName
@@ -151,16 +148,3 @@ class SilvaMixinEditForm(object):
     ## End of useless duplication.
 
 
-# Grokkers for forms.
-
-class AddFormGrokker(martian.ClassGrokker):
-    """Grok add form and register them as factories.
-    """
-
-    martian.component(SilvaMixinAddForm)
-    martian.directive(silvaconf.name)
-
-    def execute(self, form, name, **kw):
-        sm = getSiteManager()
-        sm.registerUtility(form, IFactory, name=name)
-        return True

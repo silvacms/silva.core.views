@@ -34,7 +34,7 @@ class SilvaGrokForm(SilvaMixinForm, GrokForm, ViewCode):
         """
         if name == 'index_html':
             return self
-        return super(View, self).publishTraverse(request, name)
+        return super(SilvaGrokForm, self).publishTraverse(request, name)
 
 
     def updateWidgets(self):
