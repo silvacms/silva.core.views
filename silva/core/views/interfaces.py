@@ -5,6 +5,7 @@
 
 from zope.interface import Interface, Attribute
 from zope.publisher.interfaces.browser import IBrowserRequest
+from zope.traversing.browser.interfaces import IAbsoluteURL
 from zope import schema
 
 from grokcore.view.interfaces import IGrokView
@@ -50,13 +51,20 @@ class ICustomizedTemplate(Interface):
     """A through the web template.
     """
 
-# Default layers definition
+# Preview layer
 
 class IPreviewLayer(IBrowserRequest):
     """This layer enable the fact to display preview version instead
     of public version.
     """
 
+# URL management / with preview
+
+class ISilvaURL(IAbsoluteURL):
+
+    def preview():
+        """Return URL for preview.
+        """
 
 # Silva forms
 

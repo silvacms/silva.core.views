@@ -22,12 +22,31 @@
       permission="zope.Public"
       />
 
+  <!-- Default page style -->
   <browser:page
      for="Products.Silva.interfaces.IZMIObject"
      template="templates/zmi_template.pt"
      name="five_template"
      permission="zope.Public"
      />
+
+  <!-- AbsoluteURL views -->  
+  <view
+    for="Products.Silva.interfaces.ISilvaObject"
+    factory=".absoluteurl.AbsoluteURL"
+    type="zope.publisher.interfaces.http.IHTTPRequest"
+    permission="zope.Public"
+    provides=".interfaces.ISilvaURL"
+  />
+
+  <browser:page
+    for="Products.Silva.interfaces.ISilvaObject"
+    name="absolute_url"
+    class=".absoluteurl.AbsoluteURL"
+    permission="zope.Public"
+    allowed_interface=".interfaces.ISilvaURL"
+  />
+
 
   <!-- Grok this package -->
   <grok:grok package="." />
