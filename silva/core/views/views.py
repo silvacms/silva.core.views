@@ -11,9 +11,9 @@ from five import grok
 import urllib
 
 from Products.Silva.interfaces import ISilvaObject
-from Products.SilvaLayout.interfaces import IPreviewLayer
 
-from silva.core.views.interfaces import IFeedback, IZMIView, IView, ITemplate
+from silva.core.views.interfaces import IFeedback, IZMIView, IView
+from silva.core.views.interfaces import ITemplate, IPreviewLayer
 from silva.core import conf as silvaconf
 
 import Acquisition

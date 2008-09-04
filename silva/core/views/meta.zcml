@@ -1,14 +1,9 @@
 <configure
-    xmlns="http://namespaces.zope.org/zope"
-    xmlns:grok="http://namespaces.zope.org/grok"
-    xmlns:meta="http://namespaces.zope.org/meta">
+    xmlns="http://namespaces.zope.org/zope">
 
   <!-- Load dependencies -->
   <include package="silva.core.conf" file="meta.zcml" />
   <include package="five.megrok.z3cform" file="meta.zcml" />
   <include package="five.resourceinclude" file="meta.zcml" />
-
-  <!-- Grok this package -->
-  <grok:grok package="." />
   
 </configure>

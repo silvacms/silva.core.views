@@ -4,6 +4,7 @@
 # $Id$
 
 from zope.interface import Interface, Attribute
+from zope.publisher.interfaces.browser import IBrowserRequest
 from zope import schema
 
 from grokcore.view.interfaces import IGrokView
@@ -49,8 +50,15 @@ class ICustomizedTemplate(Interface):
     """A through the web template.
     """
 
-# Silva forms
+# Default layers definition
 
+class IPreviewLayer(IBrowserRequest):
+    """This layer enable the fact to display preview version instead
+    of public version.
+    """
+
+
+# Silva forms
 
 class IDefaultAddFields(Interface):
     """Default fields used in a add form. You don't have to defines this fields.

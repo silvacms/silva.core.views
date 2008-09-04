@@ -1,6 +1,7 @@
 <configure
    xmlns="http://namespaces.zope.org/zope"
    xmlns:browser="http://namespaces.zope.org/browser"
+   xmlns:grok="http://namespaces.zope.org/grok"
    xmlns:five="http://namespaces.zope.org/five">
 
   <five:registerPackage package="." />
@@ -27,6 +28,9 @@
      name="five_template"
      permission="zope.Public"
      />
+
+  <!-- Grok this package -->
+  <grok:grok package="." />
 
   <!-- Include dependancy -->
   <include package="silva.core.conf" />
