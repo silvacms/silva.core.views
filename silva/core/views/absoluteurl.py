@@ -52,6 +52,8 @@ class AbsoluteURL(BrowserView):
         request = self.request
 
         name = context.get_short_title()
+        if len(name) > 50:
+            name = name[47:] + '...'
         
         def isVirtualHostRoot():
             path = self.context.getPhysicalPath()
