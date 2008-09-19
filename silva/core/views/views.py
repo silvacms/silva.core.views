@@ -96,6 +96,9 @@ class SMIView(SilvaGrokView):
         # able to use silva macro in your templates.
         view = self._silvaView()
         return {'here': view,
+                'realview': self, # XXX should be removed when silva
+                                  # stop to do stupid things with view
+                                  # in templates.
                 'user': getSecurityManager().getUser(),
                 'container': self.context.aq_inner,}
 
