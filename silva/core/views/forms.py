@@ -17,7 +17,7 @@ from five.grok import action
 from five.grok.components import GrokForm
 
 from silva.core.views.baseforms import SilvaMixinForm, SilvaMixinAddForm, SilvaMixinEditForm
-from silva.core.views.views import SilvaGrokView
+from silva.core.views.views import SMIView
 from silva.core.views.interfaces import IDefaultAddFields, ISilvaFormlibForm
 from silva.core import conf as silvaconf
 
@@ -36,14 +36,14 @@ class SilvaGrokForm(SilvaMixinForm, GrokForm, ViewCode):
         return (self.errors and 'error' or 'feedback') or self._status_type
 
 
-class PageForm(SilvaGrokForm, formbase.PageForm, SilvaGrokView):
+class PageForm(SilvaGrokForm, formbase.PageForm, SMIView):
     """Generic form.
     """
 
     silvaconf.baseclass()
 
 
-class AddForm(SilvaMixinAddForm, SilvaGrokForm, formbase.AddForm, SilvaGrokView):
+class AddForm(SilvaMixinAddForm, SilvaGrokForm, formbase.AddForm, SMIView):
     """Add form.
     """
 
@@ -72,7 +72,7 @@ class AddForm(SilvaMixinAddForm, SilvaGrokForm, formbase.AddForm, SilvaGrokView)
 
 
 
-class EditForm(SilvaMixinEditForm, SilvaGrokForm, formbase.EditForm, SilvaGrokView):
+class EditForm(SilvaMixinEditForm, SilvaGrokForm, formbase.EditForm, SMIView):
     """Edition form.
     """
 

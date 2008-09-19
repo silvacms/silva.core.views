@@ -16,7 +16,7 @@ from AccessControl import getSecurityManager
 import grokcore.view
 
 from silva.core.views.interfaces import IFeedback, IDefaultAddFields
-from silva.core.conf.utils import getSilvaViewFor, getFactoryName
+from silva.core.conf.utils import getFactoryName
 from silva.core import conf as silvaconf
 
 class SilvaMixinForm(object):
@@ -49,21 +49,6 @@ class SilvaMixinForm(object):
             else:
                 self._status_type = "feedback"
         return super(SilvaMixinForm, self).__call__()
-
-    def _silvaView(self):
-        # Lookup the correct Silva edit view so forms are able to use
-        # silva macros.
-        return getSilvaViewFor(self.context, 'edit', self.context)
-
-    def namespace(self):
-        # This add to the template namespace global variable used in
-        # Zope 2 and Silva templates.  Here should be bind at the
-        # correct place in the Silva view registry so you should be
-        # able to use silva macro in your templates.
-        view = self._silvaView()
-        return {'here': view,
-                'user': getSecurityManager().getUser(),
-                'container': self.context.aq_inner,}
 
     @zope.cachedescriptors.property.CachedProperty
     def form_macros(self):

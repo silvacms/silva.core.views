@@ -40,6 +40,10 @@ class IZMIView(IGrokView):
     """A view in ZMI.
     """
 
+class ISMIView(IGrokView):
+    """A view in SMI.
+    """
+
 class ITemplateNotCustomizable(Interface):
     """Marker interface to put on view/template that you don't people be able
     to customize.

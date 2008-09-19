@@ -12,7 +12,7 @@ from Products.Silva.ViewCode import ViewCode
 
 from silva.core.views.interfaces import ISilvaZ3CFormForm, IDefaultAddFields
 from silva.core.views.interfaces import ICancelButton, ISilvaStyle
-from silva.core.views.views import SilvaGrokView
+from silva.core.views.views import SMIView
 from silva.core.views.baseforms import SilvaMixinForm, SilvaMixinAddForm, SilvaMixinEditForm
 from silva.core import conf as silvaconf
 
@@ -61,14 +61,14 @@ class SilvaGrokForm(SilvaMixinForm, GrokForm, ViewCode):
         return 'feedback'
 
 
-class PageForm(SilvaGrokForm, form.Form, SilvaGrokView):
+class PageForm(SilvaGrokForm, form.Form, SMIView):
     """Generic form.
     """
 
     silvaconf.baseclass()
     
 
-class AddForm(SilvaMixinAddForm, SilvaGrokForm, form.AddForm, SilvaGrokView):
+class AddForm(SilvaMixinAddForm, SilvaGrokForm, form.AddForm, SMIView):
     """Add form.
     """
 
@@ -107,7 +107,7 @@ class AddForm(SilvaMixinAddForm, SilvaGrokForm, form.AddForm, SilvaGrokView):
             self.redirect('%s/edit' % self.context.absolute_url())
 
 
-class EditForm(SilvaMixinEditForm, SilvaGrokForm, form.EditForm, SilvaGrokView):
+class EditForm(SilvaMixinEditForm, SilvaGrokForm, form.EditForm, SMIView):
     """Edit form.
     """
 

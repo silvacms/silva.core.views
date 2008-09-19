@@ -17,8 +17,9 @@ from Products.Silva.interfaces import ISilvaObject
 from Products.Five.viewlet.manager import ViewletManagerBase
 from Products.Five.viewlet.viewlet import ViewletBase
 
-from silva.core.views.interfaces import IFeedback, IZMIView, IView
-from silva.core.views.interfaces import ITemplate, IPreviewLayer
+from silva.core.views.interfaces import IFeedback, IZMIView, ISMIView
+from silva.core.views.interfaces import ITemplate, IPreviewLayer, IView
+from silva.core.conf.utils import getSilvaViewFor
 from silva.core import conf as silvaconf
 
 from AccessControl import getSecurityManager
@@ -63,6 +64,41 @@ class ZMIView(SilvaGrokView):
     grok.implements(IZMIView)
 
     silvaconf.baseclass()
+
+
+class SMIView(SilvaGrokView):
+    """A view in SMI.
+    """
+
+    grok.implements(ISMIView)
+
+    silvaconf.baseclass()
+    silvaconf.context(ISilvaObject)
+
+    def __init__(self, context, request):
+        super(SMIView, self).__init__(context, request)
+
+        # Set model on request like SilvaViews
+        self.request['model'] = context
+        # Set id on template some macros uses template/id
+        self.template._template.id = self.__view_name__
+
+
+    def _silvaView(self):
+        # Lookup the correct Silva edit view so forms are able to use
+        # silva macros.
+        return getSilvaViewFor(self.context, 'edit', self.context)
+
+    def namespace(self):
+        # This add to the template namespace global variable used in
+        # Zope 2 and Silva templates.  Here should be bind at the
+        # correct place in the Silva view registry so you should be
+        # able to use silva macro in your templates.
+        view = self._silvaView()
+        return {'here': view,
+                'user': getSecurityManager().getUser(),
+                'container': self.context.aq_inner,}
+
 
 class Template(SilvaGrokView):
     """A view class not binded to a content.

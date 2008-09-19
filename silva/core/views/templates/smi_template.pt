@@ -1,0 +1,56 @@
+<metal:smi metal:define-macro="page">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html tal:omit-tag=""
+      lang="en"
+      xml:lang="en"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      tal:define="vein string:contents"
+      i18n:domain="silva">
+  
+  <metal:use-macro use-macro="here/macro_edit/macros/editor">
+
+    <metal:fill-editor-slot fill-slot="main">
+
+      <table class="columns columns2">
+        <tbody>
+          <tr>
+
+            <tal:block replace="nothing">
+              _____________________ sidebar _____________________
+            </tal:block>
+
+            <td class="left">
+              <metal:use-macro use-macro="here/macro_vein_navigation/macros/vein">
+                <metal:fill-slot fill-slot="sidebar">
+                  <tal:block 
+                     tal:define="template_id template/id"
+                     tal:replace="structure python: here.service_sidebar.render(model, template_id, vein)" />
+                </metal:fill-slot>
+              </metal:use-macro>
+            </td>
+            
+            <tal:block replace="nothing">
+              _____________________ main _____________________
+            </tal:block>
+
+            <td class="main">
+
+              <metal:block define-slot="body">
+              </metal:block>
+
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+    </metal:fill-editor-slot>
+
+  </metal:use-macro>
+
+</html>
+</metal:smi>
+
+

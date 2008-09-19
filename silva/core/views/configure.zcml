@@ -30,6 +30,13 @@
      permission="zope.Public"
      />
 
+  <browser:page
+     for="Products.Silva.interfaces.ISilvaObject"
+     template="templates/smi_template.pt"
+     name="five_template"
+     permission="zope.Public"
+     />
+
   <!-- AbsoluteURL views -->  
   <view
     for="Products.Silva.interfaces.ISilvaObject"
