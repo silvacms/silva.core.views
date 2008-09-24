@@ -27,8 +27,10 @@ class IFeedback(Interface):
     status_type = Attribute(u"Feedback type, error or feedback")
 
 
-class ITTWCustomizable(Interface):
-    """Can be customized with a TTW template.
+class IGrokCustomizable(Interface):
+    """A grok template which can be customized with a TTW template.
+
+    Conviently it's a sub-set of a GrokView: it's need.
     """
 
     def update():
@@ -36,7 +38,21 @@ class ITTWCustomizable(Interface):
         template.
         """
 
-class ITemplate(IGrokView, ITTWCustomizable):
+    def default_namespace():
+        """Return default namespace values.
+        """
+
+
+class ITemplateNotCustomizable(Interface):
+    """Marker interface to put on view/template that you don't people be able
+    to customize.
+    """
+
+class ITemplateCustomizable(Interface):
+    """This is a template used in Silva which can be customized.
+    """
+
+class ITemplate(IGrokView, ITemplateCustomizable, IGrokCustomizable):
     """A template used in Silva which can be customized.
     """
 
@@ -55,22 +71,17 @@ class ISMIView(IGrokView):
     """A view in SMI.
     """
 
-class ITemplateNotCustomizable(Interface):
-    """Marker interface to put on view/template that you don't people be able
-    to customize.
-    """
-
-class IContentProvider(IBaseContentProvider, ITTWCustomizable):
+class IContentProvider(IBaseContentProvider, IGrokCustomizable):
     """A customizable Content Provider.
     """
 
-class IViewlet(IBaseViewlet, ITTWCustomizable):
+class IViewlet(IBaseViewlet, IGrokCustomizable):
     """A customizable Viewlet.
     """
 
 # TTW Templates
 
-class ICustomizedTemplate(Interface):
+class ICustomizedTemplate(ITemplateCustomizable):
     """A through the web template.
     """
 

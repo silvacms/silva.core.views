@@ -10,13 +10,13 @@ import zope.component
 from AccessControl import getSecurityManager
 from AccessControl import Unauthorized
 
+from Products.Five.metaclass import makeClass
 from Products.PageTemplates.ZopePageTemplate import ZopePageTemplate
 
 from silva.core import conf as silvaconf
 
-from interfaces import ITTWCustomizable, ICustomizedTemplate
+from interfaces import IGrokCustomizable, ICustomizedTemplate
 
-# Hackland. I am not responsible for that.
 
 class TTWViewTemplate(ZopePageTemplate):
     """A template class used to generate Zope 3 views TTW"""
@@ -24,11 +24,6 @@ class TTWViewTemplate(ZopePageTemplate):
     meta_type="Silva TTW View Template"
 
     implements(ICustomizedTemplate)
-
-    manage_options = (
-        ZopePageTemplate.manage_options[0],
-        dict(label='Registrations', action='registrations.html'),
-        ) + ZopePageTemplate.manage_options[2:]
 
     def __init__(self, id, text=None, content_type='text/html', strict=True,
                  encoding='utf-8', view=None, permission=None, name=None):
@@ -38,7 +33,7 @@ class TTWViewTemplate(ZopePageTemplate):
         super(TTWViewTemplate, self).__init__(id, text, content_type, encoding,
                                               strict)
 
-    def __call__(self, context, request):
+    def __call__(self, *args):
         #XXX raise a sensible exception if context and request are
         # omitted, IOW, if someone tries to render the template not as
         # a view.
@@ -48,7 +43,14 @@ class TTWViewTemplate(ZopePageTemplate):
                 raise Unauthorized('The current user does not have the '
                                    'required "%s" permission'
                                    % self.permission)
-        return TTWViewTemplateRenderer(context, request, self, self.view)
+
+        class_ = makeClass('FrankensteinTTWTemplate', 
+                           (TTWViewTemplateRenderer, self.view), 
+                           {'__name__': self.name,
+                            '__view_name__': self.name,
+                            'module_info': FakeModuleInfoForGrok(self.view.__module__)})
+
+        return class_(self, self.view, args)
 
     # overwrite Shared.DC.Scripts.Binding.Binding's before traversal
     # hook that would prevent to look up views for instances of this
@@ -71,11 +73,9 @@ class TTWViewTemplateRenderer(object):
     (__call__).
     """
 
-    def __init__(self, context, request, template, view):
-        self.context = context
-        self.request = request
+    def __init__(self, template, view, args):
         self.template = template
-        self.view = view
+        view.__init__(self, *args)
 
     def __call__(self, *args, **kwargs):
         """Render the TTWViewTemplate-based view.
@@ -86,53 +86,36 @@ class TTWViewTemplateRenderer(object):
         """Render the view
         """
 
-        view = self._getView(*args, **kwargs)
         # we need to override the template's context and request as
         # they generally point to the wrong objects (a template's
         # context usually is what it was acquired from, which isn't
         # what the context is for a view template).
         bound_names = {'context': self.context,
                        'request': self.request,
-                       'view': view}
-        template = self.template.__of__(self.context)
-        return template._exec(bound_names, args, kwargs)
+                       'view': self}
 
-    def _getView(self, *args, **kwargs):
-        view = self.view
-        if view is not None:
-            # Filesystem-based view templates are trusted code and
-            # have unrestricted access to the view class.  We simulate
-            # that for TTW templates (which are trusted code) by
-            # creating a subclass with unrestricted access to all
-            # subobjects.
-            class TTWView(view):
-                __allow_access_to_unprotected_subobjects__ = 1
-                __view_name__ = self.template.name
-                module_info = FakeModuleInfoForGrok(view.__module__)
+        if IGrokCustomizable.providedBy(self):
+            bound_names.update(self.default_namespace())
+            self.update()
+            if self.request.response.getStatus() in (302, 303):
+                return
 
-                def __getitem__(self, key):
-                    raise AttributeError
+        return self.template._exec(bound_names, args, kwargs)
 
-            instance = TTWView(self.context, self.request)
-            
-            if ITTWCustomizable.implementedBy(view):
-                instance.update()
 
-            return instance
-        return view
+    def __getitem__(self, name):
+        # In Five, __getitem__ is define to look on index. We don't
+        # have index, so we use template.
+        if name == 'macros':
+            return self.template.macros
+        return self.template.macros[name]
 
-    # Zope 2 wants to acquisition-wrap every view object (via __of__).
-    # We don't need this as the TTWViewTemplate object is already
-    # properly acquisition-wrapped in __call__.  Nevertheless we need
-    # to support the __of__ method as a no-op.
-    def __of__(self, obj):
-        return self
 
 @silvaconf.subscribe(TTWViewTemplate, IObjectRemovedEvent)
-def unregisterViewWhenZPTIsDeleted(zpt, event):
-    components = zope.component.getSiteManager(zpt)
+def unregisterViewWhenZPTIsDeleted(template, event):
+    components = zope.component.getSiteManager(template)
     for reg in components.registeredAdapters():
-        if reg.factory == zpt:
+        if reg.factory == template:
             components.unregisterAdapter(reg.factory, reg.required,
                                          reg.provided, reg.name)
             break
