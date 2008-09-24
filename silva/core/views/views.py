@@ -3,10 +3,9 @@
 # See also LICENSE.txt
 # $Id$
 
-from zope.contentprovider.interfaces import IContentProvider
 from zope.i18n import translate
 from zope.security.interfaces import IPermission
-from zope.viewlet.interfaces import IViewletManager, IViewlet
+from zope.viewlet.interfaces import IViewletManager
 from zope import component, interface
 import zope.cachedescriptors.property
 
@@ -19,6 +18,7 @@ from Products.Five.viewlet.viewlet import ViewletBase
 
 from silva.core.views.interfaces import IFeedback, IZMIView, ISMIView
 from silva.core.views.interfaces import ITemplate, IPreviewLayer, IView
+from silva.core.views.interfaces import IContentProvider, IViewlet
 from silva.core.conf.utils import getSilvaViewFor
 from silva.core import conf as silvaconf
 

@@ -3,9 +3,11 @@
 # See also LICENSE.txt
 # $Id$
 
+from zope.contentprovider.interfaces import IContentProvider as IBaseContentProvider
 from zope.interface import Interface, Attribute
 from zope.publisher.interfaces.browser import IBrowserRequest
 from zope.traversing.browser.interfaces import IAbsoluteURL
+from zope.viewlet.interfaces import IViewlet as IBaseViewlet
 from zope import schema
 
 from grokcore.view.interfaces import IGrokView
@@ -25,7 +27,16 @@ class IFeedback(Interface):
     status_type = Attribute(u"Feedback type, error or feedback")
 
 
-class ITemplate(IGrokView):
+class ITTWCustomizable(Interface):
+    """Can be customized with a TTW template.
+    """
+
+    def update():
+        """Update method which have to be called before rendering the
+        template.
+        """
+
+class ITemplate(IGrokView, ITTWCustomizable):
     """A template used in Silva which can be customized.
     """
 
@@ -47,6 +58,14 @@ class ISMIView(IGrokView):
 class ITemplateNotCustomizable(Interface):
     """Marker interface to put on view/template that you don't people be able
     to customize.
+    """
+
+class IContentProvider(IBaseContentProvider, ITTWCustomizable):
+    """A customizable Content Provider.
+    """
+
+class IViewlet(IBaseViewlet, ITTWCustomizable):
+    """A customizable Viewlet.
     """
 
 # TTW Templates

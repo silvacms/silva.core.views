@@ -14,7 +14,7 @@ from Products.PageTemplates.ZopePageTemplate import ZopePageTemplate
 
 from silva.core import conf as silvaconf
 
-from interfaces import ITemplate, ICustomizedTemplate
+from interfaces import ITTWCustomizable, ICustomizedTemplate
 
 # Hackland. I am not responsible for that.
 
@@ -115,7 +115,7 @@ class TTWViewTemplateRenderer(object):
 
             instance = TTWView(self.context, self.request)
             
-            if ITemplate.implementedBy(view):
+            if ITTWCustomizable.implementedBy(view):
                 instance.update()
 
             return instance
