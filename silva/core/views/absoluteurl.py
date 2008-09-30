@@ -11,7 +11,7 @@ from zope.interface import implements
 from OFS.interfaces import ITraversable
 from Products.Five import BrowserView
 
-from Products.Silva.interfaces import IPublication, IRoot
+from Products.Silva.interfaces import IPublication, IRoot, IContent
 
 from silva.core.views.interfaces import IPreviewLayer, ISilvaURL
 
@@ -69,7 +69,8 @@ class AbsoluteURL(BrowserView):
         base = tuple(zope.component.getMultiAdapter(
                      (container, request), name='absolute_url').breadcrumbs())
 
-        base += ({'name': name, 'url': self.__str__()},)
+        if not (IContent.providedBy(context) and context.is_default()):
+            base += ({'name': name, 'url': self.__str__()},)
 
         return base
 
