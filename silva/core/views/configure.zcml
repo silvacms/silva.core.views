@@ -69,7 +69,6 @@
   <include package="silva.core.conf" />
   <include package="five.megrok.z3cform" />
   <include package="five.resourceinclude" />
-  <include package="silva.core.layout" />
 
   
 </configure>
