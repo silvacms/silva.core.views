@@ -33,12 +33,12 @@ class SilvaGrokView(grok.View):
 
     silvaconf.baseclass()
 
-    def publishTraverse(self, request, name):
-        """In Zope2, if you give a name, index_html is appended to it.
-        """
-        if name == 'index_html':
-            return self
-        return super(SilvaGrokView, self).publishTraverse(request, name)
+#     def publishTraverse(self, request, name):
+#         """In Zope2, if you give a name, index_html is appended to it.
+#         """
+#         if name == 'index_html':
+#             return self
+#         return super(SilvaGrokView, self).publishTraverse(request, name)
 
     def redirect(self, url):
         # Override redirect to send status information if there is.
