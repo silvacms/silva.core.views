@@ -10,8 +10,6 @@ from zope.traversing.browser.interfaces import IAbsoluteURL
 from zope.viewlet.interfaces import IViewlet as IBaseViewlet
 from zope import schema
 
-from grokcore.view.interfaces import IGrokView
-
 from silva.core.conf.fields import ID
 
 from Products.Silva.i18n import translate as _
@@ -27,33 +25,9 @@ class IFeedback(Interface):
     status_type = Attribute(u"Feedback type, error or feedback")
 
 
-class IGrokCustomizable(Interface):
-    """A grok template which can be customized with a TTW template.
 
-    Conviently it's a sub-set of a GrokView: it's need.
-    """
-
-    def update():
-        """Update method which have to be called before rendering the
-        template.
-        """
-
-    def default_namespace():
-        """Return default namespace values.
-        """
-
-
-class ITemplateNotCustomizable(Interface):
-    """Marker interface to put on view/template that you don't people be able
-    to customize.
-    """
-
-class ITemplateCustomizable(Interface):
-    """This is a template used in Silva which can be customized.
-    """
-
-class ITemplate(IGrokView, ITemplateCustomizable, IGrokCustomizable):
-    """A template used in Silva which can be customized.
+class ITemplate(Interface):
+    """A template used in Silva.
     """
 
 class IView(ITemplate):
@@ -63,42 +37,17 @@ class IView(ITemplate):
     is_preview = Attribute(u"Boolean which say if you're in preview mode.")
     content = Attribute(u"Version of the content to render.")
 
-class IZMIView(IGrokView):
-    """A view in ZMI.
-    """
-
-class ISMIView(IGrokView):
+class ISMIView(Interface):
     """A view in SMI.
     """
 
-class IContentProvider(IBaseContentProvider, IGrokCustomizable):
-    """A customizable Content Provider.
+class IContentProvider(IBaseContentProvider):
+    """A Content Provider.
     """
 
-class IViewlet(IBaseViewlet, IGrokCustomizable):
-    """A customizable Viewlet.
+class IViewlet(IBaseViewlet):
+    """A Viewlet.
     """
-
-# TTW Templates
-
-class ICustomizedTemplate(ITemplateCustomizable):
-    """A through the web template.
-    """
-
-# Preview layer
-
-class IPreviewLayer(IBrowserRequest):
-    """This layer enable the fact to display preview version instead
-    of public version.
-    """
-
-# URL management / with preview
-
-class ISilvaURL(IAbsoluteURL):
-
-    def preview():
-        """Return URL for preview.
-        """
 
 # Silva forms
 

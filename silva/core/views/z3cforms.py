@@ -3,9 +3,9 @@
 # See also LICENSE.txt
 # $Id$
 
-from zope import interface
-from zope.component import queryAdapter, IFactory
-from grokcore import component
+from zope import interface, component
+from zope.pagetemplate.interfaces import IPageTemplate
+from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 
 from Products.Silva.i18n import translate as _
 from Products.Silva.ViewCode import ViewCode
@@ -14,42 +14,29 @@ from silva.core.views.interfaces import ISilvaZ3CFormForm, IDefaultAddFields
 from silva.core.views.interfaces import ICancelButton, ISilvaStyle
 from silva.core.views.views import SMIView
 from silva.core.views.baseforms import SilvaMixinForm, SilvaMixinAddForm, SilvaMixinEditForm
-from silva.core import conf as silvaconf
 
-from five.megrok.z3cform.components import GrokForm
 from z3c.form import form, button, field
+from z3c.form.interfaces import IFormLayer, IAction
+from z3c.form.field import Fields
+from plone.z3cform import z2
+from plone.z3cform.crud import crud
 
+# Base class to forms
 
-# Base class to grok forms
-
-class SilvaGrokForm(SilvaMixinForm, GrokForm, ViewCode):
+class SilvaBaseForm(SilvaMixinForm, ViewCode):
     """Silva Gork form for z3cform.
     """
 
+    __allow_access_to_unprotected_subobjects__ = True
+
     interface.implements(ISilvaZ3CFormForm)
-    silvaconf.baseclass()
 
     def publishTraverse(self, request, name):
         """In Zope2, if you give a name, index_html is appended to it.
         """
         if name == 'index_html':
             return self
-        return super(SilvaGrokForm, self).publishTraverse(request, name)
-
-
-    def updateWidgets(self):
-        super(SilvaGrokForm, self).updateWidgets()
-        for widget in self.widgets.values():
-            apply_style = queryAdapter(widget, ISilvaStyle)
-            if apply_style:
-                apply_style.style(widget)
-
-    def updateActions(self):
-        super(SilvaGrokForm, self).updateActions()
-        for action in self.actions.values():
-            apply_style = queryAdapter(action.field, ISilvaStyle)
-            if apply_style:
-                apply_style.style(action)
+        return super(SilvaBaseForm, self).publishTraverse(request, name)
 
     @property
     def status_type(self):
@@ -61,19 +48,38 @@ class SilvaGrokForm(SilvaMixinForm, GrokForm, ViewCode):
         return 'feedback'
 
 
-class PageForm(SilvaGrokForm, form.Form, SMIView):
+    def render(self):
+        # Render content template.
+
+        if self.template is None:
+            template = component.getMultiAdapter((self, self.request),
+                IPageTemplate)
+            return template(self)
+        namespace = self.default_namespace()
+        namespace.update(self.namespace())
+        return self.template._exec(namespace, [], {})
+
+
+    def __call__(self):
+        """Render the form, patching the request first with
+        plone.z3cform helper.
+        """
+        z2.switch_on(self, request_layer=IFormLayer)
+        return super(SilvaBaseForm, self).__call__()
+
+
+
+class PageForm(SilvaBaseForm, form.Form, SMIView):
     """Generic form.
     """
 
-    silvaconf.baseclass()
     
 
-class AddForm(SilvaMixinAddForm, SilvaGrokForm, form.AddForm, SMIView):
+class AddForm(SilvaMixinAddForm, SilvaBaseForm, form.AddForm, SMIView):
     """Add form.
     """
 
-    interface.implements(IFactory)
-    silvaconf.baseclass()
+    interface.implements(component.IFactory)
     form.extends(form.AddForm, ignoreButtons=True, ignoreHandlers=True)
 
     def updateForm(self):
@@ -107,12 +113,10 @@ class AddForm(SilvaMixinAddForm, SilvaGrokForm, form.AddForm, SMIView):
             self.redirect('%s/edit' % self.context.absolute_url())
 
 
-class EditForm(SilvaMixinEditForm, SilvaGrokForm, form.EditForm, SMIView):
+class EditForm(SilvaMixinEditForm, SilvaBaseForm, form.EditForm, SMIView):
     """Edit form.
     """
 
-    silvaconf.baseclass()
-    silvaconf.name(u"tab_edit")
     form.extends(form.AddForm, ignoreButtons=True, ignoreHandlers=True)
 
     def getContent(self):
@@ -134,6 +138,14 @@ class EditForm(SilvaMixinEditForm, SilvaGrokForm, form.EditForm, SMIView):
             self.status = _(u'No changes')
 
 
+
+class CrudForm(SilvaBaseForm, crud.CrudForm, SMIView):
+    """CrudForm.
+    """
+
+    template = ViewPageTemplateFile('templates/crud_form.pt')
+
+
 # Macros to render z3c forms
 
 from zope.publisher.browser import BrowserView
@@ -143,7 +155,18 @@ class Z3CFormMacros(BrowserView):
     template = ViewPageTemplateFile('templates/z3cform.pt')
     
     def __getitem__(self, key):
+        import pdb ; pdb.set_trace()
         return self.template.macros[key]
+
+# Customization of widgets
+
+def customizeWidgets(event):
+    item = widget = event.widget
+    if IAction.providedBy(widget):
+            item = widget.field
+    apply_style = component.queryAdapter(item, ISilvaStyle)
+    if apply_style:
+        apply_style.style(widget)
 
 
 # Cancel button on every forms
@@ -155,7 +178,7 @@ class CancelButton(button.Button):
     interface.implements(ICancelButton)
     
 
-class SilvaFormActions(button.ButtonActions, component.MultiAdapter):
+class SilvaFormActions(button.ButtonActions):
     component.adapts(ISilvaZ3CFormForm,
                      interface.Interface,
                      interface.Interface)
@@ -168,7 +191,7 @@ class SilvaFormActions(button.ButtonActions, component.MultiAdapter):
 
 
 
-class SilvaAddActionHandler(button.ButtonActionHandler, component.MultiAdapter):
+class SilvaAddActionHandler(button.ButtonActionHandler):
     component.adapts(ISilvaZ3CFormForm,
                      interface.Interface,
                      interface.Interface,

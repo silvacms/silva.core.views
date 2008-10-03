@@ -1,0 +1,62 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html tal:omit-tag=""
+      lang="en"
+      xml:lang="en"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      tal:define="vein                  string:contents;
+                  maintitlecolspan      string:2"
+      i18n:domain="silva">
+  
+  <metal:use-macro use-macro="here/macro_index/macros/master">
+
+    <metal:fill-editor-slot fill-slot="main">
+
+      <table class="columns columns2">
+        <tbody>
+          <tr>
+            <td class="left">
+            </td>
+            <td class="main">
+
+              <table class="listing">
+                <thead>
+                  <tr tal:condition="view/label">
+                    <th colspan="1"
+                        tal:content="view/label">
+                    </th>
+                  </tr>
+                  <tr tal:condition="view/description">
+                    <td colspan="1"
+                        tal:content="view/description">
+                    </td>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr tal:repeat="form view/subforms">
+                    <td tal:content="structure form/render">
+                    </td>
+                  </tr>
+                </tbody>
+                <tfoot>
+                  <tr class="controls">
+                    <td>
+                      <tal:control tal:repeat="action view/actions/values">
+                        <input type="submit" tal:replace="structure action/render" />
+                      </tal:control>
+                    </td>
+                  </tr>
+                </tfoot>
+              </table>
+
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </metal:fill-editor-slot>
+
+  </metal:use-macro>
+
+</html>

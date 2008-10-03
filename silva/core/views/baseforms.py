@@ -8,34 +8,28 @@ from zope.component import queryMultiAdapter
 from zope import interface
 import zope.cachedescriptors.property
 
+from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from Products.Silva.i18n import translate as _
 from Products.Silva.interfaces import IVersionedContent
 from Products.Silva.ExtensionRegistry import extensionRegistry
 from AccessControl import getSecurityManager
 
-import grokcore.view
-
 from silva.core.views.interfaces import IFeedback, IDefaultAddFields
-from silva.core.conf.utils import getFactoryName
-from silva.core import conf as silvaconf
+#from silva.core.conf.utils import getFactoryName
 
 class SilvaMixinForm(object):
-    """Silva grok form mixin.
+    """Silva form mixin.
     """
 
     interface.implements(IFeedback)
 
-    silvaconf.baseclass()
-
-    template = grokcore.view.PageTemplateFile('templates/form.pt')
+    template = ViewPageTemplateFile('templates/form.pt')
 
     def __init__(self, context, request):
         super(SilvaMixinForm, self).__init__(context, request)
 
         # Set model on request like SilvaViews
         self.request['model'] = context
-        # Set id on template some macros uses template/id
-        self.template._template.id = self.__view_name__
 
         # Default feedback
         self._status_type = None
@@ -63,7 +57,7 @@ class SilvaMixinAddForm(object):
     """Silva add form mixin.
     """
 
-    template = grokcore.view.PageTemplateFile('templates/add_form.pt')
+    template = ViewPageTemplateFile('templates/add_form.pt')
 
     def _silvaView(self):
         view_registry = self.context.service_view_registry
@@ -113,8 +107,7 @@ class SilvaMixinEditForm(object):
     ## than a PageForm. if.
 
 
-    template = grokcore.view.PageTemplateFile('templates/edit_form.pt')
-    silvaconf.name(u'tab_edit')
+    template = ViewPageTemplateFile('templates/edit_form.pt')
 
     versioned_content = False
     propose_new_version = False

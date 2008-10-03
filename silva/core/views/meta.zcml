@@ -1,9 +1,5 @@
 <configure
     xmlns="http://namespaces.zope.org/zope">
 
-  <!-- Load dependencies -->
-  <include package="silva.core.conf" file="meta.zcml" />
-  <include package="five.megrok.z3cform" file="meta.zcml" />
-  <include package="five.resourceinclude" file="meta.zcml" />
   
 </configure>

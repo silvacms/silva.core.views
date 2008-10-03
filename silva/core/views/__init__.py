@@ -3,9 +3,3 @@
 # See also LICENSE.txt
 # $Id$
 
-from silva.core import conf as silvaconf
-
-silvaconf.extensionName('silva.core.views')
-silvaconf.extensionTitle('Silva Core Views')
-silvaconf.extensionSystem()
-

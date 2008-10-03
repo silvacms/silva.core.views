@@ -1,7 +1,11 @@
+# Copyright (c) 2008 Infrae. All rights reserved.
+# See also LICENSE.txt
+# $Id$
+
 from setuptools import setup, find_packages
 import os
 
-version = '2.2'
+version = '2.1'
 
 setup(name='silva.core.views',
       version=version,
@@ -14,7 +18,7 @@ setup(name='silva.core.views',
               "Topic :: Software Development :: Libraries :: Python Modules",
               ],
       keywords='silva core views',
-      author='Infrae',
+      author='Sylvain Viollon',
       author_email='info@infrae.com',
       url='',
       license='BSD',
@@ -24,11 +28,9 @@ setup(name='silva.core.views',
       zip_safe=False,
       install_requires=[
               'setuptools',
-              'five.grok',
               'zope.interface',
               'zope.schema',
               'plone.z3cform',
-              'silva.core.conf',
-              'five.resourceinclude',
+              'silva.core.conf > 2.0.999, < 2.1.999',
               ],
       )

@@ -4,41 +4,44 @@
 # $Id$
 
 from zope.i18n import translate
+from zope.interface import implements
 from zope.security.interfaces import IPermission
 from zope.viewlet.interfaces import IViewletManager
 from zope import component, interface
 import zope.cachedescriptors.property
 
-from five import grok
 import urllib
 
 from Products.Silva.interfaces import ISilvaObject
 from Products.Five.viewlet.manager import ViewletManagerBase
 from Products.Five.viewlet.viewlet import ViewletBase
+from Products.Five import BrowserView
 
-from silva.core.views.interfaces import IFeedback, IZMIView, ISMIView
-from silva.core.views.interfaces import ITemplate, IPreviewLayer, IView
+from silva.core.views.interfaces import IFeedback, ISMIView
+from silva.core.views.interfaces import ITemplate, IView
 from silva.core.views.interfaces import IContentProvider, IViewlet
 from silva.core.conf.utils import getSilvaViewFor
-from silva.core import conf as silvaconf
 
 from AccessControl import getSecurityManager
 import Acquisition
 
 # Simple views
 
-class SilvaGrokView(grok.View):
+class SilvaBaseView(BrowserView):
     """Grok View on Silva objects.
     """
-
-    silvaconf.baseclass()
 
 #     def publishTraverse(self, request, name):
 #         """In Zope2, if you give a name, index_html is appended to it.
 #         """
 #         if name == 'index_html':
 #             return self
-#         return super(SilvaGrokView, self).publishTraverse(request, name)
+#         return super(SilvaBaseView, self).publishTraverse(request, name)
+
+
+    @property
+    def response(self):
+        return self.request.RESPONSE
 
     def redirect(self, url):
         # Override redirect to send status information if there is.
@@ -52,37 +55,28 @@ class SilvaGrokView(grok.View):
                 to_append = urllib.urlencode({'message': message,
                                               'message_type': self.status_type,})
                 join_char = '?' in url and '&' or '?'
-                super(SilvaGrokView, self).redirect(url + join_char + to_append)
+                super(SilvaBaseView, self).redirect(url + join_char + to_append)
                 return
-        super(SilvaGrokView, self).redirect(url)
+        self.response.redirect(url)
+
+    def namespace(self):
+        return {}
+
+    def default_namespace(self):
+        return {}
 
 
-class ZMIView(SilvaGrokView):
-    """View in ZMI.
-    """
-
-    grok.implements(IZMIView)
-
-    silvaconf.baseclass()
-
-
-class SMIView(SilvaGrokView):
+class SMIView(SilvaBaseView):
     """A view in SMI.
     """
 
-    grok.implements(ISMIView)
-
-    silvaconf.baseclass()
-    silvaconf.context(ISilvaObject)
+    implements(ISMIView)
 
     def __init__(self, context, request):
         super(SMIView, self).__init__(context, request)
 
         # Set model on request like SilvaViews
         self.request['model'] = context
-        # Set id on template some macros uses template/id
-        self.template._template.id = self.__view_name__
-
 
     def _silvaView(self):
         # Lookup the correct Silva edit view so forms are able to use
@@ -99,31 +93,26 @@ class SMIView(SilvaGrokView):
                 'realview': self, # XXX should be removed when silva
                                   # stop to do stupid things with view
                                   # in templates.
-                'user': getSecurityManager().getUser(),
                 'container': self.context.aq_inner,}
 
 
-class Template(SilvaGrokView):
+class Template(SilvaBaseView):
     """A view class not binded to a content.
     """
 
-    grok.implements(ITemplate)
+    implements(ITemplate)
 
-    silvaconf.baseclass()
-    silvaconf.context(ISilvaObject)
 
 class View(Template):
     """View on Silva object, support view and preview
     """
 
-    grok.implements(IView)
-
-    silvaconf.baseclass()
-    silvaconf.name(u'content.html')
+    implements(IView)
 
     @zope.cachedescriptors.property.CachedProperty
     def is_preview(self):
-        return IPreviewLayer.providedBy(self.request)
+        # XXX to fix
+        return False
 
     @zope.cachedescriptors.property.CachedProperty
     def content(self):
@@ -137,24 +126,12 @@ class View(Template):
 
 class ContentProviderBase(Acquisition.Explicit):
 
-    silvaconf.baseclass()
-    silvaconf.context(ISilvaObject)
-
     def __init__(self, context, request, view):
         self.context = context
         self.request = request
         self.view = view
-        static = component.queryAdapter(
-            self.request, interface.Interface,
-            name = self.module_info.package_dotted_name)
-        if not (static is None):
-            self.static = static.__of__(self)
-        else:
-            self.static = static
         self.__parent__ = view
         self.__name__ = self.__view_name__
-
-    getPhysicalPath = Acquisition.Acquired
 
     def namespace(self):
         return {}
@@ -168,9 +145,7 @@ class ContentProviderBase(Acquisition.Explicit):
 
 class ContentProvider(ContentProviderBase):
 
-    grok.implements(IContentProvider)
-
-    silvaconf.baseclass()
+    implements(IContentProvider)
 
     def default_namespace(self):
         namespace = super(ContentProvider, self).default_namespace()
@@ -185,9 +160,7 @@ class ContentProvider(ContentProviderBase):
 
 class ViewletManager(ContentProviderBase, ViewletManagerBase):
 
-    grok.implements(IViewletManager)
-
-    silvaconf.baseclass()
+    implements(IViewletManager)
 
     def __init__(self, context, request, view):
         ContentProviderBase.__init__(self, context, request, view)
@@ -200,11 +173,7 @@ class ViewletManager(ContentProviderBase, ViewletManagerBase):
              s_viewlets.append(viewlet)
 
         def sort_key(viewlet):
-            # If components have a grok.order directive, sort by that.
-            explicit_order, implicit_order = silvaconf.order.bind().get(viewlet)
-            return (explicit_order,
-                    viewlet.__module__,
-                    implicit_order,
+            return (viewlet.__module__,
                     viewlet.__class__.__name__)
         s_viewlets = sorted(s_viewlets, key=sort_key)
         return [(viewlet.__viewlet_name__, viewlet) for viewlet in s_viewlets]
@@ -237,9 +206,7 @@ class ViewletManager(ContentProviderBase, ViewletManagerBase):
 
 class Viewlet(ContentProviderBase, ViewletBase):
 
-    grok.implements(IViewlet)
-
-    silvaconf.baseclass()
+    implements(IViewlet)
 
     def __init__(self, context, request, view, viewletmanager):
         ContentProviderBase.__init__(self, context, request, view)
@@ -257,9 +224,3 @@ class Viewlet(ContentProviderBase, ViewletBase):
     def render(self):
         return self.template.render(self)
 
-
-from five.resourceinclude.provider import ResourceIncludeProvider
-
-class ResourceContentProvider(ResourceIncludeProvider, ContentProvider):
-
-    silvaconf.name('resources')
