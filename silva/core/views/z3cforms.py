@@ -3,9 +3,7 @@
 # See also LICENSE.txt
 # $Id$
 
-from zope import interface
-from zope.component import queryAdapter, IFactory
-from grokcore import component
+from zope import interface, component
 
 from Products.Silva.i18n import translate as _
 from Products.Silva.ViewCode import ViewCode
@@ -16,9 +14,12 @@ from silva.core.views.views import SMIView
 from silva.core.views.baseforms import SilvaMixinForm, SilvaMixinAddForm, SilvaMixinEditForm
 from silva.core import conf as silvaconf
 
+from five import grok
+
 from five.megrok.z3cform.components import GrokForm
 from z3c.form import form, button, field
-
+from plone.z3cform.crud import crud
+import z3c.form.interfaces
 
 # Base class to grok forms
 
@@ -29,27 +30,12 @@ class SilvaGrokForm(SilvaMixinForm, GrokForm, ViewCode):
     interface.implements(ISilvaZ3CFormForm)
     silvaconf.baseclass()
 
-    def publishTraverse(self, request, name):
-        """In Zope2, if you give a name, index_html is appended to it.
-        """
-        if name == 'index_html':
-            return self
-        return super(SilvaGrokForm, self).publishTraverse(request, name)
-
-
-    def updateWidgets(self):
-        super(SilvaGrokForm, self).updateWidgets()
-        for widget in self.widgets.values():
-            apply_style = queryAdapter(widget, ISilvaStyle)
-            if apply_style:
-                apply_style.style(widget)
-
-    def updateActions(self):
-        super(SilvaGrokForm, self).updateActions()
-        for action in self.actions.values():
-            apply_style = queryAdapter(action.field, ISilvaStyle)
-            if apply_style:
-                apply_style.style(action)
+#     def publishTraverse(self, request, name):
+#         """In Zope2, if you give a name, index_html is appended to it.
+#         """
+#         if name == 'index_html':
+#             return self
+#         return super(SilvaGrokForm, self).publishTraverse(request, name)
 
     @property
     def status_type(self):
@@ -72,7 +58,7 @@ class AddForm(SilvaMixinAddForm, SilvaGrokForm, form.AddForm, SMIView):
     """Add form.
     """
 
-    interface.implements(IFactory)
+    interface.implements(component.IFactory)
     silvaconf.baseclass()
     form.extends(form.AddForm, ignoreButtons=True, ignoreHandlers=True)
 
@@ -134,6 +120,11 @@ class EditForm(SilvaMixinEditForm, SilvaGrokForm, form.EditForm, SMIView):
             self.status = _(u'No changes')
 
 
+class CrudForm(SilvaGrokForm, crud.CrudForm, SMIView):
+    """Crud form.
+    """
+
+
 # Macros to render z3c forms
 
 from zope.publisher.browser import BrowserView
@@ -145,6 +136,17 @@ class Z3CFormMacros(BrowserView):
     def __getitem__(self, key):
         return self.template.macros[key]
 
+# Customization of widgets
+
+@silvaconf.subscribe(z3c.form.interfaces.IAfterWidgetUpdateEvent)
+def customizeWidgets(event):
+    item = widget = event.widget
+    if z3c.form.interfaces.IAction.providedBy(widget):
+            item = widget.field
+    apply_style = component.queryAdapter(item, ISilvaStyle)
+    if apply_style:
+        apply_style.style(widget)
+
 
 # Cancel button on every forms
 
@@ -155,10 +157,10 @@ class CancelButton(button.Button):
     interface.implements(ICancelButton)
     
 
-class SilvaFormActions(button.ButtonActions, component.MultiAdapter):
-    component.adapts(ISilvaZ3CFormForm,
-                     interface.Interface,
-                     interface.Interface)
+class SilvaFormActions(button.ButtonActions, grok.MultiAdapter):
+    grok.adapts(ISilvaZ3CFormForm,
+                interface.Interface,
+                interface.Interface)
                       
     def update(self):
         self.form.buttons = button.Buttons(
@@ -168,11 +170,11 @@ class SilvaFormActions(button.ButtonActions, component.MultiAdapter):
 
 
 
-class SilvaAddActionHandler(button.ButtonActionHandler, component.MultiAdapter):
-    component.adapts(ISilvaZ3CFormForm,
-                     interface.Interface,
-                     interface.Interface,
-                     button.ButtonAction)
+class SilvaAddActionHandler(button.ButtonActionHandler, grok.MultiAdapter):
+    grok.adapts(ISilvaZ3CFormForm,
+                interface.Interface,
+                interface.Interface,
+                button.ButtonAction)
 
     def __call__(self):
         if self.action.name == 'form.buttons.cancel':
