@@ -7,36 +7,79 @@
       xmlns:tal="http://xml.zope.org/namespaces/tal"
       xmlns:i18n="http://xml.zope.org/namespaces/i18n"
       tal:define="vein                  string:contents;
-                  maintitlecolspan      string:2"
+                  maintitlecolspan      string:1;
+                  global vein string:external users;
+                  global active_tab string:tab_access;
+                  global parent_screen_name string:tab_access"
       i18n:domain="silva">
   
-  <metal:use-macro use-macro="here/macro_index/macros/master">
+<metal:use-macro use-macro="here/macro_index/macros/master">
+
+<metal:fill-style-slot fill-slot="style">
+<style type="text/css">
+table.listing td.nestingcell {
+  padding:0;
+}
+div.portalMessage {
+  margin: 0;
+  border: 1px solid #789;
+  border-style: solid none solid;
+  padding: 0 0.3em 0.1em;
+  color: #555;
+  background: #f3f3d9;
+}
+#crud-edit-form-buttons-delete {
+  color: #fdeaea;
+  background-color: #752e2f;
+}
+</style>
+</metal:fill-style-slot>
+
+<metal:block metal:fill-slot="middleground">
+  <metal:block use-macro="here/macro_middleground/macros/access" />
+</metal:block>
 
     <metal:fill-editor-slot fill-slot="main">
 
-      <table class="columns columns2">
+      <table class="columns columns3">
         <tbody>
           <tr>
             <td class="left">
+              <metal:use-macro use-macro="here/macro_vein_navigation/macros/vein">
+                <metal:fill-slot fill-slot="sidebar">
+                  <tal:block 
+                     tal:define="template_id template/id"
+                     tal:replace="structure python: here.service_sidebar.render(model, template_id, vein)" />
+                </metal:fill-slot>
+              </metal:use-macro>
             </td>
             <td class="main">
 
               <table class="listing">
                 <thead>
                   <tr tal:condition="view/label">
-                    <th colspan="1"
-                        tal:content="view/label">
-                    </th>
+                    <td class="top"
+                      colspan="1">
+                      <h2 tal:attributes="title string:id: ${model/id}">
+                        <img tal:replace="structure icon" />
+                        <tal:inline tal:content="view/label"
+                          i18n:translate="">table label</tal:inline>
+                      </h2>
+                    </td>
                   </tr>
-                  <tr tal:condition="view/description">
-                    <td colspan="1"
-                        tal:content="view/description">
+                  <tr class="odd"
+                    tal:condition="view/description">
+                    <td class="designator"
+                      colspan="1"
+                      tal:content="view/description">
                     </td>
                   </tr>
                 </thead>
                 <tbody>
                   <tr tal:repeat="form view/subforms">
-                    <td tal:content="structure form/render">
+                    <td class="nestingcell"
+                      tal:content="structure form/render">
+                      feedback and rendered forms appear get inserted
                     </td>
                   </tr>
                 </tbody>
@@ -51,6 +94,33 @@
                 </tfoot>
               </table>
 
+            </td>
+            <td class="right">
+              <metal:use use-macro="view/macro_user_lookup_clipboard/macros/clipboard">
+                <metal:fill fill-slot="clipboard_actions">
+                  <select class="manipulator"
+                    style="float:left"
+                    name="assign_role"
+                    title="select a role to assign">
+                    <option value="None" 
+                      i18n:translate="">
+                      select role:
+                    </option>
+                    <tal:block 
+                      define="preselected python: request.form.get('assign_role')">
+                      <metal:include metal:use-macro="here/macro_role_options/macros/options"/>
+                    </tal:block>
+                  </select>
+                  <input class="button"
+                    style="float:left"
+                    name="access_assign_to_user:method"
+                    title="assign a local role to selected user(s)"
+                    type="submit"
+                    value="assign" 
+                    i18n:attributes="title;value"
+                  />
+                </metal:fill>
+              </metal:use>
             </td>
           </tr>
         </tbody>
