@@ -81,7 +81,10 @@ div.portalMessage {
                 <thead>
                   <tr class="top-controls">
                     <td>
-                      <h3 i18n:translate="">manage external users</h3>
+                      <h3 tal:content="view/formlabel | default" 
+                        i18n:translate="">
+                        form label
+                      </h3>
                     </td>
                   </tr>
                 </thead>
