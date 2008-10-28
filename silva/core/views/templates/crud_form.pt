@@ -75,6 +75,16 @@ div.portalMessage {
                     </td>
                   </tr>
                 </thead>
+              </table>
+
+              <table class="listing">
+                <thead>
+                  <tr class="top-controls">
+                    <td>
+                      <h3 i18n:translate="">manage external users</h3>
+                    </td>
+                  </tr>
+                </thead>
                 <tbody>
                   <tr tal:repeat="form view/subforms">
                     <td class="nestingcell"
@@ -98,27 +108,14 @@ div.portalMessage {
             <td class="right">
               <metal:use use-macro="view/macro_user_lookup_clipboard/macros/clipboard">
                 <metal:fill fill-slot="clipboard_actions">
-                  <select class="manipulator"
-                    style="float:left"
-                    name="assign_role"
-                    title="select a role to assign">
-                    <option value="None" 
-                      i18n:translate="">
-                      select role:
-                    </option>
-                    <tal:block 
-                      define="preselected python: request.form.get('assign_role')">
-                      <metal:include metal:use-macro="here/macro_role_options/macros/options"/>
-                    </tal:block>
-                  </select>
-                  <input class="button"
-                    style="float:left"
-                    name="access_assign_to_user:method"
-                    title="assign a local role to selected user(s)"
+                  <input class="button remover"
+                    name="lookup_remove_from_selection:method"
                     type="submit"
-                    value="assign" 
-                    i18n:attributes="title;value"
-                  />
+                    value="remove user"
+                    title="remove users from the clipboard: alt-r"
+                    accesskey="r"
+                    i18n:attributes="value;title"
+                 />
                 </metal:fill>
               </metal:use>
             </td>
