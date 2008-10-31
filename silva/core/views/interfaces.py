@@ -8,6 +8,7 @@ from zope.interface import Interface, Attribute
 from zope.publisher.interfaces.browser import IBrowserRequest
 from zope.traversing.browser.interfaces import IAbsoluteURL
 from zope.viewlet.interfaces import IViewlet as IBaseViewlet
+from zope.viewlet.interfaces import IViewletManager as IBaseViewletManager
 from zope import schema
 
 from grokcore.view.interfaces import IGrokView
@@ -73,6 +74,10 @@ class ISMIView(IGrokView):
 
 class IContentProvider(IBaseContentProvider, IGrokCustomizable):
     """A customizable Content Provider.
+    """
+
+class IViewletManager(IBaseViewletManager, IGrokCustomizable):
+    """A customizable Viewlet Manager.
     """
 
 class IViewlet(IBaseViewlet, IGrokCustomizable):

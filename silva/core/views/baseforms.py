@@ -39,7 +39,7 @@ class SilvaMixinForm(object):
 
         # Default feedback
         self._status_type = None
-        
+
 
     def __call__(self, message=None, message_type=None):
         if message:
@@ -78,7 +78,7 @@ class SilvaMixinAddForm(object):
                          extensionRegistry.get_addables())
         if len(addable) != 1:
             raise ValueError, "Content cannot be found. " \
-               "Check that the name of add is the meta type of your content." 
+               "Check that the name of add is the meta type of your content."
         addable = addable[0]
         factory = getattr(resolve(addable['instance'].__module__),
                           getFactoryName(addable['instance']))
@@ -119,7 +119,7 @@ class SilvaMixinEditForm(object):
     versioned_content = False
     propose_new_version = False
     is_editable = True
-    
+
     @property
     def propose_to_publish(self):
         if not IVersionedContent.providedBy(self.context):

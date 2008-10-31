@@ -33,13 +33,6 @@ class SilvaGrokView(grok.View):
 
     silvaconf.baseclass()
 
-#     def publishTraverse(self, request, name):
-#         """In Zope2, if you give a name, index_html is appended to it.
-#         """
-#         if name == 'index_html':
-#             return self
-#         return super(SilvaGrokView, self).publishTraverse(request, name)
-
     def redirect(self, url):
         # Override redirect to send status information if there is.
         if IFeedback.providedBy(self):
@@ -229,9 +222,15 @@ class ViewletManager(ContentProviderBase, ViewletManagerBase):
                       [(name, viewlet.__of__(parent)) for name, viewlet in viewlets])
 
     def default_namespace(self):
-        namespace = super(ContentProvider, self).default_namespace()
+        namespace = super(ViewletManager, self).default_namespace()
         namespace['viewletmanager'] = self
         return namespace
+
+    def render(self):
+        if self.template:
+            return self.template.render(self)
+        else:
+            return u'\n'.join([viewlet.render() for viewlet in self.viewlets])
 
 
 
@@ -246,7 +245,7 @@ class Viewlet(ContentProviderBase, ViewletBase):
         self.viewletmanager = viewletmanager
 
     def default_namespace(self):
-        namespace = super(ContentProvider, self).default_namespace()
+        namespace = super(Viewlet, self).default_namespace()
         namespace['viewlet'] = self
         namespace['viewletmanager'] = self.viewletmanager
         return namespace
