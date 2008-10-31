@@ -31,14 +31,6 @@ class SilvaBaseView(BrowserView):
     """Grok View on Silva objects.
     """
 
-#     def publishTraverse(self, request, name):
-#         """In Zope2, if you give a name, index_html is appended to it.
-#         """
-#         if name == 'index_html':
-#             return self
-#         return super(SilvaBaseView, self).publishTraverse(request, name)
-
-
     @property
     def response(self):
         return self.request.RESPONSE

@@ -31,12 +31,12 @@ class SilvaBaseForm(SilvaMixinForm, ViewCode):
 
     interface.implements(ISilvaZ3CFormForm)
 
-    def publishTraverse(self, request, name):
-        """In Zope2, if you give a name, index_html is appended to it.
-        """
-        if name == 'index_html':
-            return self
-        return super(SilvaBaseForm, self).publishTraverse(request, name)
+#     def publishTraverse(self, request, name):
+#         """In Zope2, if you give a name, index_html is appended to it.
+#         """
+#         if name == 'index_html':
+#             return self
+#         return super(SilvaBaseForm, self).publishTraverse(request, name)
 
     @property
     def status_type(self):
@@ -140,7 +140,7 @@ class EditForm(SilvaMixinEditForm, SilvaBaseForm, form.EditForm, SMIView):
 
 
 class CrudForm(SilvaBaseForm, crud.CrudForm, SMIView):
-    """CrudForm.
+    """Crud form.
     """
 
     template = ViewPageTemplateFile('templates/crud_form.pt')

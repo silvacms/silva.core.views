@@ -12,7 +12,7 @@
                   global active_tab string:tab_access;
                   global parent_screen_name string:tab_access"
       i18n:domain="silva">
-  
+
 <metal:use-macro use-macro="here/macro_index/macros/master">
 
 <metal:fill-style-slot fill-slot="style">
@@ -36,7 +36,7 @@ div.portalMessage {
 </metal:fill-style-slot>
 
 <metal:block metal:fill-slot="middleground">
-  <metal:block use-macro="here/macro_middleground/macros/access" />
+    <tal:buttons tal:replace="structure model/@@tab_access_extra" />
 </metal:block>
 
     <metal:fill-editor-slot fill-slot="main">
@@ -47,7 +47,7 @@ div.portalMessage {
             <td class="left">
               <metal:use-macro use-macro="here/macro_vein_navigation/macros/vein">
                 <metal:fill-slot fill-slot="sidebar">
-                  <tal:block 
+                  <tal:block
                      tal:define="template_id template/id"
                      tal:replace="structure python: here.service_sidebar.render(model, template_id, vein)" />
                 </metal:fill-slot>
@@ -81,7 +81,7 @@ div.portalMessage {
                 <thead>
                   <tr class="top-controls">
                     <td>
-                      <h3 tal:content="view/formlabel | default" 
+                      <h3 tal:content="view/formlabel | default"
                         i18n:translate="">
                         form label
                       </h3>
@@ -109,18 +109,7 @@ div.portalMessage {
 
             </td>
             <td class="right">
-              <metal:use use-macro="view/macro_user_lookup_clipboard/macros/clipboard">
-                <metal:fill fill-slot="clipboard_actions">
-                  <input class="button remover"
-                    name="lookup_remove_from_selection:method"
-                    type="submit"
-                    value="remove user"
-                    title="remove users from the clipboard: alt-r"
-                    accesskey="r"
-                    i18n:attributes="value;title"
-                 />
-                </metal:fill>
-              </metal:use>
+              <metal:use use-macro="view/macro_user_lookup_clipboard/macros/clipboard" />
             </td>
           </tr>
         </tbody>

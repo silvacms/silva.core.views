@@ -9,7 +9,7 @@
       tal:define="vein          string:add;
                   active_tab    string:tab_edit;"
       i18n:domain="silva">
-  
+
   <metal:use-macro use-macro="here/macro_index/macros/master">
 
     <metal:fill-add-slot fill-slot="main">
@@ -50,7 +50,7 @@
             <tbody>
               <metal:widgets metal:use-macro="view/form_macros/widgets" />
             </tbody>
-            
+
             <tfoot>
               <tr>
                 <th i18n:translate="">
