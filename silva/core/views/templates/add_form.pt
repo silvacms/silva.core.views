@@ -9,7 +9,7 @@
       tal:define="vein          string:add;
                   active_tab    string:tab_edit;"
       i18n:domain="silva">
-  
+
   <metal:use-macro use-macro="here/macro_index/macros/master">
 
     <metal:fill-add-slot fill-slot="main">
@@ -27,7 +27,7 @@
                 <td class="top"
                     colspan="2">
                   <h2>
-                    <img tal:replace="structure python:view.render_icon_by_meta_type(meta_type)" />
+                    <img tal:replace="structure python:here.render_icon_by_meta_type(meta_type)" />
                     <tal:translate i18n:translate="">
                       create
                       <tal:block replace="meta_type"
@@ -50,7 +50,7 @@
             <tbody>
               <metal:widgets metal:use-macro="view/form_macros/widgets" />
             </tbody>
-            
+
             <tfoot>
               <tr>
                 <th i18n:translate="">

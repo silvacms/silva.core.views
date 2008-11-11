@@ -37,7 +37,7 @@
      permission="zope.Public"
      />
 
-  <!-- AbsoluteURL views -->  
+  <!-- AbsoluteURL views -->
   <view
     for="Products.Silva.interfaces.ISilvaObject"
     factory=".absoluteurl.AbsoluteURL"
@@ -56,7 +56,7 @@
 
   <!-- Default traverser for Silva views -->
   <adapter
-    for="Products.Silva.interfaces.ISilvaObject 
+    for="Products.Silva.interfaces.ISilvaObject
          zope.publisher.interfaces.browser.IBrowserRequest"
     factory=".traverser.SilvaPublishTraverse"
     provides="zope.publisher.interfaces.browser.IBrowserPublisher"
@@ -70,5 +70,5 @@
   <include package="five.megrok.z3cform" />
   <include package="five.resourceinclude" />
 
-  
+
 </configure>
