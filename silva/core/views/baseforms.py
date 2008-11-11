@@ -65,6 +65,8 @@ class SilvaMixinAddForm(object):
 
     template = grokcore.view.PageTemplateFile('templates/add_form.pt')
 
+    vein = u'add'
+
     def _silvaView(self):
         view_registry = self.context.service_view_registry
         ## Then you add a element, you have the edit view of the
@@ -115,6 +117,8 @@ class SilvaMixinEditForm(object):
 
     template = grokcore.view.PageTemplateFile('templates/edit_form.pt')
     silvaconf.name(u'tab_edit')
+
+    vein = u'edit'
 
     versioned_content = False
     propose_new_version = False

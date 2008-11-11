@@ -9,6 +9,7 @@ from zope.viewlet.interfaces import IViewletManager
 from zope import component, interface
 import zope.cachedescriptors.property
 
+from grokcore.view.meta.views import default_view_name
 from five import grok
 import urllib
 
@@ -16,7 +17,7 @@ from Products.Silva.interfaces import ISilvaObject
 from Products.Five.viewlet.manager import ViewletManagerBase
 from Products.Five.viewlet.viewlet import ViewletBase
 
-from silva.core.views.interfaces import IFeedback, IZMIView, ISMIView
+from silva.core.views.interfaces import IFeedback, IZMIView, ISMIView, ISMITab
 from silva.core.views.interfaces import ITemplate, IPreviewLayer, IView
 from silva.core.views.interfaces import IContentProvider, IViewlet
 from silva.core.conf.utils import getSilvaViewFor
@@ -68,6 +69,8 @@ class SMIView(SilvaGrokView):
     silvaconf.baseclass()
     silvaconf.context(ISilvaObject)
 
+    vein = 'contents'
+
     def __init__(self, context, request):
         super(SMIView, self).__init__(context, request)
 
@@ -81,6 +84,20 @@ class SMIView(SilvaGrokView):
         # Lookup the correct Silva edit view so forms are able to use
         # silva macros.
         return getSilvaViewFor(self.context, 'edit', self.context)
+
+    @property
+    def tab_name(self):
+        return silvaconf.name.bind().get(self, default=default_view_name)
+
+    @property
+    def active_tab(self):
+        tab_class = None
+        for base in self.__class__.__bases__:
+            if ISMITab.implementedBy(base):
+                tab_class = base
+        if tab_class:
+            return silvaconf.name.bind().get(tab_class, default=default_view_name)
+        return 'tab_edit'
 
     def namespace(self):
         # This add to the template namespace global variable used in

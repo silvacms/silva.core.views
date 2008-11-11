@@ -6,8 +6,8 @@
       xmlns:metal="http://xml.zope.org/namespaces/metal"
       xmlns:tal="http://xml.zope.org/namespaces/tal"
       xmlns:i18n="http://xml.zope.org/namespaces/i18n"
-      tal:define="vein          string:add;
-                  active_tab    string:tab_edit;"
+      tal:define="vein string:add;
+                  active_tab view/active_tab;"
       i18n:domain="silva">
 
   <metal:use-macro use-macro="here/macro_index/macros/master">
