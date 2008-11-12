@@ -14,7 +14,7 @@ from silva.core.views.views import SMIView
 from silva.core.views.baseforms import SilvaMixinForm, SilvaMixinAddForm, SilvaMixinEditForm
 from silva.core import conf as silvaconf
 
-import grokcore.viewx
+import grokcore.view
 from five import grok
 
 from five.megrok.z3cform.components import GrokForm
