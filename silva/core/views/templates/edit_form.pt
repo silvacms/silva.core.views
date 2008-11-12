@@ -31,24 +31,9 @@
       </tal:preview>
     </metal:fill-slot>
 
-    <metal:block fill-slot="middleground">
-      <div class="middleground"
-           tal:condition="context/versioned_content">
-        <div style="float:right">
-          <a class="executor"
-             title="publish this document: alt-p"
-             accesskey="p"
-             tal:attributes="href string:${context/absolute_url}/edit/quick_publish?return_to=tab_edit"
-             i18n:translate=""
-             i18n:attributes="title"
-             tal:condition="view/propose_to_publish">
-            publish&nbsp;now
-          </a>
-        </div>
-        &nbsp;
-      </div>
-    </metal:block>
-
+    <metal:middleground metal:fill-slot="middleground">
+      <tal:replace tal:replace="structure provider:smimiddlegroundmanager" />
+    </metal:middleground>
 
     <metal:fill-notice-slot fill-slot="notice">
 

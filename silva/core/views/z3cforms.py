@@ -30,13 +30,6 @@ class SilvaGrokForm(SilvaMixinForm, GrokForm, ViewCode):
     interface.implements(ISilvaZ3CFormForm)
     silvaconf.baseclass()
 
-#     def publishTraverse(self, request, name):
-#         """In Zope2, if you give a name, index_html is appended to it.
-#         """
-#         if name == 'index_html':
-#             return self
-#         return super(SilvaGrokForm, self).publishTraverse(request, name)
-
     @property
     def status_type(self):
         if self._status_type:
@@ -52,7 +45,7 @@ class PageForm(SilvaGrokForm, form.Form, SMIView):
     """
 
     silvaconf.baseclass()
-    
+
 
 class AddForm(SilvaMixinAddForm, SilvaGrokForm, form.AddForm, SMIView):
     """Add form.
@@ -124,6 +117,8 @@ class CrudForm(SilvaGrokForm, crud.CrudForm, SMIView):
     """Crud form.
     """
 
+    template = ViewPageTemplateFile('templates/crud_form.pt')
+
 
 # Macros to render z3c forms
 
@@ -132,7 +127,7 @@ from zope.app.pagetemplate.viewpagetemplatefile import ViewPageTemplateFile
 
 class Z3CFormMacros(BrowserView):
     template = ViewPageTemplateFile('templates/z3cform.pt')
-    
+
     def __getitem__(self, key):
         return self.template.macros[key]
 
@@ -155,13 +150,13 @@ class CancelButton(button.Button):
     """
 
     interface.implements(ICancelButton)
-    
+
 
 class SilvaFormActions(button.ButtonActions, grok.MultiAdapter):
     grok.adapts(ISilvaZ3CFormForm,
                 interface.Interface,
                 interface.Interface)
-                      
+
     def update(self):
         self.form.buttons = button.Buttons(
             self.form.buttons,

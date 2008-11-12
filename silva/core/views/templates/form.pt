@@ -13,6 +13,10 @@
 
   <metal:use-macro use-macro="here/macro_edit/macros/editor">
 
+    <metal:middleground metal:fill-slot="middleground">
+      <tal:replace tal:replace="structure provider:smimiddlegroundmanager" />
+    </metal:middleground>
+
     <metal:fill-editor-slot fill-slot="main">
 
       <metal:use-macro use-macro="here/macro_edit/macros/two-col-layout">
