@@ -14,6 +14,7 @@ from silva.core.views.views import SMIView
 from silva.core.views.baseforms import SilvaMixinForm, SilvaMixinAddForm, SilvaMixinEditForm
 from silva.core import conf as silvaconf
 
+import grokcore.viewx
 from five import grok
 
 from five.megrok.z3cform.components import GrokForm
@@ -117,7 +118,7 @@ class CrudForm(SilvaGrokForm, crud.CrudForm, SMIView):
     """Crud form.
     """
 
-    template = ViewPageTemplateFile('templates/crud_form.pt')
+    template = grokcore.view.PageTemplateFile('templates/crud_form.pt')
 
 
 # Macros to render z3c forms
