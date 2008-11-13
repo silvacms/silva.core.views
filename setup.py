@@ -29,6 +29,5 @@ setup(name='silva.core.views',
               'zope.schema',
               'plone.z3cform',
               'silva.core.conf',
-              'five.resourceinclude',
               ],
       )

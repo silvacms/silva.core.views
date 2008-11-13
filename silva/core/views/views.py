@@ -272,8 +272,3 @@ class Viewlet(ContentProviderBase, ViewletBase):
         return self.template.render(self)
 
 
-from five.resourceinclude.provider import ResourceIncludeProvider
-
-class ResourceContentProvider(ResourceIncludeProvider, ContentProvider):
-
-    silvaconf.name('resources')
