@@ -58,6 +58,7 @@ class ZMIView(SilvaGrokView):
     grok.implements(IZMIView)
 
     silvaconf.baseclass()
+    silvaconf.require('zope2.ViewManagementScreens')
 
 
 class ZMIEditForm(grok.EditForm, ZMIView):
