@@ -22,7 +22,7 @@ class AbsoluteURL(BrowserView):
     """
 
     implements(ISilvaURL)
-    
+
     def __init__(self, context, request):
         self.context = context
         self.request = request
@@ -54,15 +54,15 @@ class AbsoluteURL(BrowserView):
         name = context.get_short_title()
         if len(name) > 50:
             name = name[47:] + '...'
-        
+
         def isVirtualHostRoot():
             path = self.context.getPhysicalPath()
             virtualPath = self.request.physicalPathToVirtualPath(path)
             return not virtualPath
 
-        if (container is None or 
+        if (container is None or
             IRoot.providedBy(self.context) or
-            isVirtualHostRoot() or 
+            isVirtualHostRoot() or
             not ITraversable.providedBy(container)):
             return ({'name': name, 'url': self.__str__()},)
 
