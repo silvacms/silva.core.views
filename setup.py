@@ -30,7 +30,7 @@ setup(name='silva.core.views',
       zip_safe=False,
       install_requires=[
               'setuptools',
-              'five.grok',
+              'five.grok >= 1.0a2',
               'five.megrok.z3cform',
               'zope.interface',
               'zope.schema',

@@ -11,7 +11,7 @@ from zope.interface import implements
 from OFS.interfaces import ITraversable
 from Products.Five import BrowserView
 
-from Products.Silva.interfaces import IPublication, IRoot, IContent
+from Products.Silva.interfaces import IRoot, IContent
 
 from silva.core.views.interfaces import IPreviewLayer, ISilvaURL
 
@@ -29,7 +29,8 @@ class AbsoluteURL(BrowserView):
 
     def url(self, preview=False):
         path = list(self.context.getPhysicalPath())
-        # Insert back the preview namespace. Maybe there is a better way to do it.
+        # Insert back the preview namespace. Maybe there is a better
+        # way to do it.
         if preview:
             root = self.context.get_root()
             root_path = root.getPhysicalPath()

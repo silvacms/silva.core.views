@@ -39,13 +39,13 @@ class TTWViewTemplate(ZopePageTemplate):
         # a view.
         sm = getSecurityManager()
         if self.permission:
-            if not sm.checkPermission(self.permission, context):
+            if not sm.checkPermission(self.permission, args[0]):
                 raise Unauthorized('The current user does not have the '
                                    'required "%s" permission'
                                    % self.permission)
 
-        class_ = makeClass('FrankensteinTTWTemplate', 
-                           (TTWViewTemplateRenderer, self.view), 
+        class_ = makeClass('FrankensteinTTWTemplate',
+                           (TTWViewTemplateRenderer, self.view),
                            {'__name__': self.name,
                             '__view_name__': self.name,
                             'module_info': FakeModuleInfoForGrok(self.view.__module__)})

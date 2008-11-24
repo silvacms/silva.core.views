@@ -4,9 +4,7 @@
 # $Id$
 
 from zope.i18n import translate
-from zope.security.interfaces import IPermission
 from zope.viewlet.interfaces import IViewletManager
-from zope import component, interface
 import zope.cachedescriptors.property
 
 from grokcore.view.meta.views import default_view_name
@@ -14,8 +12,6 @@ from five import grok
 import urllib
 
 from Products.Silva.interfaces import ISilvaObject
-from Products.Five.viewlet.manager import ViewletManagerBase
-from Products.Five.viewlet.viewlet import ViewletBase
 
 from silva.core.views.interfaces import IFeedback, IZMIView, ISMIView, ISMITab
 from silva.core.views.interfaces import ITemplate, IPreviewLayer, IView
@@ -24,7 +20,6 @@ from silva.core.conf.utils import getSilvaViewFor
 from silva.core import conf as silvaconf
 
 from AccessControl import getSecurityManager
-import Acquisition
 
 # Simple views
 
@@ -107,7 +102,8 @@ class SMIView(SilvaGrokView):
             if ISMITab.implementedBy(base):
                 tab_class = base
         if tab_class:
-            return silvaconf.name.bind().get(tab_class, default=default_view_name)
+            name = silvaconf.name.bind()
+            return name.get(tab_class, default=default_view_name)
         return 'tab_edit'
 
     def namespace(self):
@@ -154,132 +150,42 @@ class View(Template):
         return {'content': self.content}
 
 
-class ContentProviderBase(Acquisition.Explicit):
-
-    silvaconf.baseclass()
-    silvaconf.context(ISilvaObject)
-
-    def __init__(self, context, request, view):
-        self.context = context
-        self.request = request
-        self.view = view
-        static = component.queryAdapter(
-            self.request, interface.Interface,
-            name = self.module_info.package_dotted_name)
-        if not (static is None):
-            self.static = static.__of__(self)
-        else:
-            self.static = static
-        self.__parent__ = view
-        self.__name__ = self.__view_name__
-
-    getPhysicalPath = Acquisition.Acquired
-
-    def namespace(self):
-        return {}
-
-    def default_namespace(self):
-        namespace = {}
-        namespace['view'] = self.view
-        namespace['static'] = self.static
-        return namespace
-
-
-class ContentProvider(ContentProviderBase):
+class ContentProvider(grok.ViewletManager):
+    """A content provider in Silva. In fact it's just a viewlet
+    manager...
+    """
 
     grok.implements(IContentProvider)
 
     silvaconf.baseclass()
+    silvaconf.context(ISilvaObject)
+
+    def __init__(self, *args):
+        super(ContentProvider, self).__init__(*args)
+        self.provider = self.viewletmanager
 
     def default_namespace(self):
         namespace = super(ContentProvider, self).default_namespace()
         namespace['provider'] = self
         return namespace
 
-    def update(self):
-        pass
 
-    def render(self):
-        return self.template.render(self)
-
-class ViewletManager(ContentProviderBase, ViewletManagerBase):
+class ViewletManager(grok.ViewletManager):
+    """A viewlet manager in Silva.
+    """
 
     grok.implements(IViewletManager)
 
     silvaconf.baseclass()
-
-    def __init__(self, context, request, view):
-        ContentProviderBase.__init__(self, context, request, view)
-        ViewletManagerBase.__init__(self, context, request, view)
-
-    def sort(self, viewlets):
-        s_viewlets = []
-        for name, viewlet in viewlets:
-             viewlet.__viewlet_name__ = name
-             s_viewlets.append(viewlet)
-
-        def sort_key(viewlet):
-            # If components have a grok.order directive, sort by that.
-            explicit_order, implicit_order = silvaconf.order.bind().get(viewlet)
-            return (explicit_order,
-                    viewlet.__module__,
-                    implicit_order,
-                    viewlet.__class__.__name__)
-        s_viewlets = sorted(s_viewlets, key=sort_key)
-        return [(viewlet.__viewlet_name__, viewlet) for viewlet in s_viewlets]
-
-    def filter(self, viewlets):
-        # Wrap viewlet in aquisition, and only return viewlets
-        # accessible to the user.
-        parent = self.aq_parent
-        security_manager = getSecurityManager()
-
-        def checkPermission(viewlet):
-            _, viewlet = viewlet
-            # Unfortuanetly, we don't have easy way to check the permission.
-            permission = silvaconf.require.bind().get(viewlet)
-            if (permission is None) or (permission == 'zope.Public'):
-                return True
-            if isinstance(permission, str):
-                permission = component.getUtility(IPermission, permission)
-            return security_manager.checkPermission(permission.title, viewlet)
-
-        return filter(checkPermission,
-                      [(name, viewlet.__of__(parent)) for name, viewlet in viewlets])
-
-    def default_namespace(self):
-        namespace = super(ViewletManager, self).default_namespace()
-        namespace['viewletmanager'] = self
-        return namespace
-
-    def render(self):
-        if self.template:
-            return self.template.render(self)
-        else:
-            return u'\n'.join([viewlet.render() for viewlet in self.viewlets])
+    silvaconf.context(ISilvaObject)
 
 
-
-class Viewlet(ContentProviderBase, ViewletBase):
+class Viewlet(grok.Viewlet):
+    """A viewlet in Silva
+    """
 
     grok.implements(IViewlet)
 
     silvaconf.baseclass()
-
-    def __init__(self, context, request, view, viewletmanager):
-        ContentProviderBase.__init__(self, context, request, view)
-        self.viewletmanager = viewletmanager
-
-    def default_namespace(self):
-        namespace = super(Viewlet, self).default_namespace()
-        namespace['viewlet'] = self
-        namespace['viewletmanager'] = self.viewletmanager
-        return namespace
-
-    def update(self):
-        pass
-
-    def render(self):
-        return self.template.render(self)
-
+    silvaconf.context(ISilvaObject)
 
