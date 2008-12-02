@@ -41,6 +41,14 @@ class ISMIView(Interface):
     """A view in SMI.
     """
 
+    tab_name = Attribute("Name of the current tab.")
+    active_tab = Attribute(u"Which is the current active tab")
+    vein = Attribute(u"What's the vein to display")
+
+class ISMITab(ISMIView):
+    """A tab in SMI.
+    """
+
 class IContentProvider(IBaseContentProvider):
     """A Content Provider.
     """

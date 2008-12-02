@@ -31,13 +31,6 @@ class SilvaBaseForm(SilvaMixinForm, ViewCode):
 
     interface.implements(ISilvaZ3CFormForm)
 
-#     def publishTraverse(self, request, name):
-#         """In Zope2, if you give a name, index_html is appended to it.
-#         """
-#         if name == 'index_html':
-#             return self
-#         return super(SilvaBaseForm, self).publishTraverse(request, name)
-
     @property
     def status_type(self):
         if self._status_type:
@@ -73,7 +66,7 @@ class PageForm(SilvaBaseForm, form.Form, SMIView):
     """Generic form.
     """
 
-    
+
 
 class AddForm(SilvaMixinAddForm, SilvaBaseForm, form.AddForm, SMIView):
     """Add form.
@@ -153,7 +146,7 @@ from zope.app.pagetemplate.viewpagetemplatefile import ViewPageTemplateFile
 
 class Z3CFormMacros(BrowserView):
     template = ViewPageTemplateFile('templates/z3cform.pt')
-    
+
     def __getitem__(self, key):
         import pdb ; pdb.set_trace()
         return self.template.macros[key]
@@ -176,13 +169,13 @@ class CancelButton(button.Button):
     """
 
     interface.implements(ICancelButton)
-    
+
 
 class SilvaFormActions(button.ButtonActions):
     component.adapts(ISilvaZ3CFormForm,
                      interface.Interface,
                      interface.Interface)
-                      
+
     def update(self):
         self.form.buttons = button.Buttons(
             self.form.buttons,

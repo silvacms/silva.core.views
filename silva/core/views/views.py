@@ -64,6 +64,10 @@ class SMIView(SilvaBaseView):
 
     implements(ISMIView)
 
+    vein = 'contents'
+    tab_name = 'tab_edit'
+    active_tab = 'tab_edit'
+
     def __init__(self, context, request):
         super(SMIView, self).__init__(context, request)
 
