@@ -8,7 +8,7 @@
       xmlns:i18n="http://xml.zope.org/namespaces/i18n"
       tal:define="vein string:contents"
       i18n:domain="silva">
-  
+
   <metal:use-macro use-macro="here/macro_edit/macros/editor">
 
     <metal:fill-slot fill-slot="metatype_css">
@@ -50,7 +50,7 @@
 
 
     <metal:fill-notice-slot fill-slot="notice">
-      
+
       <div class="fixed-feedback" style="padding:0"
            tal:condition="view/propose_new_version">
         <form action="tab_edit_make_copy" method="post">
@@ -90,13 +90,13 @@
             <td class="left">
               <metal:use-macro use-macro="here/macro_vein_navigation/macros/vein">
                 <metal:fill-slot fill-slot="sidebar">
-                  <tal:block 
+                  <tal:block
                      tal:define="template_id template/id"
                      tal:replace="structure python: here.service_sidebar.render(model, template_id, vein)" />
                 </metal:fill-slot>
               </metal:use-macro>
             </td>
-            
+
             <tal:block replace="nothing">
               _____________________ main _____________________
             </tal:block>
@@ -106,7 +106,7 @@
                     tal:attributes="action template/id">
                 <table class="listing">
                   <thead>
-                    
+
                     <tal:block replace="nothing">
                       ______________ vein + title row ______________
                     </tal:block>

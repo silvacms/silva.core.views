@@ -10,7 +10,7 @@ import zope.cachedescriptors.property
 
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from Products.Silva.i18n import translate as _
-from Products.Silva.interfaces import IVersionedContent
+from Products.Silva.interfaces import IVersionedContent, ISilvaObject
 from Products.Silva.ExtensionRegistry import extensionRegistry
 from AccessControl import getSecurityManager
 
@@ -29,11 +29,10 @@ class SilvaMixinForm(object):
         super(SilvaMixinForm, self).__init__(context, request)
 
         # Set model on request like SilvaViews
-        self.request['model'] = context
+        self.request['model'] = self._silvaContext
 
         # Default feedback
         self._status_type = None
-
 
     def __call__(self, message=None, message_type=None):
         if message:

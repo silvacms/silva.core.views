@@ -84,7 +84,7 @@ class EditForm(SilvaMixinEditForm, SilvaGrokForm, formbase.EditForm, SMIView):
             self.widgets = form.setUpEditWidgets(
                 self.form_fields, self.prefix, editable_obj, self.request,
                 adapters=self.adapters, ignore_request=ignore_request)
-        
+
     @form.action(_("save"), condition=form.haveInputWidgets)
     def handle_edit_action(self, **data):
         editable_obj = self.context.get_editable()
@@ -103,6 +103,6 @@ from zope.app.pagetemplate.viewpagetemplatefile import ViewPageTemplateFile
 
 class FormlibMacros(BrowserView):
     template = ViewPageTemplateFile('templates/formlib.pt')
-    
+
     def __getitem__(self, key):
         return self.template.macros[key]

@@ -15,16 +15,8 @@
 
   <metal:fill-style-slot fill-slot="style">
     <style type="text/css">
-table.listing td.nestingcell {
-  padding:0;
-}
-div.portalMessage {
-  margin: 0;
-  border: 1px solid #789;
-  border-style: solid none solid;
-  padding: 0 0.3em 0.1em;
-  color: #555;
-  background: #f3f3d9;
+table.listing {
+  margin:0;
 }
 #crud-edit-form-buttons-delete {
   color: #fdeaea;
@@ -56,45 +48,34 @@ div.portalMessage {
               <table class="listing">
                 <thead>
                   <tr tal:condition="view/label">
-                    <td class="top"
-                      colspan="1">
+                    <td class="top">
                       <h2 tal:attributes="title string:id: ${model/id}">
                         <img tal:replace="structure icon" />
                         <tal:inline tal:content="view/label"
-                          i18n:translate="">table label</tal:inline>
+                                    i18n:translate="">table label</tal:inline>
                       </h2>
                     </td>
                   </tr>
                   <tr class="odd"
-                    tal:condition="view/description">
+                      tal:condition="view/description">
                     <td class="designator"
-                      colspan="1"
-                      tal:content="view/description">
-                    </td>
-                  </tr>
-                </thead>
-              </table>
-
-              <table class="listing">
-                <thead>
-                  <tr class="top-controls">
-                    <td>
-                      <h3 tal:content="view/formlabel | default"
-                        i18n:translate="">
-                        form label
-                      </h3>
+                        tal:content="view/description">
                     </td>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr tal:repeat="form view/subforms">
-                    <td class="nestingcell"
-                      tal:content="structure form/render">
-                      feedback and rendered forms appear get inserted
+                  <tr class="top-controls"
+                      tal:define="formlabel view/formlabel | nothing"
+                      tal:condition="formlabel">
+                    <td>
+                      <h3 tal:content="formlabel"
+                          i18n:translate="">
+                        form label
+                      </h3>
                     </td>
                   </tr>
                 </tbody>
-                <tfoot>
+                <tfoot tal:condition="view/actions">
                   <tr class="controls">
                     <td>
                       <tal:control tal:repeat="action view/actions/values">
@@ -104,6 +85,10 @@ div.portalMessage {
                   </tr>
                 </tfoot>
               </table>
+
+              <tal:repeat tal:repeat="form view/subforms"
+                          tal:replace="structure form/render">
+              </tal:repeat>
 
             </td>
             <td class="right">

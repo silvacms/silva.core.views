@@ -93,6 +93,13 @@ class ICancelButton(IButton):
     """A button to cancel a form.
     """
 
+
+class INoCancelButton(Interface):
+    """Marker interface for Z3CForm to say that you don't want a
+    cancel button.
+    """
+
+
 class ISilvaStyle(Interface):
     """Adapter used to apply new style information on z3c.form
     elements.

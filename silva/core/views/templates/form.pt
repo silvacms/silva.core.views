@@ -9,7 +9,7 @@
       tal:define="vein                  string:contents;
                   maintitlecolspan      string:2"
       i18n:domain="silva">
-  
+
   <metal:use-macro use-macro="here/macro_edit/macros/editor">
 
     <metal:fill-editor-slot fill-slot="main">
@@ -20,7 +20,7 @@
           <td class="left">
             <metal:use-macro use-macro="here/macro_vein_navigation/macros/vein">
               <metal:fill-slot fill-slot="sidebar">
-                <tal:block 
+                <tal:block
                    tal:define="template_id template/id"
                    tal:replace="structure python: here.service_sidebar.render(model, template_id, vein)" />
               </metal:fill-slot>

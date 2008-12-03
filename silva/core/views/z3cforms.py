@@ -11,7 +11,7 @@ from Products.Silva.i18n import translate as _
 from Products.Silva.ViewCode import ViewCode
 
 from silva.core.views.interfaces import ISilvaZ3CFormForm, IDefaultAddFields
-from silva.core.views.interfaces import ICancelButton, ISilvaStyle
+from silva.core.views.interfaces import ICancelButton, ISilvaStyle, INoCancelButton
 from silva.core.views.views import SMIView
 from silva.core.views.baseforms import SilvaMixinForm, SilvaMixinAddForm, SilvaMixinEditForm
 
@@ -22,6 +22,7 @@ from plone.z3cform import z2
 from plone.z3cform.crud import crud
 
 # Base class to forms
+
 
 class SilvaBaseForm(SilvaMixinForm, ViewCode):
     """Silva Gork form for z3cform.
@@ -40,7 +41,6 @@ class SilvaBaseForm(SilvaMixinForm, ViewCode):
                 return 'error'
         return 'feedback'
 
-
     def render(self):
         # Render content template.
 
@@ -50,8 +50,7 @@ class SilvaBaseForm(SilvaMixinForm, ViewCode):
             return template(self)
         namespace = self.default_namespace()
         namespace.update(self.namespace())
-        return self.template._exec(namespace, [], {})
-
+        return self.template.__of__(self)._exec(namespace, [], {})
 
     def __call__(self):
         """Render the form, patching the request first with
@@ -61,11 +60,9 @@ class SilvaBaseForm(SilvaMixinForm, ViewCode):
         return super(SilvaBaseForm, self).__call__()
 
 
-
 class PageForm(SilvaBaseForm, form.Form, SMIView):
     """Generic form.
     """
-
 
 
 class AddForm(SilvaMixinAddForm, SilvaBaseForm, form.AddForm, SMIView):
@@ -116,7 +113,6 @@ class EditForm(SilvaMixinEditForm, SilvaBaseForm, form.EditForm, SMIView):
         # Return the content to edit.
         return self.context.get_editable()
 
-
     @button.buttonAndHandler(_('save'), name='save')
     def handleSave(self, action):
         data, errors = self.extractData()
@@ -131,12 +127,66 @@ class EditForm(SilvaMixinEditForm, SilvaBaseForm, form.EditForm, SMIView):
             self.status = _(u'No changes')
 
 
+class CrudAddForm(SilvaBaseForm, crud.AddForm, SMIView):
+    """The add form of a CRUD form.
+    """
+
+    interface.implements(INoCancelButton)
+
+    template = ViewPageTemplateFile('templates/z3cform.pt')
+
+    @property
+    def label(self):
+        return _(u"Add ${label}", mapping=dict(label=self.context.label))
+
+    @apply
+    def status():
+        def get(self):
+            return self.context.status
+        def set(self, status):
+            self.context.status = status
+        return property(get, set)
+
+
+class CrudEditForm(SilvaBaseForm, crud.EditForm, SMIView):
+    """The edit form of a CRUD form.
+    """
+
+    interface.implements(INoCancelButton)
+
+    template = ViewPageTemplateFile('templates/crud_editform.pt')
+
+    @property
+    def label(self):
+        return _(u"Modify ${label}", mapping=dict(label=self.context.label))
+
+    @apply
+    def status():
+        def get(self):
+            return self.context.status
+        def set(self, status):
+            self.context.status = status
+        return property(get, set)
+
 
 class CrudForm(SilvaBaseForm, crud.CrudForm, SMIView):
     """Crud form.
     """
 
+    interface.implements(INoCancelButton)
+
     template = ViewPageTemplateFile('templates/crud_form.pt')
+    addform_factory = CrudAddForm
+    editform_factory = CrudEditForm
+
+    def update(self):
+        form.Form.update(self)
+
+        addform = self.addform_factory(self, self.request)
+        editform = self.editform_factory(self, self.request)
+        addform.update()
+        editform.update()
+        self.subforms = [addform, editform]
 
 
 # Macros to render z3c forms
@@ -148,7 +198,6 @@ class Z3CFormMacros(BrowserView):
     template = ViewPageTemplateFile('templates/z3cform.pt')
 
     def __getitem__(self, key):
-        import pdb ; pdb.set_trace()
         return self.template.macros[key]
 
 # Customization of widgets
@@ -177,11 +226,11 @@ class SilvaFormActions(button.ButtonActions):
                      interface.Interface)
 
     def update(self):
-        self.form.buttons = button.Buttons(
-            self.form.buttons,
-            CancelButton('cancel', _(u'cancel'), accessKey=u'c'))
+        if not INoCancelButton.providedBy(self.form):
+            self.form.buttons = button.Buttons(
+                self.form.buttons,
+                CancelButton('cancel', _(u'cancel'), accessKey=u'c'))
         super(SilvaFormActions, self).update()
-
 
 
 class SilvaAddActionHandler(button.ButtonActionHandler):
@@ -191,7 +240,8 @@ class SilvaAddActionHandler(button.ButtonActionHandler):
                      button.ButtonAction)
 
     def __call__(self):
-        if self.action.name == 'form.buttons.cancel':
-            self.form.redirect('%s/edit' % self.form.context.absolute_url())
-            return
+        if not INoCancelButton.providedBy(self.form):
+            if self.action.name == 'form.buttons.cancel':
+                self.form.redirect('%s/edit' % self.form.context.absolute_url())
+                return
         super(SilvaAddActionHandler, self).__call__()

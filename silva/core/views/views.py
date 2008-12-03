@@ -8,7 +8,7 @@ from zope.interface import implements
 from zope.security.interfaces import IPermission
 from zope.viewlet.interfaces import IViewletManager
 from zope import component, interface
-import zope.cachedescriptors.property
+from zope.cachedescriptors.property import CachedProperty
 
 import urllib
 
@@ -72,12 +72,20 @@ class SMIView(SilvaBaseView):
         super(SMIView, self).__init__(context, request)
 
         # Set model on request like SilvaViews
-        self.request['model'] = context
+        self.request['model'] = self._silvaContext
+
+    @CachedProperty
+    def _silvaContext(self):
+        context = self.context
+        while not ISilvaObject.providedBy(context) and hasattr(context, 'context'):
+            context = context.context
+        return context
 
     def _silvaView(self):
         # Lookup the correct Silva edit view so forms are able to use
         # silva macros.
-        return getSilvaViewFor(self.context, 'edit', self.context)
+        context = self._silvaContext
+        return getSilvaViewFor(context, 'edit', context)
 
     def namespace(self):
         # This add to the template namespace global variable used in
@@ -86,10 +94,12 @@ class SMIView(SilvaBaseView):
         # able to use silva macro in your templates.
         view = self._silvaView()
         return {'here': view,
+                'request': self.request,
+                'user': getSecurityManager().getUser(),
                 'realview': self, # XXX should be removed when silva
                                   # stop to do stupid things with view
                                   # in templates.
-                'container': self.context.aq_inner,}
+                'container': self._silvaContext.aq_inner,}
 
 
 class Template(SilvaBaseView):
@@ -105,12 +115,12 @@ class View(Template):
 
     implements(IView)
 
-    @zope.cachedescriptors.property.CachedProperty
+    @CachedProperty
     def is_preview(self):
         # XXX to fix
         return False
 
-    @zope.cachedescriptors.property.CachedProperty
+    @CachedProperty
     def content(self):
         if self.is_preview:
             return self.context.get_previewable()
