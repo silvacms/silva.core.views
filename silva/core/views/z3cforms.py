@@ -60,6 +60,19 @@ class SilvaBaseForm(SilvaMixinForm, ViewCode):
         return super(SilvaBaseForm, self).__call__()
 
 
+class SilvaBaseSubForm(SilvaBaseForm):
+    """Silva base subform for z3cform.
+    """
+
+    @apply
+    def status():
+        def get(self):
+            return self.context.status
+        def set(self, status):
+            self.context.status = status
+        return property(get, set)
+
+
 class PageForm(SilvaBaseForm, form.Form, SMIView):
     """Generic form.
     """
@@ -127,28 +140,21 @@ class EditForm(SilvaMixinEditForm, SilvaBaseForm, form.EditForm, SMIView):
             self.status = _(u'No changes')
 
 
-class CrudAddForm(SilvaBaseForm, crud.AddForm, SMIView):
+class CrudAddForm(SilvaBaseSubForm, crud.AddForm, SMIView):
     """The add form of a CRUD form.
     """
 
     interface.implements(INoCancelButton)
 
     template = ViewPageTemplateFile('templates/z3cform.pt')
+    ignoreRequest = False
 
     @property
     def label(self):
         return _(u"Add ${label}", mapping=dict(label=self.context.label))
 
-    @apply
-    def status():
-        def get(self):
-            return self.context.status
-        def set(self, status):
-            self.context.status = status
-        return property(get, set)
 
-
-class CrudEditForm(SilvaBaseForm, crud.EditForm, SMIView):
+class CrudEditForm(SilvaBaseSubForm, crud.EditForm, SMIView):
     """The edit form of a CRUD form.
     """
 
@@ -159,14 +165,6 @@ class CrudEditForm(SilvaBaseForm, crud.EditForm, SMIView):
     @property
     def label(self):
         return _(u"Modify ${label}", mapping=dict(label=self.context.label))
-
-    @apply
-    def status():
-        def get(self):
-            return self.context.status
-        def set(self, status):
-            self.context.status = status
-        return property(get, set)
 
 
 class CrudForm(SilvaBaseForm, crud.CrudForm, SMIView):
