@@ -1,4 +1,4 @@
- <html xmlns="http://www.w3.org/1999/xhtml"
+<html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:metal="http://xml.zope.org/namespaces/metal"
       xmlns:tal="http://xml.zope.org/namespaces/tal"
       xmlns:i18n="http://xml.zope.org/namespaces/i18n"
@@ -18,6 +18,13 @@
     <table class="listing"
            tal:define="rows view/subforms;
                        colspan python:len(realview.widgets)">
+      <thead>
+        <tr class="divider">
+          <td style="background-color:#c4d6e7"
+            tal:attributes="colspan colspan">
+          </td>
+        </tr>
+      </thead>
       <tbody tal:define="row1 python:len(rows) and rows[0] or None"
              tal:condition="python:row1 is not None">
         <tal:label tal:define="label view/label | nothing"
@@ -33,14 +40,12 @@
           <th tal:define="widgetsForTitles row1/getTitleWidgets;
                           niceTitles row1/getNiceTitles"
               tal:repeat="widget widgetsForTitles">
-
             <span tal:define="idx repeat/widget/index"
                   tal:content="python: niceTitles[idx]"
                   tal:attributes="title widget/field/description;
                                   class python: 'header-' + niceTitles[idx]">
               Field
             </span>
-
             <span class="fieldRequired"
                   tal:condition="python:widget.required and widget.mode == 'input'"
                   i18n:attributes="title">
@@ -53,10 +58,12 @@
           <tr tal:content="structure row/render"
               tal:attributes="class python:repeat['row'].odd() and 'odd' or 'even'" />
         </tal:block>
-        <tr>
-          <td colspan="#"
-              tal:attributes="colspan colspan">
-            <ul tal:replace="structure view/render_batch_navigation">
+        <tr class="even" tal:define="batch_nav view/render_batch_navigation"
+          tal:condition="python: batch_nav != ''">
+          <td class="designator"
+            style="padding:0 0.3em; border-top:1px solid #789; text-align:center"
+            tal:attributes="colspan colspan">
+            <ul tal:replace="structure batch_nav">
             </ul>
           </td>
         </tr>
@@ -70,7 +77,6 @@
         </tr>
       </tbody>
     </table>
-
 
   </form>
 

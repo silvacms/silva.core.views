@@ -35,11 +35,8 @@
                  <label tal:attributes="for widget/id"
                         tal:content="widget/label">
                    Field Name
-                 </label>
-                 <span class="warning"
-                       tal:condition="widget/required">
-                   *
-                 </span>
+                 </label><span class="warning"
+                   tal:condition="widget/required">*</span>
                  <p tal:condition="description" tal:content="description">
                    Description
                  </p>

@@ -25,7 +25,7 @@ from plone.z3cform.crud import crud
 
 
 class SilvaBaseForm(SilvaMixinForm, ViewCode):
-    """Silva Gork form for z3cform.
+    """Silva Grok form for z3cform.
     """
 
     __allow_access_to_unprotected_subobjects__ = True
@@ -151,7 +151,7 @@ class CrudAddForm(SilvaBaseSubForm, crud.AddForm, SMIView):
 
     @property
     def label(self):
-        return _(u"Add ${label}", mapping=dict(label=self.context.label))
+        return _(u"add ${label}", mapping=dict(label=self.context.label))
 
 
 class CrudEditForm(SilvaBaseSubForm, crud.EditForm, SMIView):
@@ -164,7 +164,7 @@ class CrudEditForm(SilvaBaseSubForm, crud.EditForm, SMIView):
 
     @property
     def label(self):
-        return _(u"Modify ${label}", mapping=dict(label=self.context.label))
+        return _(u"modify ${label}", mapping=dict(label=self.context.label))
 
 
 class CrudForm(SilvaBaseForm, crud.CrudForm, SMIView):
