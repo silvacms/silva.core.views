@@ -6,10 +6,10 @@
       tal:omit-tag=""
       tal:condition="view/subforms">
 
-  <form action="." method="post" tal:attributes="action request/getURL">
+  <form action="." method="post" tal:attributes="action request/getURL"
+    tal:define="batch view/batch">
 
     <input type="hidden"
-           tal:define="batch view/batch"
            tal:condition="python:batch.total &gt; 1"
            tal:attributes="name python:'%spage' % view.prefix;
                            value python:batch.number-1"
@@ -63,6 +63,9 @@
           <td class="designator"
             style="padding:0 0.3em; border-top:1px solid #789; text-align:center"
             tal:attributes="colspan colspan">
+            <span class="matchlabel" style="float:left; padding-right:1em">
+              <span tal:replace="string:${batch/total} pages" i18n:translate=""># pages</span>
+            </span>
             <ul tal:replace="structure batch_nav">
             </ul>
           </td>
