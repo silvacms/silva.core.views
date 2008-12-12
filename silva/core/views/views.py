@@ -79,7 +79,7 @@ class SMIView(SilvaBaseView):
         context = self.context
         while not ISilvaObject.providedBy(context) and hasattr(context, 'context'):
             context = context.context
-        return context
+        return context.aq_inner
 
     def _silvaView(self):
         # Lookup the correct Silva edit view so forms are able to use
