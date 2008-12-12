@@ -30,7 +30,7 @@ setup(name='silva.core.views',
               'setuptools',
               'zope.interface',
               'zope.schema',
-              'plone.z3cform',
+              'plone.z3cform > 0.5.2',
               'silva.core.conf > 2.0.999, < 2.1.999',
               ],
       )
