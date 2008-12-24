@@ -18,6 +18,9 @@
 table.listing {
   margin:0;
 }
+table.listing th.cell0 {
+width:5%;
+}
 #crud-edit-form-buttons-delete {
   color: #fdeaea;
   background-color: #752e2f;
