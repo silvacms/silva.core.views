@@ -40,19 +40,15 @@
             </tr>
           </tal:label>
           <tr>
-            <th tal:repeat="widget widgetsForTitles">
-              <span tal:define="idx repeat/widget/index"
-                    tal:content="python: niceTitles[idx]"
-                    tal:attributes="title widget/field/description;
-                                    class python: 'header-' + niceTitles[idx]">
-                Field
-              </span>
-              <span class="fieldRequired"
-                    tal:condition="python:widget.required and widget.mode == 'input'"
-                    i18n:attributes="title">
-                *
-              </span>
-            </th>
+            <tal:series tal:repeat="widget widgetsForTitles">
+              <th tal:define="idx repeat/widget/index"
+                tal:content="python: niceTitles[idx]"
+                tal:attributes="
+                  title widget/field/description;
+                  class python: 'cell' + str(idx) + ' header-' + niceTitles[idx]">
+                field
+              </th>
+            </tal:series>
           </tr>
           <tal:block repeat="row view/subforms">
             <a name="" tal:attributes="name string:edit-${row/content_id}" />
