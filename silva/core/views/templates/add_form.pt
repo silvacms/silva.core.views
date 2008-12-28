@@ -13,6 +13,12 @@
   <metal:use-macro use-macro="here/macro_index/macros/master">
 
     <metal:fill-add-slot fill-slot="main">
+<script type="text/javascript"
+  tal:define="
+    metatype request/meta_type;
+    focusfield python:metatype == 'Silva Image' and 'form.widgets.title' or 'form.widgets.id'"
+  tal:content="structure python:here.focus_editor(focusfield)"
+/>
       <div class="focus-rectangle">
         <form method="post"
               action="add_object"
