@@ -8,7 +8,7 @@ from zope.interface import Interface, Attribute
 from zope.publisher.interfaces.browser import IBrowserRequest
 from zope.traversing.browser.interfaces import IAbsoluteURL
 from zope.viewlet.interfaces import IViewlet as IBaseViewlet
-from zope.viewlet.interfaces import IViewletManager as IBaseViewletManager
+from grokcore.viewlet.interfaces import IViewletManager as IBaseViewletManager
 from zope import schema
 
 from grokcore.view.interfaces import IGrokView
@@ -148,6 +148,11 @@ from z3c.form.interfaces import IButton
 
 class ICancelButton(IButton):
     """A button to cancel a form.
+    """
+
+class INoCancelButton(Interface):
+    """Marker interface for Z3CForm to say that you don't want a
+    cancel button.
     """
 
 class ISilvaStyle(Interface):

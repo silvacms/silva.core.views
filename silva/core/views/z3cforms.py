@@ -9,7 +9,7 @@ from Products.Silva.i18n import translate as _
 from Products.Silva.ViewCode import ViewCode
 
 from silva.core.views.interfaces import ISilvaZ3CFormForm, IDefaultAddFields
-from silva.core.views.interfaces import ICancelButton, ISilvaStyle
+from silva.core.views.interfaces import ICancelButton, ISilvaStyle, INoCancelButton
 from silva.core.views.views import SMIView
 from silva.core.views.baseforms import SilvaMixinForm, SilvaMixinAddForm, SilvaMixinEditForm
 from silva.core import conf as silvaconf
@@ -113,12 +113,64 @@ class EditForm(SilvaMixinEditForm, SilvaGrokForm, form.EditForm, SMIView):
         else:
             self.status = _(u'No changes')
 
+class SilvaGrokSubForm(SilvaGrokForm):
+
+    silvaconf.baseclass()
+
+    @apply
+    def status():
+        def get(self):
+            return self.context.status
+        def set(self, status):
+            self.context.status = status
+        return property(get, set)
+
+
+class CrudAddForm(SilvaGrokSubForm, crud.AddForm, SMIView):
+    """The add form of a CRUD form.
+    """
+
+    interface.implements(INoCancelButton)
+
+    template = grokcore.view.PageTemplateFile('templates/z3cform.pt')
+    ignoreRequest = False
+
+    @property
+    def label(self):
+        return _(u"add ${label}", mapping=dict(label=self.context.label))
+
+
+class CrudEditForm(SilvaGrokSubForm, crud.EditForm, SMIView):
+    """The edit form of a CRUD form.
+    """
+
+    interface.implements(INoCancelButton)
+
+    template = grokcore.view.PageTemplateFile('templates/crud_editform.pt')
+
+    @property
+    def label(self):
+        return _(u"modify ${label}", mapping=dict(label=self.context.label))
+
 
 class CrudForm(SilvaGrokForm, crud.CrudForm, SMIView):
     """Crud form.
     """
 
+    interface.implements(INoCancelButton)
+
     template = grokcore.view.PageTemplateFile('templates/crud_form.pt')
+    addform_factory = CrudAddForm
+    editform_factory = CrudEditForm
+
+    def update(self):
+        form.Form.update(self)
+
+        addform = self.addform_factory(self, self.request)
+        editform = self.editform_factory(self, self.request)
+        addform.update()
+        editform.update()
+        self.subforms = [addform, editform]
 
 
 # Macros to render z3c forms

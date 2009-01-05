@@ -5,7 +5,7 @@
 
 from zope.i18n import translate
 from zope.viewlet.interfaces import IViewletManager
-import zope.cachedescriptors.property
+from zope.cachedescriptors.property import CachedProperty
 
 from grokcore.view.meta.views import default_view_name
 from five import grok
@@ -81,15 +81,22 @@ class SMIView(SilvaGrokView):
         super(SMIView, self).__init__(context, request)
 
         # Set model on request like SilvaViews
-        self.request['model'] = context
+        self.request['model'] = self._silvaContext
         # Set id on template some macros uses template/id
         self.template._template.id = self.__view_name__
 
+    @CachedProperty
+    def _silvaContext(self):
+        context = self.context
+        while not ISilvaObject.providedBy(context) and hasattr(context, 'context'):
+            context = context.context
+        return context.aq_inner
 
     def _silvaView(self):
         # Lookup the correct Silva edit view so forms are able to use
         # silva macros.
-        return getSilvaViewFor(self.context, 'edit', self.context)
+        context = self._silvaContext
+        return getSilvaViewFor(self.context, 'edit', context)
 
     @property
     def tab_name(self):
@@ -114,7 +121,7 @@ class SMIView(SilvaGrokView):
         view = self._silvaView()
         return {'here': view,
                 'user': getSecurityManager().getUser(),
-                'container': self.context.aq_inner,}
+                'container': self._silvaContext.aq_inner,}
 
 
 class Template(SilvaGrokView):
@@ -136,11 +143,11 @@ class View(Template):
     silvaconf.baseclass()
     silvaconf.name(u'content.html')
 
-    @zope.cachedescriptors.property.CachedProperty
+    @CachedProperty
     def is_preview(self):
         return IPreviewLayer.providedBy(self.request)
 
-    @zope.cachedescriptors.property.CachedProperty
+    @CachedProperty
     def content(self):
         if self.is_preview:
             return self.context.get_previewable()
