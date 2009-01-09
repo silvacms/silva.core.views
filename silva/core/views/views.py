@@ -56,6 +56,16 @@ class ZMIView(SilvaGrokView):
     silvaconf.require('zope2.ViewManagementScreens')
 
 
+class ZMIForm(grok.Form, ZMIView):
+    """A simple form in ZMI.
+    """
+
+    silvaconf.baseclass()
+
+    # ZMI Templates requires Zope2 engine.
+    template = grok.PageTemplate(filename='templates/zmi_form.pt')
+
+
 class ZMIEditForm(grok.EditForm, ZMIView):
     """An edit form in ZMI.
     """
