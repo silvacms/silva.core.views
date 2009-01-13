@@ -177,10 +177,6 @@ class ContentProvider(grok.ViewletManager):
     silvaconf.baseclass()
     silvaconf.context(ISilvaObject)
 
-    def __init__(self, *args):
-        super(ContentProvider, self).__init__(*args)
-        self.provider = self.viewletmanager
-
     def default_namespace(self):
         namespace = super(ContentProvider, self).default_namespace()
         namespace['provider'] = self
