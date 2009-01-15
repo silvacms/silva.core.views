@@ -19,52 +19,77 @@
 
     <metal:fill-editor-slot fill-slot="main">
 
-      <metal:use-macro use-macro="here/macro_edit/macros/two-col-layout">
-
-        <metal:fill fill-slot="sidebar">
-          <td class="left">
-            <metal:use-macro use-macro="here/macro_vein_navigation/macros/vein">
-              <metal:fill-slot fill-slot="sidebar">
-                <tal:block
-                   tal:define="template_id view/tab_name"
-                   tal:replace="structure python: here.service_sidebar.render(model, template_id, vein)" />
-              </metal:fill-slot>
-            </metal:use-macro>
-          </td>
-        </metal:fill>
-
-        <metal:fillhead fill-slot="main-head">
-          <tr tal:condition="view/label">
-            <th colspan="2"
-                tal:content="view/label">
-            </th>
-          </tr>
+      <table class="columns columns2">
+        <tbody>
           <tr>
-            <th style="width:33%"
-                i18n:translate="">
-              aspect
-            </th>
-            <th i18n:translate="">
-              content
-            </th>
+
+            <tal:block replace="nothing">
+              _____________________ sidebar _____________________
+            </tal:block>
+
+            <td class="left">
+              <metal:use-macro use-macro="here/macro_vein_navigation/macros/vein">
+                <metal:fill-slot fill-slot="sidebar">
+                  <tal:block
+                     tal:define="template_id view/tab_name"
+                     tal:replace="structure python: here.service_sidebar.render(model, template_id, vein)" />
+                </metal:fill-slot>
+              </metal:use-macro>
+            </td>
+
+            <tal:block replace="nothing">
+              _____________________ main _____________________
+            </tal:block>
+
+            <td class="main">
+              <form method="post" name="silvaObjects" action="#"
+                    tal:attributes="action template/id">
+                <table class="listing">
+                  <thead>
+                    <tal:block replace="nothing">
+                      ______________ vein + title row ______________
+                    </tal:block>
+                    <tr>
+                      <td class="top" colspan="2">
+                        <metal:use use-macro="here/macro_edit/macros/main-title" />
+                      </td>
+                    </tr>
+                    <tr tal:condition="view/label">
+                      <th colspan="2" tal:content="view/label">
+                      </th>
+                    </tr>
+                    <tr class="odd" tal:condition="view/description">
+                      <td class="designator" colspan="2"
+                          tal:content="view/description">
+                      </td>
+                    </tr>
+                    <tr tal:condition="view/widgets">
+                      <th style="width:33%" i18n:translate="">
+                        aspect
+                      </th>
+                      <th i18n:translate="">
+                        content
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <metal:widgets metal:use-macro="view/form_macros/widgets" />
+                  </tbody>
+                  <tfoot>
+                    <tr tal:condition="view/widgets">
+                      <th i18n:translate="">
+                        * required
+                      </th>
+                      <th>&nbsp;</th>
+                    </tr>
+                    <metal:widgets metal:use-macro="view/form_macros/actions" />
+                  </tfoot>
+                </table>
+              </form>
+            </td>
           </tr>
-        </metal:fillhead>
-
-        <metal:fillbody fill-slot="main-body">
-          <metal:widgets metal:use-macro="view/form_macros/widgets" />
-       </metal:fillbody>
-
-        <metal:fillfoot fill-slot="main-foot">
-          <tr>
-            <th i18n:translate="">
-              * required
-            </th>
-            <th>&nbsp;</th>
-          </tr>
-          <metal:widgets metal:use-macro="view/form_macros/actions" />
-        </metal:fillfoot>
-
-      </metal:use-macro>
+        </tbody>
+      </table>
 
     </metal:fill-editor-slot>
 

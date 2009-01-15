@@ -13,7 +13,7 @@ from Products.Silva.interfaces import IVersionedContent
 from Products.Silva.ExtensionRegistry import extensionRegistry
 from AccessControl import getSecurityManager
 
-import grokcore.view
+from five import grok
 
 from silva.core.views.interfaces import IFeedback, IDefaultAddFields
 from silva.core.conf.utils import getFactoryName
@@ -27,7 +27,7 @@ class SilvaMixinForm(object):
 
     silvaconf.baseclass()
 
-    template = grokcore.view.PageTemplateFile('templates/form.pt')
+    template = grok.PageTemplateFile('templates/form.pt')
 
     def __init__(self, context, request):
         super(SilvaMixinForm, self).__init__(context, request)
@@ -63,7 +63,7 @@ class SilvaMixinAddForm(object):
     """Silva add form mixin.
     """
 
-    template = grokcore.view.PageTemplateFile('templates/add_form.pt')
+    template = grok.PageTemplateFile('templates/add_form.pt')
 
     vein = u'add'
 
@@ -115,7 +115,7 @@ class SilvaMixinEditForm(object):
     ## than a PageForm. if.
 
 
-    template = grokcore.view.PageTemplateFile('templates/edit_form.pt')
+    template = grok.PageTemplateFile('templates/edit_form.pt')
     silvaconf.name(u'tab_edit')
 
     vein = u'edit'

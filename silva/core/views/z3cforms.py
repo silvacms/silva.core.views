@@ -211,9 +211,10 @@ class SilvaFormActions(button.ButtonActions, grok.MultiAdapter):
                 interface.Interface)
 
     def update(self):
-        self.form.buttons = button.Buttons(
-            self.form.buttons,
-            CancelButton('cancel', _(u'cancel'), accessKey=u'c'))
+        if not INoCancelButton.providedBy(self.form):
+            self.form.buttons = button.Buttons(
+                self.form.buttons,
+                CancelButton('cancel', _(u'cancel'), accessKey=u'c'))
         super(SilvaFormActions, self).update()
 
 
@@ -225,7 +226,8 @@ class SilvaAddActionHandler(button.ButtonActionHandler, grok.MultiAdapter):
                 button.ButtonAction)
 
     def __call__(self):
-        if self.action.name == 'form.buttons.cancel':
-            self.form.redirect('%s/edit' % self.form.context.absolute_url())
-            return
+        if not INoCancelButton.providedBy(self.form):
+            if self.action.name == 'form.buttons.cancel':
+                self.form.redirect('%s/edit' % self.form.context.absolute_url())
+                return
         super(SilvaAddActionHandler, self).__call__()
