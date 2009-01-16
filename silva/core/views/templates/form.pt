@@ -55,9 +55,10 @@
                         <metal:use use-macro="here/macro_edit/macros/main-title" />
                       </td>
                     </tr>
-                    <tr tal:condition="view/label">
-                      <th colspan="2" tal:content="view/label">
-                      </th>
+                    <tr class="top-controls" tal:condition="view/label">
+                      <td colspan="2"> 
+                        <h3 tal:content="view/label">label</h3>
+                      </td>
                     </tr>
                     <tr class="odd" tal:condition="view/description">
                       <td class="designator" colspan="2"
