@@ -31,14 +31,18 @@ class SilvaGrokForm(SilvaMixinForm, GrokForm, ViewCode):
     interface.implements(ISilvaZ3CFormForm)
     silvaconf.baseclass()
 
-    @property
-    def status_type(self):
-        if self._status_type:
-            return self._status_type
-        if hasattr(self, 'formErrorsMessage'):
-            if self.formErrorsMessage == self.status:
-                return 'error'
-        return 'feedback'
+    @apply
+    def status_type():
+        def get(self):
+            if self._status_type:
+                return self._status_type
+            if hasattr(self, 'formErrorsMessage'):
+                if self.formErrorsMessage == self.status:
+                    return 'error'
+            return 'feedback'
+        def set(self, type):
+            self._status_type = type
+        return property(get, set)
 
 
 class PageForm(SilvaGrokForm, form.Form, SMIView):
