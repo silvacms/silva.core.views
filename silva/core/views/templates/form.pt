@@ -19,7 +19,7 @@
 
     <metal:fill-editor-slot fill-slot="main">
 
-      <table class="columns columns2">
+      <table class="columns columns3">
         <tbody>
           <tr>
 
@@ -88,6 +88,8 @@
                   </tfoot>
                 </table>
               </form>
+            </td>
+            <td class="right">
             </td>
           </tr>
         </tbody>
