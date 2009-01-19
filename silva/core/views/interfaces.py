@@ -17,6 +17,12 @@ from silva.core.conf.fields import ID
 
 from Products.Silva.i18n import translate as _
 
+# Preview layer
+
+class IPreviewLayer(IBrowserRequest):
+    """This layer enable the fact to display preview version instead
+    of public version.
+    """
 
 # View
 
@@ -97,13 +103,6 @@ class IViewlet(IBaseViewlet, IGrokCustomizable):
 
 class ICustomizedTemplate(ITemplateCustomizable):
     """A through the web template.
-    """
-
-# Preview layer
-
-class IPreviewLayer(IBrowserRequest):
-    """This layer enable the fact to display preview version instead
-    of public version.
     """
 
 # URL management / with preview

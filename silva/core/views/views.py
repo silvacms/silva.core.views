@@ -16,6 +16,7 @@ from Products.Silva.interfaces import ISilvaObject
 from silva.core.views.interfaces import IFeedback, IZMIView, ISMIView, ISMITab
 from silva.core.views.interfaces import ITemplate, IPreviewLayer, IView
 from silva.core.views.interfaces import IContentProvider, IViewlet
+from silva.core.layout.interfaces import ISMILayer
 from silva.core.conf.utils import getSilvaViewFor
 from silva.core import conf as silvaconf
 
@@ -84,6 +85,7 @@ class SMIView(SilvaGrokView):
 
     silvaconf.baseclass()
     silvaconf.context(ISilvaObject)
+    silvaconf.layer(ISMILayer)
 
     vein = 'contents'
 
