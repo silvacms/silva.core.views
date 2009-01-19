@@ -25,6 +25,10 @@ class TTWViewTemplate(ZopePageTemplate):
 
     implements(ICustomizedTemplate)
 
+    manage_options = (
+        ZopePageTemplate.manage_options[0],
+        ) + ZopePageTemplate.manage_options[2:]
+
     def __init__(self, id, text=None, content_type='text/html', strict=True,
                  encoding='utf-8', view=None, permission=None, name=None):
         self.view = view
