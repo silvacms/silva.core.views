@@ -6,12 +6,14 @@
 from zope import interface, component
 
 from Products.Silva.i18n import translate as _
+from Products.Silva.interfaces import IVersionedContent
 from Products.Silva.ViewCode import ViewCode
 
-from silva.core.views.interfaces import ISilvaZ3CFormForm, IDefaultAddFields
-from silva.core.views.interfaces import ICancelButton, ISilvaStyle, INoCancelButton
+from silva.core.views.interfaces import ISilvaZ3CFormForm, IDefaultAddFields, \
+    ICancelButton, ISilvaStyle, INoCancelButton
 from silva.core.views.views import SMIView
-from silva.core.views.baseforms import SilvaMixinForm, SilvaMixinAddForm, SilvaMixinEditForm
+from silva.core.views.baseforms import SilvaMixinForm, SilvaMixinAddForm, \
+    SilvaMixinEditForm
 from silva.core import conf as silvaconf
 
 import grokcore.view
@@ -99,10 +101,18 @@ class EditForm(SilvaMixinEditForm, SilvaGrokForm, form.EditForm, SMIView):
     silvaconf.name(u"tab_edit")
     form.extends(form.AddForm, ignoreButtons=True, ignoreHandlers=True)
 
+    def updateForm(self):
+        editable_obj =  self.context.get_editable()
+        if editable_obj is None:
+            self.versioned_content = IVersionedContent.providedBy(self.context)
+            self.propose_new_version = self.versioned_content
+            self.is_editable = False
+        else:
+            super(EditForm, self).updateForm()
+
     def getContent(self):
         # Return the content to edit.
         return self.context.get_editable()
-
 
     @button.buttonAndHandler(_('save'), name='save')
     def handleSave(self, action):
