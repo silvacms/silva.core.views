@@ -8,39 +8,48 @@ from five import grok
 from silva.core.views import interfaces
 import z3c.form.interfaces
 
-class ButtonStyle(grok.Adapter):
-    grok.context(z3c.form.interfaces.IButton)
-    grok.provides(interfaces.ISilvaStyle)
+class Style(grok.MultiAdapter):
+    grok.baseclass()
+    grok.implements(interfaces.ISilvaStyle)
+
+    def __init__(self, item, form):
+        self.item = item
+        self.form = form
+
+
+class ButtonStyle(Style):
+    grok.adapts(z3c.form.interfaces.IButton,
+                interfaces.ISilvaZ3CFormForm)
 
     def style(self, widget):
         widget.klass = u'button'
         widget.style = u'float: right;'
 
 
-class CancelButtonStyle(grok.Adapter):
-    grok.context(interfaces.ICancelButton)
-    grok.provides(interfaces.ISilvaStyle)
+class CancelButtonStyle(Style):
+    grok.adapts(interfaces.ICancelButton,
+                interfaces.ISilvaZ3CFormForm)
 
     def style(self, widget):
         widget.klass = u'button canceler'
         widget.style = u'float: left;'
 
 
-class TextInputStyle(grok.Adapter):
-    grok.context(z3c.form.interfaces.ITextWidget)
-    grok.provides(interfaces.ISilvaStyle)
+class TextInputStyle(Style):
+    grok.adapts(z3c.form.interfaces.ITextWidget,
+                interfaces.ISilvaZ3CFormForm)
 
     def style(self, widget):
         widget.klass = u'store'
         widget.size = 20
 
 
-class TextAreaStyle(grok.Adapter):
-    grok.context(z3c.form.interfaces.ITextAreaWidget)
-    grok.provides(interfaces.ISilvaStyle)
+class TextAreaStyle(Style):
+    grok.adapts(z3c.form.interfaces.ITextAreaWidget,
+                interfaces.ISilvaZ3CFormForm)
 
     def style(self, widget):
         widget.klass = u'store'
-        widget.cols= 80
+        widget.cols = 80
         widget.rows = 20
 

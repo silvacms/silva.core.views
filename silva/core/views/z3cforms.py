@@ -203,9 +203,10 @@ class Z3CFormMacros(BrowserView):
 @silvaconf.subscribe(z3c.form.interfaces.IAfterWidgetUpdateEvent)
 def customizeWidgets(event):
     item = widget = event.widget
+    form = widget.form
     if z3c.form.interfaces.IAction.providedBy(widget):
-            item = widget.field
-    apply_style = component.queryAdapter(item, ISilvaStyle)
+        item = widget.field
+    apply_style = component.queryMultiAdapter((item, form), ISilvaStyle)
     if apply_style:
         apply_style.style(widget)
 
