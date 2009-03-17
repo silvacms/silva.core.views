@@ -10,7 +10,7 @@ from Products.Silva.interfaces import IVersionedContent
 from Products.Silva.ViewCode import ViewCode
 
 from silva.core.views.interfaces import ISilvaZ3CFormForm, IDefaultAddFields, \
-    ICancelButton, ISilvaStyle, INoCancelButton
+    ICancelButton, ISilvaStyle, INoCancelButton, ISilvaStyledForm
 from silva.core.views.views import SMIView
 from silva.core.views.baseforms import SilvaMixinForm, SilvaMixinAddForm, \
     SilvaMixinEditForm
@@ -154,12 +154,20 @@ class CrudAddForm(SilvaGrokSubForm, crud.AddForm, SMIView):
         return _(u"add ${label}", mapping=dict(label=self.context.label))
 
 
+class CrudEditSubForm(crud.EditSubForm):
+    """An crud edit sub-form.
+    """
+
+    interface.implements(ISilvaStyledForm)
+
+
 class CrudEditForm(SilvaGrokSubForm, crud.EditForm, SMIView):
     """The edit form of a CRUD form.
     """
 
     interface.implements(INoCancelButton)
 
+    editsubform_factory = CrudEditSubForm
     template = grokcore.view.PageTemplateFile('templates/crud_editform.pt')
 
     @property

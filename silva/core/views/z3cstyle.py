@@ -22,7 +22,7 @@ class Style(grok.MultiAdapter):
 
 class ButtonStyle(Style):
     grok.adapts(z3c.form.interfaces.IButton,
-                interfaces.ISilvaZ3CFormForm)
+                interfaces.ISilvaStyledForm)
 
     def style(self, widget):
         widget.klass = u'button'
@@ -31,7 +31,7 @@ class ButtonStyle(Style):
 
 class CancelButtonStyle(Style):
     grok.adapts(interfaces.ICancelButton,
-                interfaces.ISilvaZ3CFormForm)
+                interfaces.ISilvaStyledForm)
 
     def style(self, widget):
         widget.klass = u'button canceler'
@@ -40,7 +40,7 @@ class CancelButtonStyle(Style):
 
 class TextInputStyle(Style):
     grok.adapts(z3c.form.interfaces.ITextWidget,
-                interfaces.ISilvaZ3CFormForm)
+                interfaces.ISilvaStyledForm)
 
     def style(self, widget):
         widget.klass = u'store'
@@ -49,7 +49,7 @@ class TextInputStyle(Style):
 
 class TextAreaStyle(Style):
     grok.adapts(z3c.form.interfaces.ITextAreaWidget,
-                interfaces.ISilvaZ3CFormForm)
+                interfaces.ISilvaStyledForm)
 
     def style(self, widget):
         widget.klass = u'store'
