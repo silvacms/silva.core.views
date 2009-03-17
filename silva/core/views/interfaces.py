@@ -81,7 +81,11 @@ class ISilvaFormlibForm(ISilvaForm):
     """A Silva form built using formlib.
     """
 
-class ISilvaZ3CFormForm(ISilvaForm):
+class ISilvaStyledForm(Interface):
+    """A form with a Silva style.
+    """
+
+class ISilvaZ3CFormForm(ISilvaForm, ISilvaStyledForm):
     """A Silva form built using z3c.form.
     """
 

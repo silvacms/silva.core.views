@@ -4,7 +4,10 @@ Changelog
 2.1b2 (unreleased)
 ------------------
 
-* ...
+Ported from 2.2:
+
+* Add the possibility to change widget rendering style between
+  different z3c forms.
 
 2.1b1 (2009-03-05)
 ------------------

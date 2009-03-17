@@ -10,10 +10,11 @@ from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from Products.Silva.i18n import translate as _
 from Products.Silva.ViewCode import ViewCode
 
-from silva.core.views.interfaces import ISilvaZ3CFormForm, IDefaultAddFields
-from silva.core.views.interfaces import ICancelButton, ISilvaStyle, INoCancelButton
+from silva.core.views.interfaces import ISilvaZ3CFormForm, IDefaultAddFields, \
+    ICancelButton, ISilvaStyle, INoCancelButton, ISilvaStyledForm
 from silva.core.views.views import SMIView
-from silva.core.views.baseforms import SilvaMixinForm, SilvaMixinAddForm, SilvaMixinEditForm
+from silva.core.views.baseforms import SilvaMixinForm, SilvaMixinAddForm, \
+    SilvaMixinEditForm
 
 from z3c.form import form, button, field
 from z3c.form.interfaces import IFormLayer, IAction
@@ -154,12 +155,20 @@ class CrudAddForm(SilvaBaseSubForm, crud.AddForm, SMIView):
         return _(u"add ${label}", mapping=dict(label=self.context.label))
 
 
+class CrudEditSubForm(crud.EditSubForm):
+    """An crud edit sub-form.
+    """
+
+    interface.implements(ISilvaStyledForm)
+
+
 class CrudEditForm(SilvaBaseSubForm, crud.EditForm, SMIView):
     """The edit form of a CRUD form.
     """
 
     interface.implements(INoCancelButton)
 
+    editsubform_factory = CrudEditSubForm
     template = ViewPageTemplateFile('templates/crud_editform.pt')
 
     @property
@@ -202,9 +211,10 @@ class Z3CFormMacros(BrowserView):
 
 def customizeWidgets(event):
     item = widget = event.widget
+    form = widget.form
     if IAction.providedBy(widget):
-            item = widget.field
-    apply_style = component.queryAdapter(item, ISilvaStyle)
+        item = widget.field
+    apply_style = component.queryMultiAdapter((item, form), ISilvaStyle)
     if apply_style:
         apply_style.style(widget)
 
