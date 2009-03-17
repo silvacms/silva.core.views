@@ -16,6 +16,9 @@ class Style(grok.MultiAdapter):
         self.item = item
         self.form = form
 
+    def style(self, widget):
+        pass
+
 
 class ButtonStyle(Style):
     grok.adapts(z3c.form.interfaces.IButton,
