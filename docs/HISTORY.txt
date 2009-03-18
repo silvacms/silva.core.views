@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.1b2 (unreleased)
+2.1b2 (2009-03-18)
 ------------------
 
 Ported from 2.2:
