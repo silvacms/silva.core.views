@@ -257,6 +257,7 @@ class SilvaAddActionHandler(button.ButtonActionHandler, grok.MultiAdapter):
         super(SilvaAddActionHandler, self).__call__()
 
 
+# We customize that to prevent z3c.form to destroy the FileUpload Object.
 class FileUploadDataConverter(
     converter.FileUploadDataConverter, grok.MultiAdapter):
     grok.adapts(silvaschema.IBytes,

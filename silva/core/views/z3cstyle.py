@@ -47,6 +47,15 @@ class TextInputStyle(Style):
         widget.size = 20
 
 
+class FileUploadStyle(Style):
+    grok.adapts(z3c.form.interfaces.IFileWidget,
+                interfaces.ISilvaStyledForm)
+
+    def style(self, widget):
+        widget.klass = u'store'
+        widget.size = 54
+
+
 class TextAreaStyle(Style):
     grok.adapts(z3c.form.interfaces.ITextAreaWidget,
                 interfaces.ISilvaStyledForm)
