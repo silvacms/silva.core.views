@@ -74,8 +74,10 @@ class SilvaMixinAddForm(object):
         parent_view = super(SilvaMixinAddForm, self)._silvaView()
         return view_registry.get_view('add', 'Five Content').__of__(parent_view)
 
-
-    def createAndAdd(self, data):
+    def create(self, data):
+        """Purely create the object. This method can be overriden to
+        support custom creation needs.
+        """
         addable = filter(lambda a: a['name'] == self.__name__,
                          extensionRegistry.get_addables())
         if len(addable) != 1:
@@ -93,17 +95,28 @@ class SilvaMixinAddForm(object):
         for key, value in data.iteritems():
             if key not in IDefaultAddFields:
                 setattr(editable_obj, key, value)
-
-        # Update last author information
-        obj.sec_update_last_author_info()
-        self.context.sec_update_last_author_info()
-
-        # Set status
-        self.status = _(u'Added ${meta_type} "${obj_id}".',
-                        mapping={'obj_id': obj_id,
-                                 'meta_type': obj.meta_type,})
         return obj
 
+    def createAndAdd(self, data):
+        """Create and add the new object.
+        """
+        try:
+            obj = self.create(data)
+        except ValueError, msg:
+            self.status = msg
+            self.status_type = 'error'
+            return None
+
+        if obj is not None:
+            # Update last author information
+            obj.sec_update_last_author_info()
+            self.context.sec_update_last_author_info()
+
+            # Set status
+            self.status = _(u'Added ${meta_type} "${obj_id}".',
+                            mapping={'obj_id': obj.id,
+                                     'meta_type': obj.meta_type,})
+        return obj
 
 
 class SilvaMixinEditForm(object):

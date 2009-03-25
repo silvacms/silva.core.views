@@ -3,7 +3,8 @@
 # See also LICENSE.txt
 # $Id$
 
-from zope.contentprovider.interfaces import IContentProvider as IBaseContentProvider
+from zope.contentprovider.interfaces import IContentProvider \
+    as IBaseContentProvider
 from zope.interface import Interface, Attribute
 from zope.publisher.interfaces.browser import IBrowserRequest
 from zope.traversing.browser.interfaces import IAbsoluteURL
@@ -13,7 +14,7 @@ from zope import schema
 
 from grokcore.view.interfaces import IGrokView
 
-from silva.core.conf.fields import ID
+from silva.core.conf import schema as silvaschema
 
 from Products.Silva.i18n import translate as _
 
@@ -119,7 +120,7 @@ class IDefaultAddFields(Interface):
     """Default fields used in a add form. You don't have to defines this fields.
     """
 
-    id = ID(
+    id = silvaschema.ID(
         title=_(u"id"),
         description=_(u"No spaces or special characters besides ‘_’ or ‘-’ or ‘.’"),
         required=True)

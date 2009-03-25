@@ -6,7 +6,6 @@
 from zope import interface, component
 
 from Products.Silva.i18n import translate as _
-from Products.Silva.interfaces import IVersionedContent
 from Products.Silva.ViewCode import ViewCode
 
 from silva.core.views.interfaces import ISilvaZ3CFormForm, IDefaultAddFields, \
@@ -15,13 +14,15 @@ from silva.core.views.views import SMIView
 from silva.core.views.baseforms import SilvaMixinForm, SilvaMixinAddForm, \
     SilvaMixinEditForm
 from silva.core import conf as silvaconf
-
+from silva.core.interfaces import IVersionedContent
+from silva.core.conf import schema as silvaschema
 import grokcore.view
 from five import grok
 
 from five.megrok.z3cform.components import GrokForm
 from z3c.form import form, button, field
 from plone.z3cform.crud import crud
+from plone.z3cform import converter
 import z3c.form.interfaces
 
 # Base class to grok forms
@@ -65,7 +66,7 @@ class AddForm(SilvaMixinAddForm, SilvaGrokForm, form.AddForm, SMIView):
     def updateForm(self):
         field_to_add = field.Fields()
         for name in IDefaultAddFields:
-            if self.fields.get(field) is None:
+            if self.fields.get(name) is None:
                 field_to_add += field.Fields(IDefaultAddFields[name])
         if field_to_add:
             self.fields = field_to_add + self.fields
@@ -254,3 +255,15 @@ class SilvaAddActionHandler(button.ButtonActionHandler, grok.MultiAdapter):
                 self.form.redirect('%s/edit' % self.form.context.absolute_url())
                 return
         super(SilvaAddActionHandler, self).__call__()
+
+
+class FileUploadDataConverter(
+    converter.FileUploadDataConverter, grok.MultiAdapter):
+    grok.adapts(silvaschema.IBytes,
+                z3c.form.interfaces.IFileWidget)
+
+    def toFieldValue(self, value):
+        return value
+
+    def toWidgetValue(self, value):
+        return super(FileUploadDataConverter, self).toFieldValue(value)
