@@ -100,7 +100,8 @@ class SMIView(SilvaGrokView):
     @CachedProperty
     def _silvaContext(self):
         context = self.context
-        while not ISilvaObject.providedBy(context) and hasattr(context, 'context'):
+        while not ISilvaObject.providedBy(context) and \
+                hasattr(context, 'context'):
             context = context.context
         return context.aq_inner
 

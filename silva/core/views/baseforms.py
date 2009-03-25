@@ -74,7 +74,7 @@ class SilvaMixinAddForm(object):
         parent_view = super(SilvaMixinAddForm, self)._silvaView()
         return view_registry.get_view('add', 'Five Content').__of__(parent_view)
 
-    def create(self, data):
+    def create(self, parent, data):
         """Purely create the object. This method can be overriden to
         support custom creation needs.
         """
@@ -88,8 +88,8 @@ class SilvaMixinAddForm(object):
                           getFactoryName(addable['instance']))
         # Build the content
         obj_id = str(data['id'])
-        factory(self.context, obj_id, data['title'])
-        obj = getattr(self.context, obj_id)
+        factory(parent, obj_id, data['title'])
+        obj = getattr(parent, obj_id)
 
         editable_obj = obj.get_editable()
         for key, value in data.iteritems():
@@ -100,8 +100,9 @@ class SilvaMixinAddForm(object):
     def createAndAdd(self, data):
         """Create and add the new object.
         """
+        parent = self.context.aq_inner
         try:
-            obj = self.create(data)
+            obj = self.create(parent, data)
         except ValueError, msg:
             self.status = msg
             self.status_type = 'error'
@@ -110,7 +111,7 @@ class SilvaMixinAddForm(object):
         if obj is not None:
             # Update last author information
             obj.sec_update_last_author_info()
-            self.context.sec_update_last_author_info()
+            parent.sec_update_last_author_info()
 
             # Set status
             self.status = _(u'Added ${meta_type} "${obj_id}".',
