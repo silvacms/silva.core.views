@@ -32,14 +32,31 @@
      permission="zope.Public"
      />
 
+  <!-- Site -->
+  <browser:page
+     for="Products.Silva.interfaces.ISilvaObject"
+     name="virtual_site"
+     class=".site.VirtualSite"
+     permission="zope.Public"
+     allowed_interface=".interfaces.IVirtualSite"
+     />
+
+  <view
+     for="Products.Silva.interfaces.ISilvaObject"
+     factory=".site.VirtualSite"
+     type="zope.publisher.interfaces.http.IHTTPRequest"
+     permission="zope.Public"
+     provides=".interfaces.IVirtualSite"
+     />
+
   <!-- Z3C Extra button -->
   <adapter factory=".z3cforms.SilvaFormActions" />
   <adapter factory=".z3cforms.SilvaAddActionHandler" />
-  
+
   <!-- Z3C Style -->
-  <subscriber for="z3c.form.interfaces.IAfterWidgetUpdateEvent" 
+  <subscriber for="z3c.form.interfaces.IAfterWidgetUpdateEvent"
               handler=".z3cforms.customizeWidgets" />
-  
+
   <adapter factory=".z3cstyle.ButtonStyle" />
   <adapter factory=".z3cstyle.CancelButtonStyle" />
   <adapter factory=".z3cstyle.TextInputStyle" />

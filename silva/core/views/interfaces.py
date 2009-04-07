@@ -3,7 +3,8 @@
 # See also LICENSE.txt
 # $Id$
 
-from zope.contentprovider.interfaces import IContentProvider as IBaseContentProvider
+from zope.contentprovider.interfaces import IContentProvider as \
+    IBaseContentProvider
 from zope.interface import Interface, Attribute
 from zope.publisher.interfaces.browser import IBrowserRequest
 from zope.traversing.browser.interfaces import IAbsoluteURL
@@ -25,10 +26,10 @@ class IFeedback(Interface):
     status_type = Attribute(u"Feedback type, error or feedback")
 
 
-
 class ITemplate(Interface):
     """A template used in Silva.
     """
+
 
 class IView(ITemplate):
     """A view in Silva.
@@ -36,6 +37,7 @@ class IView(ITemplate):
 
     is_preview = Attribute(u"Boolean which say if you're in preview mode.")
     content = Attribute(u"Version of the content to render.")
+
 
 class ISMIView(Interface):
     """A view in SMI.
@@ -45,13 +47,16 @@ class ISMIView(Interface):
     active_tab = Attribute(u"Which is the current active tab")
     vein = Attribute(u"What's the vein to display")
 
+
 class ISMITab(ISMIView):
     """A tab in SMI.
     """
 
+
 class IContentProvider(IBaseContentProvider):
     """A Content Provider.
     """
+
 
 class IViewlet(IBaseViewlet):
     """A Viewlet.
@@ -60,7 +65,8 @@ class IViewlet(IBaseViewlet):
 # Silva forms
 
 class IDefaultAddFields(Interface):
-    """Default fields used in a add form. You don't have to defines this fields.
+    """Default fields used in a add form. You don't have to defines
+    this fields.
     """
 
     id = ID(
@@ -77,13 +83,16 @@ class ISilvaForm(Interface):
     """A Silva form.
     """
 
+
 class ISilvaFormlibForm(ISilvaForm):
     """A Silva form built using formlib.
     """
 
+
 class ISilvaStyledForm(Interface):
     """A form with a Silva style.
     """
+
 
 class ISilvaZ3CFormForm(ISilvaForm, ISilvaStyledForm):
     """A Silva form built using z3c.form.
@@ -111,4 +120,21 @@ class ISilvaStyle(Interface):
 
     def style(widget):
         """Apply Silva style to that element.
+        """
+
+
+# Adapters
+
+class IVirtualSite(Interface):
+
+    def get_root():
+        """Return the virtual root of the current site.
+        """
+
+    def get_virtual_root():
+        """Return the virtual root or None.
+        """
+
+    def get_virtal_path():
+        """Return the virtual path or None.
         """
