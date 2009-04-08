@@ -9,6 +9,7 @@ from zope.interface import Interface, Attribute
 from zope.publisher.interfaces.browser import IBrowserRequest
 from zope.traversing.browser.interfaces import IAbsoluteURL
 from zope.viewlet.interfaces import IViewlet as IBaseViewlet
+from zope.viewlet.interfaces import IViewletManager as IBaseViewletManager
 from zope import schema
 
 from silva.core.conf.fields import ID
@@ -55,6 +56,11 @@ class ISMITab(ISMIView):
 
 class IContentProvider(IBaseContentProvider):
     """A Content Provider.
+    """
+
+
+class IViewletManager(IBaseViewletManager):
+    """A customizable Viewlet Manager.
     """
 
 

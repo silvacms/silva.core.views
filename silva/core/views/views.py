@@ -6,7 +6,6 @@
 from zope.i18n import translate
 from zope.interface import implements
 from zope.security.interfaces import IPermission
-from zope.viewlet.interfaces import IViewletManager
 from zope import component, interface
 from zope.cachedescriptors.property import CachedProperty
 
@@ -20,6 +19,7 @@ from Products.Five import BrowserView
 from silva.core.views.interfaces import IFeedback, ISMIView
 from silva.core.views.interfaces import ITemplate, IView
 from silva.core.views.interfaces import IContentProvider, IViewlet
+from silva.core.views.interfaces import IViewletManager
 from silva.core.conf.utils import getSilvaViewFor
 
 from AccessControl import getSecurityManager
