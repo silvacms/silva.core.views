@@ -137,7 +137,9 @@ class ContentProviderBase(Acquisition.Explicit):
         self.request = request
         self.view = view
         self.__parent__ = view
-        self.__name__ = self.__view_name__
+
+    # See View
+    getPhysicalPath = Acquisition.Acquired
 
     def namespace(self):
         return {}
