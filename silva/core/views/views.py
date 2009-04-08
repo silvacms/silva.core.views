@@ -164,7 +164,7 @@ class ContentProvider(ContentProviderBase):
         pass
 
     def render(self):
-        return self.template.render(self)
+        return self.template()
 
 class ViewletManager(ContentProviderBase, ViewletManagerBase):
 
@@ -230,5 +230,5 @@ class Viewlet(ContentProviderBase, ViewletBase):
         pass
 
     def render(self):
-        return self.template.render(self)
+        return self.template()
 
