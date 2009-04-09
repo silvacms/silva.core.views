@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) 2002-2008 Infrae. All rights reserved.
+# Copyright (c) 2002-2009 Infrae. All rights reserved.
 # See also LICENSE.txt
 # $Id$
 
@@ -14,22 +14,28 @@ from Products.Silva.interfaces import IVersionedContent, ISilvaObject
 from Products.Silva.ExtensionRegistry import extensionRegistry
 from AccessControl import getSecurityManager
 
+from five import grok
+
 from silva.core.views.interfaces import IFeedback, IDefaultAddFields
 #from silva.core.conf.utils import getFactoryName
 
 class SilvaMixinForm(object):
-    """Silva form mixin.
+    """Silva grok form mixin.
     """
 
     interface.implements(IFeedback)
 
-    template = ViewPageTemplateFile('templates/form.pt')
+    grok.baseclass()
+
+    template = grok.PageTemplateFile('templates/form.pt')
 
     def __init__(self, context, request):
         super(SilvaMixinForm, self).__init__(context, request)
 
         # Set model on request like SilvaViews
         self.request['model'] = self._silvaContext
+        # Set id on template some macros uses template/id
+        self.template._template.id = self.__view_name__
 
         # Default feedback
         self._status_type = None
@@ -56,7 +62,9 @@ class SilvaMixinAddForm(object):
     """Silva add form mixin.
     """
 
-    template = ViewPageTemplateFile('templates/add_form.pt')
+    template = grok.PageTemplateFile('templates/add_form.pt')
+
+    vein = u'add'
 
     def _silvaView(self):
         view_registry = self.context.service_view_registry
@@ -65,8 +73,10 @@ class SilvaMixinAddForm(object):
         parent_view = super(SilvaMixinAddForm, self)._silvaView()
         return view_registry.get_view('add', 'Five Content').__of__(parent_view)
 
-
-    def createAndAdd(self, data):
+    def create(self, parent, data):
+        """Purely create the object. This method can be overriden to
+        support custom creation needs.
+        """
         addable = filter(lambda a: a['name'] == self.__name__,
                          extensionRegistry.get_addables())
         if len(addable) != 1:
@@ -77,24 +87,36 @@ class SilvaMixinAddForm(object):
                           getFactoryName(addable['instance']))
         # Build the content
         obj_id = str(data['id'])
-        factory(self.context, obj_id, data['title'])
-        obj = getattr(self.context, obj_id)
+        factory(parent, obj_id, data['title'])
+        obj = getattr(parent, obj_id)
 
         editable_obj = obj.get_editable()
         for key, value in data.iteritems():
             if key not in IDefaultAddFields:
                 setattr(editable_obj, key, value)
-
-        # Update last author information
-        obj.sec_update_last_author_info()
-        self.context.sec_update_last_author_info()
-
-        # Set status
-        self.status = _(u'Added ${meta_type} "${obj_id}".',
-                        mapping={'obj_id': obj_id,
-                                 'meta_type': obj.meta_type,})
         return obj
 
+    def createAndAdd(self, data):
+        """Create and add the new object.
+        """
+        parent = self.context.aq_inner
+        try:
+            obj = self.create(parent, data)
+        except ValueError, msg:
+            self.status = msg
+            self.status_type = 'error'
+            return None
+
+        if obj is not None:
+            # Update last author information
+            obj.sec_update_last_author_info()
+            parent.sec_update_last_author_info()
+
+            # Set status
+            self.status = _(u'Added ${meta_type} "${obj_id}".',
+                            mapping={'obj_id': obj.id,
+                                     'meta_type': obj.meta_type,})
+        return obj
 
 
 class SilvaMixinEditForm(object):
@@ -106,7 +128,10 @@ class SilvaMixinEditForm(object):
     ## than a PageForm. if.
 
 
-    template = ViewPageTemplateFile('templates/edit_form.pt')
+    template = grok.PageTemplateFile('templates/edit_form.pt')
+    grok.name(u'tab_edit')
+
+    vein = u'edit'
 
     versioned_content = False
     propose_new_version = False

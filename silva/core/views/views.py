@@ -1,39 +1,33 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) 2002-2008 Infrae. All rights reserved.
+# Copyright (c) 2002-2009 Infrae. All rights reserved.
 # See also LICENSE.txt
 # $Id$
 
 from zope.i18n import translate
-from zope.interface import implements
-from zope.security.interfaces import IPermission
-from zope import component, interface
+from zope.viewlet.interfaces import IViewletManager
 from zope.cachedescriptors.property import CachedProperty
 
+from grokcore.view.meta.views import default_view_name
+from five import grok
 import urllib
 
 from Products.Silva.interfaces import ISilvaObject
-from Products.Five.viewlet.manager import ViewletManagerBase
-from Products.Five.viewlet.viewlet import ViewletBase
-from Products.Five import BrowserView
 
-from silva.core.views.interfaces import IFeedback, ISMIView
+from silva.core.views.interfaces import IFeedback, IZMIView, ISMIView, ISMITab
 from silva.core.views.interfaces import ITemplate, IView
 from silva.core.views.interfaces import IContentProvider, IViewlet
-from silva.core.views.interfaces import IViewletManager
+from silva.core.layout.interfaces import ISMILayer
 from silva.core.conf.utils import getSilvaViewFor
 
 from AccessControl import getSecurityManager
-import Acquisition
 
 # Simple views
 
-class SilvaBaseView(BrowserView):
+class SilvaGrokView(grok.View):
     """Grok View on Silva objects.
     """
 
-    @property
-    def response(self):
-        return self.request.RESPONSE
+    grok.baseclass()
 
     def redirect(self, url):
         # Override redirect to send status information if there is.
@@ -47,32 +41,59 @@ class SilvaBaseView(BrowserView):
                 to_append = urllib.urlencode(
                     {'message': message, 'message_type': self.status_type,})
                 join_char = '?' in url and '&' or '?'
-                super(SilvaBaseView, self).redirect(url + join_char + to_append)
+                super(SilvaGrokView, self).redirect(url + join_char + to_append)
                 return
-        self.response.redirect(url)
-
-    def namespace(self):
-        return {}
-
-    def default_namespace(self):
-        return {}
+        super(SilvaGrokView, self).redirect(url)
 
 
-class SMIView(SilvaBaseView):
+class ZMIView(SilvaGrokView):
+    """View in ZMI.
+    """
+
+    grok.implements(IZMIView)
+    grok.baseclass()
+    grok.require('zope2.ViewManagementScreens')
+
+
+class ZMIForm(grok.Form, ZMIView):
+    """A simple form in ZMI.
+    """
+
+    grok.baseclass()
+
+    # ZMI Templates requires Zope2 engine.
+    template = grok.PageTemplate(filename='templates/zmi_form.pt')
+
+
+class ZMIEditForm(grok.EditForm, ZMIView):
+    """An edit form in ZMI.
+    """
+
+    grok.baseclass()
+
+    # ZMI Templates requires Zope2 engine.
+    template = grok.PageTemplate(filename='templates/zmi_form.pt')
+
+
+class SMIView(SilvaGrokView):
     """A view in SMI.
     """
 
-    implements(ISMIView)
+    grok.implements(ISMIView)
+
+    grok.baseclass()
+    grok.context(ISilvaObject)
+    grok.layer(ISMILayer)
 
     vein = 'contents'
-    tab_name = 'tab_edit'
-    active_tab = 'tab_edit'
 
     def __init__(self, context, request):
         super(SMIView, self).__init__(context, request)
 
         # Set model on request like SilvaViews
         self.request['model'] = self._silvaContext
+        # Set id on template some macros uses template/id
+        self.template._template.id = self.__view_name__
 
     @CachedProperty
     def _silvaContext(self):
@@ -86,7 +107,22 @@ class SMIView(SilvaBaseView):
         # Lookup the correct Silva edit view so forms are able to use
         # silva macros.
         context = self._silvaContext
-        return getSilvaViewFor(context, 'edit', context)
+        return getSilvaViewFor(self.context, 'edit', context)
+
+    @property
+    def tab_name(self):
+        return grok.name.bind().get(self, default=default_view_name)
+
+    @property
+    def active_tab(self):
+        tab_class = None
+        for base in self.__class__.__bases__:
+            if ISMITab.implementedBy(base):
+                tab_class = base
+        if tab_class:
+            name = silvaconf.name.bind()
+            return name.get(tab_class, default=default_view_name)
+        return 'tab_edit'
 
     def namespace(self):
         # This add to the template namespace global variable used in
@@ -95,7 +131,6 @@ class SMIView(SilvaBaseView):
         # able to use silva macro in your templates.
         view = self._silvaView()
         return {'here': view,
-                'request': self.request,
                 'user': getSecurityManager().getUser(),
                 'realview': self, # XXX should be removed when silva
                                   # stop to do stupid things with view
@@ -103,18 +138,22 @@ class SMIView(SilvaBaseView):
                 'container': self._silvaContext.aq_inner,}
 
 
-class Template(SilvaBaseView):
+class Template(SilvaGrokView):
     """A view class not binded to a content.
     """
 
-    implements(ITemplate)
+    grok.implements(ITemplate)
+    grok.baseclass()
+    grok.context(ISilvaObject)
 
 
 class View(Template):
     """View on Silva object, support view and preview
     """
 
-    implements(IView)
+    grok.implements(IView)
+    grok.baseclass()
+    grok.name(u'content.html')
 
     @CachedProperty
     def is_preview(self):
@@ -131,87 +170,35 @@ class View(Template):
         return {'content': self.content}
 
 
-class ContentProviderBase(Acquisition.Explicit):
+class ContentProvider(grok.ViewletManager):
+    """A content provider in Silva. In fact it's just a viewlet
+    manager...
+    """
 
-    def __init__(self, context, request, view):
-        self.context = context
-        self.request = request
-        self.view = view
-        self.__parent__ = view
-
-    # See View
-    getPhysicalPath = Acquisition.Acquired
-
-    def namespace(self):
-        return {}
-
-    def default_namespace(self):
-        namespace = {}
-        namespace['view'] = self.view
-        namespace['static'] = None
-        return namespace
-
-
-class ContentProvider(ContentProviderBase):
-
-    implements(IContentProvider)
+    grok.implements(IContentProvider)
+    grok.baseclass()
+    grok.context(ISilvaObject)
 
     def default_namespace(self):
         namespace = super(ContentProvider, self).default_namespace()
         namespace['provider'] = self
         return namespace
 
-    def update(self):
-        pass
 
-    def render(self):
-        return self.template()
+class ViewletManager(grok.ViewletManager):
+    """A viewlet manager in Silva.
+    """
 
-
-class ViewletManager(ContentProviderBase, ViewletManagerBase):
-
-    implements(IViewletManager)
-
-    def __init__(self, context, request, view):
-        ContentProviderBase.__init__(self, context, request, view)
-        ViewletManagerBase.__init__(self, context, request, view)
-
-    def sort(self, viewlets):
-        s_viewlets = []
-        for name, viewlet in viewlets:
-             viewlet.__viewlet_name__ = name
-             s_viewlets.append(viewlet)
-
-        def sort_key(viewlet):
-            return (viewlet.__module__,
-                    viewlet.__class__.__name__)
-        s_viewlets = sorted(s_viewlets, key=sort_key)
-        return [(viewlet.__viewlet_name__, viewlet) for viewlet in s_viewlets]
-
-    def default_namespace(self):
-        namespace = super(ViewletManager, self).default_namespace()
-        namespace['viewletmanager'] = self
-        return namespace
+    grok.implements(IViewletManager)
+    grok.baseclass()
+    grok.context(ISilvaObject)
 
 
+class Viewlet(grok.Viewlet):
+    """A viewlet in Silva
+    """
 
-class Viewlet(ContentProviderBase, ViewletBase):
-
-    implements(IViewlet)
-
-    def __init__(self, context, request, view, viewletmanager):
-        ContentProviderBase.__init__(self, context, request, view)
-        self.viewletmanager = viewletmanager
-
-    def default_namespace(self):
-        namespace = super(Viewlet, self).default_namespace()
-        namespace['viewlet'] = self
-        namespace['viewletmanager'] = self.viewletmanager
-        return namespace
-
-    def update(self):
-        pass
-
-    def render(self):
-        return self.template()
+    grok.implements(IViewlet)
+    grok.baseclass()
+    grok.context(ISilvaObject)
 

@@ -1,0 +1,84 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      metal:use-macro="context/@@standard_macros/page">
+  <body>
+    <div metal:fill-slot="body">
+
+      <form action="." method="post" enctype="multipart/form-data"
+            tal:attributes="action request/URL">
+
+        <h3 i18n:translate=""
+            tal:condition="view/label"
+            tal:content="structure view/label" />
+
+        <p tal:content="view/description|nothing" />
+
+        <div class="form-status"
+             tal:define="status view/status"
+             tal:condition="status">
+
+          <div class="system-msg"
+               i18n:translate=""
+               tal:content="view/status">
+            Form status summary
+          </div>
+
+          <ul id="formlib-errors" class="errors" tal:condition="view/errors">
+            <li tal:repeat="error view/error_views">
+              <span tal:replace="structure error">Error Type</span>
+            </li>
+          </ul>
+        </div>
+
+        <fieldset tal:define="form_name view/form_name|nothing"
+                  tal:omit-tag="not:form_name">
+          <legend tal:condition="form_name"
+                  tal:content="form_name">Form name</legend>
+          <tal:block tal:repeat="widget view/widgets">
+            <div class="field" style="padding-bottom: 10px;"
+                 tal:define="description  widget/hint;
+                             rendered     widget;
+				             error        widget/error"
+                 tal:attributes="class python:'field'+(error and ' error' or '')">
+              <label style="font-weight: bold; font-size: 90%"
+                     tal:attributes="for widget/name">
+		        <span i18n:translate=""
+                      tal:content="widget/label">label</span>
+              </label>
+              <span class="fieldRequired" title="Required"
+                    tal:condition="widget/required">
+                (Required)
+              </span>
+
+              <div class="formHelp" style="font-style: italic; font-size: 80%"
+                   i18n:translate=""
+                   tal:content="description"
+                   tal:condition="description">field description</div>
+              <div tal:condition="error" tal:replace="structure error">
+                The Error
+              </div>
+              <div class="widget" tal:content="structure rendered">
+                Widget!
+              </div>
+	        </div>
+          </tal:block>
+
+          <div id="actionsView">
+            <span class="actionButtons"
+                  tal:condition="view/availableActions">
+              <input tal:repeat="action view/actions"
+                     tal:replace="structure action/render" />
+            </span>
+          </div>
+        </fieldset>
+      </form>
+
+      <script type="text/javascript"
+		      tal:define="extra_script view/extra_script | nothing"
+              tal:condition="extra_script"
+              tal:content="structure extra_script" />
+    </div>
+  </body>
+</html>

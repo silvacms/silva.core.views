@@ -1,12 +1,14 @@
 <configure
    xmlns="http://namespaces.zope.org/zope"
    xmlns:browser="http://namespaces.zope.org/browser"
+   xmlns:grok="http://namespaces.zope.org/grok"
    xmlns:five="http://namespaces.zope.org/five">
 
   <five:registerPackage package="." />
-
+  <include package="five.grok" />
   <include package="silva.core.conf" />
-  <include package="plone.z3cform" />
+  <include package="five.megrok.z3cform" file="meta.zcml" />
+  <include package="five.megrok.z3cform" />
 
   <!-- Register macros for form implementation -->
   <browser:page
@@ -25,6 +27,13 @@
       />
 
   <!-- Default page style -->
+  <browser:page
+     for=".interfaces.IZMIObject"
+     template="templates/zmi_template.pt"
+     name="five_template"
+     permission="zope.Public"
+     />
+
   <browser:page
      for="Products.Silva.interfaces.ISilvaObject"
      template="templates/smi_template.pt"
@@ -48,19 +57,6 @@
      permission="zope.Public"
      provides=".interfaces.IVirtualSite"
      />
-
-  <!-- Z3C Extra button -->
-  <adapter factory=".z3cforms.SilvaFormActions" />
-  <adapter factory=".z3cforms.SilvaAddActionHandler" />
-
-  <!-- Z3C Style -->
-  <subscriber for="z3c.form.interfaces.IAfterWidgetUpdateEvent"
-              handler=".z3cforms.customizeWidgets" />
-
-  <adapter factory=".z3cstyle.ButtonStyle" />
-  <adapter factory=".z3cstyle.CancelButtonStyle" />
-  <adapter factory=".z3cstyle.TextInputStyle" />
-  <adapter factory=".z3cstyle.TextAreaStyle" />
 
 
 </configure>

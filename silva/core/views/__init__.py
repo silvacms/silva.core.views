@@ -3,4 +3,3 @@
 # See also LICENSE.txt
 # $Id$
 
-import monkey

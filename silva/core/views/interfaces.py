@@ -1,36 +1,29 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) 2002-2008 Infrae. All rights reserved.
+# Copyright (c) 2002-2009 Infrae. All rights reserved.
 # See also LICENSE.txt
 # $Id$
 
-from zope.contentprovider.interfaces import IContentProvider as \
-    IBaseContentProvider
+from zope.contentprovider.interfaces import IContentProvider \
+    as IBaseContentProvider
 from zope.interface import Interface, Attribute
 from zope.publisher.interfaces.browser import IBrowserRequest
 from zope.traversing.browser.interfaces import IAbsoluteURL
 from zope.viewlet.interfaces import IViewlet as IBaseViewlet
-from zope.viewlet.interfaces import IViewletManager as IBaseViewletManager
+from grokcore.viewlet.interfaces import IViewletManager as IBaseViewletManager
 from zope import schema
 
-from silva.core.conf.fields import ID
+from grokcore.view.interfaces import IGrokView
+
+from silva.core.conf import schema as silvaschema
 
 from Products.Silva.i18n import translate as _
 
 
 # View
 
-class IGrokCompliantView(Interface):
-    """This view can fake a Grok view.
-    """
-
-    def default_namespace():
-        """Return the default namespace to use in a template
-        """
-
-    def namespace():
-        """Return the namespace to use in a template.
-        """
-
+class IZMIObject(Interface):
+	"""ZMI Object.
+	"""
 
 class IFeedback(Interface):
     """Feedback information.
@@ -40,8 +33,8 @@ class IFeedback(Interface):
     status_type = Attribute(u"Feedback type, error or feedback")
 
 
-class ITemplate(Interface):
-    """A template used in Silva.
+class ITemplate(IGrokView):
+    """A template used in Silva which can be customized.
     """
 
 
@@ -52,8 +45,12 @@ class IView(ITemplate):
     is_preview = Attribute(u"Boolean which say if you're in preview mode.")
     content = Attribute(u"Version of the content to render.")
 
+class IZMIView(IGrokView):
+    """A view in ZMI.
+    """
 
-class ISMIView(Interface):
+
+class ISMIView(IGrokView):
     """A view in SMI.
     """
 
@@ -61,25 +58,25 @@ class ISMIView(Interface):
     active_tab = Attribute(u"Which is the current active tab")
     vein = Attribute(u"What's the vein to display")
 
-
 class ISMITab(ISMIView):
     """A tab in SMI.
     """
 
 
-class IContentProvider(IBaseContentProvider, IGrokCompliantView):
-    """A Content Provider.
+class IContentProvider(IBaseContentProvider):
+    """A customizable Content Provider.
     """
 
 
-class IViewletManager(IBaseViewletManager, IGrokCompliantView):
+class IViewletManager(IBaseViewletManager):
     """A customizable Viewlet Manager.
     """
 
 
-class IViewlet(IBaseViewlet, IGrokCompliantView):
-    """A Viewlet.
+class IViewlet(IBaseViewlet):
+    """A customizable Viewlet.
     """
+
 
 # Silva forms
 
@@ -88,7 +85,7 @@ class IDefaultAddFields(Interface):
     this fields.
     """
 
-    id = ID(
+    id = silvaschema.ID(
         title=_(u"id"),
         description=_(u"No spaces or special characters besides ‘_’ or ‘-’ or ‘.’"),
         required=True)
@@ -140,7 +137,6 @@ class ISilvaStyle(Interface):
     def style(widget):
         """Apply Silva style to that element.
         """
-
 
 # Adapters
 

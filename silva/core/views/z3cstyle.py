@@ -1,17 +1,17 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) 2002-2008 Infrae. All rights reserved.
+# Copyright (c) 2002-2009 Infrae. All rights reserved.
 # See also LICENSE.txt
 # $Id$
 
-from zope import component, interface
+from five import grok
 
 from silva.core.views import interfaces
 import z3c.form.interfaces
 
 
-class Style(object):
-
-    interface.implements(interfaces.ISilvaStyle)
+class Style(grok.MultiAdapter):
+    grok.baseclass()
+    grok.implements(interfaces.ISilvaStyle)
 
     def __init__(self, item, form):
         self.item = item
@@ -22,8 +22,8 @@ class Style(object):
 
 
 class ButtonStyle(Style):
-    component.adapts(z3c.form.interfaces.IButton,
-                     interfaces.ISilvaStyledForm)
+    grok.adapts(z3c.form.interfaces.IButton,
+                interfaces.ISilvaStyledForm)
 
     def style(self, widget):
         widget.klass = u'button'
@@ -31,8 +31,8 @@ class ButtonStyle(Style):
 
 
 class CancelButtonStyle(Style):
-    component.adapts(interfaces.ICancelButton,
-                     interfaces.ISilvaStyledForm)
+    grok.adapts(interfaces.ICancelButton,
+                interfaces.ISilvaStyledForm)
 
     def style(self, widget):
         widget.klass = u'button canceler'
@@ -40,17 +40,26 @@ class CancelButtonStyle(Style):
 
 
 class TextInputStyle(Style):
-    component.adapts(z3c.form.interfaces.ITextWidget,
-                     interfaces.ISilvaStyledForm)
+    grok.adapts(z3c.form.interfaces.ITextWidget,
+                interfaces.ISilvaStyledForm)
 
     def style(self, widget):
         widget.klass = u'store'
         widget.size = 20
 
 
+class FileUploadStyle(Style):
+    grok.adapts(z3c.form.interfaces.IFileWidget,
+                interfaces.ISilvaStyledForm)
+
+    def style(self, widget):
+        widget.klass = u'store'
+        widget.size = 54
+
+
 class TextAreaStyle(Style):
-    component.adapts(z3c.form.interfaces.ITextAreaWidget,
-                     interfaces.ISilvaStyledForm)
+    grok.adapts(z3c.form.interfaces.ITextAreaWidget,
+                interfaces.ISilvaStyledForm)
 
     def style(self, widget):
         widget.klass = u'store'
