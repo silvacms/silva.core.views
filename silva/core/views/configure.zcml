@@ -5,6 +5,7 @@
    xmlns:five="http://namespaces.zope.org/five">
 
   <five:registerPackage package="." />
+  <include package="five.grok" />
   <include package="silva.core.conf" />
   <include package="five.megrok.z3cform" file="meta.zcml" />
   <include package="five.megrok.z3cform" />
@@ -56,6 +57,23 @@
     permission="zope.Public"
     allowed_interface=".interfaces.ISilvaURL"
   />
+
+  <!-- Site -->
+  <browser:page
+     for="Products.Silva.interfaces.ISilvaObject"
+     name="virtual_site"
+     class=".site.VirtualSite"
+     permission="zope.Public"
+     allowed_interface=".interfaces.IVirtualSite"
+     />
+
+  <view
+     for="Products.Silva.interfaces.ISilvaObject"
+     factory=".site.VirtualSite"
+     type="zope.publisher.interfaces.http.IHTTPRequest"
+     permission="zope.Public"
+     provides=".interfaces.IVirtualSite"
+     />
 
   <!-- Default traverser for Silva views -->
   <adapter

@@ -64,6 +64,7 @@ class ITemplate(IGrokView, ITemplateCustomizable, IGrokCustomizable):
     """A template used in Silva which can be customized.
     """
 
+
 class IView(ITemplate):
     """A view in Silva.
     """
