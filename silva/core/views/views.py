@@ -44,8 +44,8 @@ class SilvaBaseView(BrowserView):
                 if isinstance(message, unicode):
                     # XXX This won't be decoded correctly at the other end.
                     message = message.encode('utf8')
-                to_append = urllib.urlencode({'message': message,
-                                              'message_type': self.status_type,})
+                to_append = urllib.urlencode(
+                    {'message': message, 'message_type': self.status_type,})
                 join_char = '?' in url and '&' or '?'
                 super(SilvaBaseView, self).redirect(url + join_char + to_append)
                 return
@@ -77,7 +77,8 @@ class SMIView(SilvaBaseView):
     @CachedProperty
     def _silvaContext(self):
         context = self.context
-        while not ISilvaObject.providedBy(context) and hasattr(context, 'context'):
+        while not ISilvaObject.providedBy(context) and \
+                hasattr(context, 'context'):
             context = context.context
         return context.aq_inner
 
@@ -147,7 +148,7 @@ class ContentProviderBase(Acquisition.Explicit):
     def default_namespace(self):
         namespace = {}
         namespace['view'] = self.view
-        namespace['static'] = self.static
+        namespace['static'] = None
         return namespace
 
 
@@ -165,6 +166,7 @@ class ContentProvider(ContentProviderBase):
 
     def render(self):
         return self.template()
+
 
 class ViewletManager(ContentProviderBase, ViewletManagerBase):
 
@@ -186,27 +188,8 @@ class ViewletManager(ContentProviderBase, ViewletManagerBase):
         s_viewlets = sorted(s_viewlets, key=sort_key)
         return [(viewlet.__viewlet_name__, viewlet) for viewlet in s_viewlets]
 
-    def filter(self, viewlets):
-        # Wrap viewlet in aquisition, and only return viewlets
-        # accessible to the user.
-        parent = self.aq_parent
-        security_manager = getSecurityManager()
-
-        def checkPermission(viewlet):
-            _, viewlet = viewlet
-            # Unfortuanetly, we don't have easy way to check the permission.
-            permission = silvaconf.require.bind().get(viewlet)
-            if (permission is None) or (permission == 'zope.Public'):
-                return True
-            if isinstance(permission, str):
-                permission = component.getUtility(IPermission, permission)
-            return security_manager.checkPermission(permission.title, viewlet)
-
-        return filter(checkPermission,
-                      [(name, viewlet.__of__(parent)) for name, viewlet in viewlets])
-
     def default_namespace(self):
-        namespace = super(ContentProvider, self).default_namespace()
+        namespace = super(ViewletManager, self).default_namespace()
         namespace['viewletmanager'] = self
         return namespace
 
@@ -221,7 +204,7 @@ class Viewlet(ContentProviderBase, ViewletBase):
         self.viewletmanager = viewletmanager
 
     def default_namespace(self):
-        namespace = super(ContentProvider, self).default_namespace()
+        namespace = super(Viewlet, self).default_namespace()
         namespace['viewlet'] = self
         namespace['viewletmanager'] = self.viewletmanager
         return namespace

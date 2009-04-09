@@ -19,6 +19,19 @@ from Products.Silva.i18n import translate as _
 
 # View
 
+class IGrokCompliantView(Interface):
+    """This view can fake a Grok view.
+    """
+
+    def default_namespace():
+        """Return the default namespace to use in a template
+        """
+
+    def namespace():
+        """Return the namespace to use in a template.
+        """
+
+
 class IFeedback(Interface):
     """Feedback information.
     """
@@ -54,17 +67,17 @@ class ISMITab(ISMIView):
     """
 
 
-class IContentProvider(IBaseContentProvider):
+class IContentProvider(IBaseContentProvider, IGrokCompliantView):
     """A Content Provider.
     """
 
 
-class IViewletManager(IBaseViewletManager):
+class IViewletManager(IBaseViewletManager, IGrokCompliantView):
     """A customizable Viewlet Manager.
     """
 
 
-class IViewlet(IBaseViewlet):
+class IViewlet(IBaseViewlet, IGrokCompliantView):
     """A Viewlet.
     """
 
