@@ -13,7 +13,6 @@ from silva.core.views.interfaces import ISilvaZ3CFormForm, IDefaultAddFields, \
 from silva.core.views.views import SMIView
 from silva.core.views.baseforms import SilvaMixinForm, SilvaMixinAddForm, \
     SilvaMixinEditForm
-from silva.core import conf as silvaconf
 from silva.core.interfaces import IVersionedContent
 from silva.core.conf import schema as silvaschema
 import grokcore.view
@@ -31,8 +30,8 @@ class SilvaGrokForm(SilvaMixinForm, GrokForm, ViewCode):
     """Silva Gork form for z3cform.
     """
 
-    interface.implements(ISilvaZ3CFormForm)
-    silvaconf.baseclass()
+    grok.implements(ISilvaZ3CFormForm)
+    grok.baseclass()
 
     @apply
     def status_type():
@@ -52,15 +51,15 @@ class PageForm(SilvaGrokForm, form.Form, SMIView):
     """Generic form.
     """
 
-    silvaconf.baseclass()
+    grok.baseclass()
 
 
 class AddForm(SilvaMixinAddForm, SilvaGrokForm, form.AddForm, SMIView):
     """Add form.
     """
 
-    interface.implements(component.IFactory)
-    silvaconf.baseclass()
+    grok.implements(component.IFactory)
+    grok.baseclass()
     form.extends(form.AddForm, ignoreButtons=True, ignoreHandlers=True)
 
     def updateForm(self):
@@ -98,8 +97,8 @@ class EditForm(SilvaMixinEditForm, SilvaGrokForm, form.EditForm, SMIView):
     """Edit form.
     """
 
-    silvaconf.baseclass()
-    silvaconf.name(u"tab_edit")
+    grok.baseclass()
+    grok.name(u"tab_edit")
     form.extends(form.AddForm, ignoreButtons=True, ignoreHandlers=True)
 
     def updateForm(self):
@@ -130,7 +129,7 @@ class EditForm(SilvaMixinEditForm, SilvaGrokForm, form.EditForm, SMIView):
 
 class SilvaGrokSubForm(SilvaGrokForm):
 
-    silvaconf.baseclass()
+    grok.baseclass()
 
     @apply
     def status():
@@ -145,7 +144,7 @@ class CrudAddForm(SilvaGrokSubForm, crud.AddForm, SMIView):
     """The add form of a CRUD form.
     """
 
-    interface.implements(INoCancelButton)
+    grok.implements(INoCancelButton)
 
     template = grokcore.view.PageTemplateFile('templates/z3cform.pt')
     ignoreRequest = False
@@ -159,14 +158,14 @@ class CrudEditSubForm(crud.EditSubForm):
     """An crud edit sub-form.
     """
 
-    interface.implements(ISilvaStyledForm)
+    grok.implements(ISilvaStyledForm)
 
 
 class CrudEditForm(SilvaGrokSubForm, crud.EditForm, SMIView):
     """The edit form of a CRUD form.
     """
 
-    interface.implements(INoCancelButton)
+    grok.implements(INoCancelButton)
 
     editsubform_factory = CrudEditSubForm
     template = grokcore.view.PageTemplateFile('templates/crud_editform.pt')
@@ -180,7 +179,7 @@ class CrudForm(SilvaGrokForm, crud.CrudForm, SMIView):
     """Crud form.
     """
 
-    interface.implements(INoCancelButton)
+    grok.implements(INoCancelButton)
 
     template = grokcore.view.PageTemplateFile('templates/crud_form.pt')
     addform_factory = CrudAddForm
@@ -209,7 +208,7 @@ class Z3CFormMacros(BrowserView):
 
 # Customization of widgets
 
-@silvaconf.subscribe(z3c.form.interfaces.IAfterWidgetUpdateEvent)
+@grok.subscribe(z3c.form.interfaces.IAfterWidgetUpdateEvent)
 def customizeWidgets(event):
     item = widget = event.widget
     form = widget.form
@@ -226,7 +225,7 @@ class CancelButton(button.Button):
     """A cancel button.
     """
 
-    interface.implements(ICancelButton)
+    grok.implements(ICancelButton)
 
 
 class SilvaFormActions(button.ButtonActions, grok.MultiAdapter):
@@ -240,7 +239,6 @@ class SilvaFormActions(button.ButtonActions, grok.MultiAdapter):
                 self.form.buttons,
                 CancelButton('cancel', _(u'cancel'), accessKey=u'c'))
         super(SilvaFormActions, self).update()
-
 
 
 class SilvaAddActionHandler(button.ButtonActionHandler, grok.MultiAdapter):

@@ -17,7 +17,6 @@ from five import grok
 
 from silva.core.views.interfaces import IFeedback, IDefaultAddFields
 from silva.core.conf.utils import getFactoryName
-from silva.core import conf as silvaconf
 
 class SilvaMixinForm(object):
     """Silva grok form mixin.
@@ -25,7 +24,7 @@ class SilvaMixinForm(object):
 
     interface.implements(IFeedback)
 
-    silvaconf.baseclass()
+    grok.baseclass()
 
     template = grok.PageTemplateFile('templates/form.pt')
 
@@ -39,7 +38,6 @@ class SilvaMixinForm(object):
 
         # Default feedback
         self._status_type = None
-
 
     def __call__(self, message=None, message_type=None):
         if message:
@@ -130,7 +128,7 @@ class SilvaMixinEditForm(object):
 
 
     template = grok.PageTemplateFile('templates/edit_form.pt')
-    silvaconf.name(u'tab_edit')
+    grok.name(u'tab_edit')
 
     vein = u'edit'
 

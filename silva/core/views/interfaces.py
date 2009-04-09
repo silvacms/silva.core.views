@@ -75,6 +75,7 @@ class IZMIView(IGrokView):
     """A view in ZMI.
     """
 
+
 class ISMIView(IGrokView):
     """A view in SMI.
     """
@@ -92,13 +93,16 @@ class IContentProvider(IBaseContentProvider, IGrokCustomizable):
     """A customizable Content Provider.
     """
 
+
 class IViewletManager(IBaseViewletManager, IGrokCustomizable):
     """A customizable Viewlet Manager.
     """
 
+
 class IViewlet(IBaseViewlet, IGrokCustomizable):
     """A customizable Viewlet.
     """
+
 
 # TTW Templates
 
@@ -117,7 +121,8 @@ class ISilvaURL(IAbsoluteURL):
 # Silva forms
 
 class IDefaultAddFields(Interface):
-    """Default fields used in a add form. You don't have to defines this fields.
+    """Default fields used in a add form. You don't have to defines
+    this fields.
     """
 
     id = silvaschema.ID(
@@ -134,13 +139,16 @@ class ISilvaForm(Interface):
     """A Silva form.
     """
 
+
 class ISilvaFormlibForm(ISilvaForm):
     """A Silva form built using formlib.
     """
 
+
 class ISilvaStyledForm(Interface):
     """A form with a Silva style.
     """
+
 
 class ISilvaZ3CFormForm(ISilvaForm, ISilvaStyledForm):
     """A Silva form built using z3c.form.
@@ -154,10 +162,12 @@ class ICancelButton(IButton):
     """A button to cancel a form.
     """
 
+
 class INoCancelButton(Interface):
     """Marker interface for Z3CForm to say that you don't want a
     cancel button.
     """
+
 
 class ISilvaStyle(Interface):
     """Adapter used to apply new style information on z3c.form
@@ -166,4 +176,20 @@ class ISilvaStyle(Interface):
 
     def style(widget):
         """Apply Silva style to that element.
+        """
+
+# Adapters
+
+class IVirtualSite(Interface):
+
+    def get_root():
+        """Return the virtual root of the current site.
+        """
+
+    def get_virtual_root():
+        """Return the virtual root or None.
+        """
+
+    def get_virtal_path():
+        """Return the virtual path or None.
         """

@@ -5,6 +5,9 @@
    xmlns:five="http://namespaces.zope.org/five">
 
   <five:registerPackage package="." />
+  <include package="silva.core.conf" />
+  <include package="five.megrok.z3cform" file="meta.zcml" />
+  <include package="five.megrok.z3cform" />
 
   <!-- Register macros for form implementation -->
   <browser:page
@@ -65,9 +68,6 @@
   <!-- Grok this package -->
   <grok:grok package="." />
 
-  <!-- Include dependency -->
-  <include package="silva.core.conf" />
-  <include package="five.megrok.z3cform" file="meta.zcml" />
-  <include package="five.megrok.z3cform" />
+
 
 </configure>

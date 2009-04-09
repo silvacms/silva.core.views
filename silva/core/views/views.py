@@ -18,7 +18,6 @@ from silva.core.views.interfaces import ITemplate, IPreviewLayer, IView
 from silva.core.views.interfaces import IContentProvider, IViewlet
 from silva.core.layout.interfaces import ISMILayer
 from silva.core.conf.utils import getSilvaViewFor
-from silva.core import conf as silvaconf
 
 from AccessControl import getSecurityManager
 
@@ -28,7 +27,7 @@ class SilvaGrokView(grok.View):
     """Grok View on Silva objects.
     """
 
-    silvaconf.baseclass()
+    grok.baseclass()
 
     def redirect(self, url):
         # Override redirect to send status information if there is.
@@ -39,8 +38,8 @@ class SilvaGrokView(grok.View):
                 if isinstance(message, unicode):
                     # XXX This won't be decoded correctly at the other end.
                     message = message.encode('utf8')
-                to_append = urllib.urlencode({'message': message,
-                                              'message_type': self.status_type,})
+                to_append = urllib.urlencode(
+                    {'message': message, 'message_type': self.status_type,})
                 join_char = '?' in url and '&' or '?'
                 super(SilvaGrokView, self).redirect(url + join_char + to_append)
                 return
@@ -52,16 +51,15 @@ class ZMIView(SilvaGrokView):
     """
 
     grok.implements(IZMIView)
-
-    silvaconf.baseclass()
-    silvaconf.require('zope2.ViewManagementScreens')
+    grok.baseclass()
+    grok.require('zope2.ViewManagementScreens')
 
 
 class ZMIForm(grok.Form, ZMIView):
     """A simple form in ZMI.
     """
 
-    silvaconf.baseclass()
+    grok.baseclass()
 
     # ZMI Templates requires Zope2 engine.
     template = grok.PageTemplate(filename='templates/zmi_form.pt')
@@ -71,7 +69,7 @@ class ZMIEditForm(grok.EditForm, ZMIView):
     """An edit form in ZMI.
     """
 
-    silvaconf.baseclass()
+    grok.baseclass()
 
     # ZMI Templates requires Zope2 engine.
     template = grok.PageTemplate(filename='templates/zmi_form.pt')
@@ -83,9 +81,9 @@ class SMIView(SilvaGrokView):
 
     grok.implements(ISMIView)
 
-    silvaconf.baseclass()
-    silvaconf.context(ISilvaObject)
-    silvaconf.layer(ISMILayer)
+    grok.baseclass()
+    grok.context(ISilvaObject)
+    grok.layer(ISMILayer)
 
     vein = 'contents'
 
@@ -113,7 +111,7 @@ class SMIView(SilvaGrokView):
 
     @property
     def tab_name(self):
-        return silvaconf.name.bind().get(self, default=default_view_name)
+        return grok.name.bind().get(self, default=default_view_name)
 
     @property
     def active_tab(self):
@@ -142,9 +140,8 @@ class Template(SilvaGrokView):
     """
 
     grok.implements(ITemplate)
-
-    silvaconf.baseclass()
-    silvaconf.context(ISilvaObject)
+    grok.baseclass()
+    grok.context(ISilvaObject)
 
 
 class View(Template):
@@ -152,9 +149,8 @@ class View(Template):
     """
 
     grok.implements(IView)
-
-    silvaconf.baseclass()
-    silvaconf.name(u'content.html')
+    grok.baseclass()
+    grok.name(u'content.html')
 
     @CachedProperty
     def is_preview(self):
@@ -176,9 +172,8 @@ class ContentProvider(grok.ViewletManager):
     """
 
     grok.implements(IContentProvider)
-
-    silvaconf.baseclass()
-    silvaconf.context(ISilvaObject)
+    grok.baseclass()
+    grok.context(ISilvaObject)
 
     def default_namespace(self):
         namespace = super(ContentProvider, self).default_namespace()
@@ -191,9 +186,8 @@ class ViewletManager(grok.ViewletManager):
     """
 
     grok.implements(IViewletManager)
-
-    silvaconf.baseclass()
-    silvaconf.context(ISilvaObject)
+    grok.baseclass()
+    grok.context(ISilvaObject)
 
 
 class Viewlet(grok.Viewlet):
@@ -201,7 +195,6 @@ class Viewlet(grok.Viewlet):
     """
 
     grok.implements(IViewlet)
-
-    silvaconf.baseclass()
-    silvaconf.context(ISilvaObject)
+    grok.baseclass()
+    grok.context(ISilvaObject)
 

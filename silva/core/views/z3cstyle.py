@@ -8,6 +8,7 @@ from five import grok
 from silva.core.views import interfaces
 import z3c.form.interfaces
 
+
 class Style(grok.MultiAdapter):
     grok.baseclass()
     grok.implements(interfaces.ISilvaStyle)
