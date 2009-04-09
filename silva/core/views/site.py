@@ -1,3 +1,7 @@
+# -*- coding: utf-8 -*-
+# Copyright (c) 2009 Infrae. All rights reserved.
+# See also LICENSE.txt
+# $Id$
 
 from Products.Five import BrowserView
 
@@ -15,7 +19,6 @@ class VirtualSite(BrowserView):
             return None
 
         return self.context.restrictedTraverse(root_path, None)
-
 
     def get_virtual_path(self):
         try:
