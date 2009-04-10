@@ -59,4 +59,7 @@
      />
 
 
+  <!-- Grok this package -->
+  <grok:grok package="." />
+
 </configure>

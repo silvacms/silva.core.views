@@ -31,7 +31,6 @@ class SilvaMixinForm(object):
 
     def __init__(self, context, request):
         super(SilvaMixinForm, self).__init__(context, request)
-
         # Set model on request like SilvaViews
         self.request['model'] = self._silvaContext
         # Set id on template some macros uses template/id
