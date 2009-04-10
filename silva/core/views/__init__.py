@@ -3,3 +3,6 @@
 # See also LICENSE.txt
 # $Id$
 
+# Backward compatibility import for 2.2.
+from Products.SilvaLayout.browser import absoluteurl
+
