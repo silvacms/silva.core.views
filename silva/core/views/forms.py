@@ -5,7 +5,6 @@
 
 from zope.formlib import form
 from zope import event
-from zope import interface
 from zope import lifecycleevent
 
 from Products.Five.formlib import formbase
@@ -13,13 +12,12 @@ from Products.Silva.i18n import translate as _
 from Products.Silva.interfaces import IVersionedContent
 from Products.Silva.ViewCode import ViewCode
 
-from five.grok import action
-from five.grok.components import GrokForm
-
 from silva.core.views.baseforms import SilvaMixinForm, SilvaMixinAddForm, SilvaMixinEditForm
-from silva.core.views.views import SMIView
+from silva.core.views.views import SMIView, Template
 from silva.core.views.interfaces import IDefaultAddFields, ISilvaFormlibForm
-from silva.core import conf as silvaconf
+
+from five.grok.components import GrokForm
+from five import grok
 
 # Forms
 
@@ -28,8 +26,8 @@ class SilvaGrokForm(SilvaMixinForm, GrokForm, ViewCode):
     """Silva Grok form for formlib.
     """
 
-    interface.implements(ISilvaFormlibForm)
-    silvaconf.baseclass()
+    grok.implements(ISilvaFormlibForm)
+    grok.baseclass()
 
     @property
     def status_type(self):
@@ -40,14 +38,27 @@ class PageForm(SilvaGrokForm, formbase.PageForm, SMIView):
     """Generic form.
     """
 
-    silvaconf.baseclass()
+    grok.baseclass()
+
+
+class PublicForm(GrokForm, formbase.PageForm, Template):
+    """Generic form for the public interface.
+    """
+
+    grok.implements(ISilvaFormlibForm)
+    grok.baseclass()
+    template = grok.PageTemplateFile('templates/public_form.pt')
+
+    @property
+    def form_macros(self):
+        return component.queryMultiAdapter((self, self.request,), name='form-macros')
 
 
 class AddForm(SilvaMixinAddForm, SilvaGrokForm, formbase.AddForm, SMIView):
     """Add form.
     """
 
-    silvaconf.baseclass()
+    grok.baseclass()
 
     def setUpWidgets(self, ignore_request=False):
         # Add missing fields from IDefaultAddFields
@@ -60,12 +71,12 @@ class AddForm(SilvaMixinAddForm, SilvaGrokForm, formbase.AddForm, SMIView):
         # Setup widgets
         super(AddForm, self).setUpWidgets(ignore_request)
 
-    @action(_(u"save"), condition=form.haveInputWidgets)
+    @grok.action(_(u"save"), condition=form.haveInputWidgets)
     def handle_save(self, **data):
         obj = self.createAndAdd(data)
         self.redirect('%s/edit' % self.context.absolute_url())
 
-    @action(_(u"save + edit"), condition=form.haveInputWidgets)
+    @grok.action(_(u"save + edit"), condition=form.haveInputWidgets)
     def handle_save_and_enter(self, **data):
         obj = self.createAndAdd(data)
         self.redirect('%s/edit' % obj.absolute_url())
@@ -76,7 +87,7 @@ class EditForm(SilvaMixinEditForm, SilvaGrokForm, formbase.EditForm, SMIView):
     """Edition form.
     """
 
-    silvaconf.baseclass()
+    grok.baseclass()
 
     def setUpWidgets(self, ignore_request=False):
         self.adapters = {}
@@ -93,7 +104,7 @@ class EditForm(SilvaMixinEditForm, SilvaGrokForm, formbase.EditForm, SMIView):
                 self.form_fields, self.prefix, editable_obj, self.request,
                 adapters=self.adapters, ignore_request=ignore_request)
 
-    @action(_("save"), condition=form.haveInputWidgets)
+    @grok.action(_("save"), condition=form.haveInputWidgets)
     def handle_edit_action(self, **data):
         editable_obj = self.context.get_editable()
         if form.applyChanges(editable_obj, self.form_fields, data, self.adapters):

@@ -10,7 +10,7 @@ from Products.Silva.ViewCode import ViewCode
 
 from silva.core.views.interfaces import ISilvaZ3CFormForm, IDefaultAddFields, \
     ICancelButton, ISilvaStyle, INoCancelButton, ISilvaStyledForm
-from silva.core.views.views import SMIView
+from silva.core.views.views import SMIView, Template
 from silva.core.views.baseforms import SilvaMixinForm, SilvaMixinAddForm, \
     SilvaMixinEditForm
 from silva.core.interfaces import IVersionedContent
@@ -52,6 +52,19 @@ class PageForm(SilvaGrokForm, form.Form, SMIView):
     """
 
     grok.baseclass()
+
+
+class PublicForm(GrokForm, form.Form, Template):
+    """Generic form for the public interface.
+    """
+
+    grok.implements(ISilvaZ3CFormForm)
+    grok.baseclass()
+    template = grok.PageTemplateFile('templates/public_form.pt')
+
+    @property
+    def form_macros(self):
+        return component.queryMultiAdapter((self, self.request,), name='form-macros')
 
 
 class AddForm(SilvaMixinAddForm, SilvaGrokForm, form.AddForm, SMIView):
@@ -144,6 +157,7 @@ class CrudAddForm(SilvaGrokSubForm, crud.AddForm, SMIView):
     """The add form of a CRUD form.
     """
 
+    grok.baseclass()
     grok.implements(INoCancelButton)
 
     template = grokcore.view.PageTemplateFile('templates/z3cform.pt')
@@ -166,6 +180,7 @@ class CrudEditForm(SilvaGrokSubForm, crud.EditForm, SMIView):
     """
 
     grok.implements(INoCancelButton)
+    grok.baseclass()
 
     editsubform_factory = CrudEditSubForm
     template = grokcore.view.PageTemplateFile('templates/crud_editform.pt')
@@ -180,6 +195,7 @@ class CrudForm(SilvaGrokForm, crud.CrudForm, SMIView):
     """
 
     grok.implements(INoCancelButton)
+    grok.baseclass()
 
     template = grokcore.view.PageTemplateFile('templates/crud_form.pt')
     addform_factory = CrudAddForm
