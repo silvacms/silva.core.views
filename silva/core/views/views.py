@@ -157,8 +157,9 @@ class View(Template):
 
     @CachedProperty
     def is_preview(self):
-        # XXX to fix
-        return False
+        # Preview in 2.1 is different.
+        url = self.request.URL
+        return 'preview_html' in url
 
     @CachedProperty
     def content(self):
