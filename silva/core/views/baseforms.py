@@ -88,6 +88,16 @@ class SilvaMixinAddForm(object):
         obj_id = str(data['id'])
         factory(parent, obj_id, data['title'])
         obj = getattr(parent, obj_id)
+        
+        #now move to position, if 'add_object_position' is in the request
+        position = self.request.get('add_object_position', None)
+        if position:
+            try:
+                position = int(position)
+                if position >= 0:
+                    parent.move_to([obj_id], position)
+            except ValueError:
+                pass
 
         editable_obj = obj.get_editable()
         for key, value in data.iteritems():
