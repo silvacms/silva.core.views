@@ -43,7 +43,7 @@ class ITemplate(IGrokView):
     """
 
 
-class IView(ITemplate):
+class IView(IGrokView):
     """A view in Silva.
     """
 

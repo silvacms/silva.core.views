@@ -22,6 +22,7 @@ from silva.core.layout.interfaces import ISMILayer
 from silva.core.conf.utils import getSilvaViewFor
 
 from AccessControl import getSecurityManager
+import Acquisition
 
 # Simple views
 
@@ -140,7 +141,7 @@ class SMIView(SilvaGrokView):
                 'container': self._silvaContext.aq_inner,}
 
 
-class Layout(object):
+class Layout(Acquisition.Explicit):
     """A layout object.
     """
 
@@ -256,6 +257,8 @@ class ContentProvider(grok.ViewletManager):
     def default_namespace(self):
         namespace = super(ContentProvider, self).default_namespace()
         namespace['provider'] = self
+        if IView.providedBy(self.view):
+            namespace['layout'] = self.view.layout
         return namespace
 
 
@@ -267,6 +270,12 @@ class ViewletManager(grok.ViewletManager):
     grok.baseclass()
     grok.context(ISilvaObject)
 
+    def default_namespace(self):
+        namespace = super(ContentProvider, self).default_namespace()
+        if IView.providedBy(self.view):
+            namespace['layout'] = self.view.layout
+        return namespace
+
 
 class Viewlet(grok.Viewlet):
     """A viewlet in Silva
@@ -275,4 +284,10 @@ class Viewlet(grok.Viewlet):
     grok.implements(IViewlet)
     grok.baseclass()
     grok.context(ISilvaObject)
+
+    def default_namespace(self):
+        namespace = super(ContentProvider, self).default_namespace()
+        if IView.providedBy(self.view):
+            namespace['layout'] = self.view.layout
+        return namespace
 
