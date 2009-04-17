@@ -33,6 +33,11 @@ class IFeedback(Interface):
     status_type = Attribute(u"Feedback type, error or feedback")
 
 
+class ILayout(Interface):
+    """Layout code.
+    """
+
+
 class ITemplate(IGrokView):
     """A template used in Silva which can be customized.
     """
@@ -44,6 +49,7 @@ class IView(ITemplate):
 
     is_preview = Attribute(u"Boolean which say if you're in preview mode.")
     content = Attribute(u"Version of the content to render.")
+
 
 class IZMIView(IGrokView):
     """A view in ZMI.

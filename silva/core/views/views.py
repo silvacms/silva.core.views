@@ -6,6 +6,7 @@
 from zope.i18n import translate
 from zope.viewlet.interfaces import IViewletManager
 from zope.cachedescriptors.property import CachedProperty
+from zope import component
 
 from grokcore.view.meta.views import default_view_name
 from five import grok
@@ -14,7 +15,7 @@ import urllib
 from Products.Silva.interfaces import ISilvaObject
 
 from silva.core.views.interfaces import IFeedback, IZMIView, ISMIView, ISMITab
-from silva.core.views.interfaces import ITemplate, IView
+from silva.core.views.interfaces import ITemplate, IView, ILayout
 from silva.core.views.interfaces import IContentProvider, IViewlet
 from silva.core.layout.interfaces import ISMILayer
 from silva.core.conf.utils import getSilvaViewFor
@@ -138,6 +139,49 @@ class SMIView(SilvaGrokView):
                 'container': self._silvaContext.aq_inner,}
 
 
+class Layout(object):
+    """A layout object.
+    """
+
+    grok.implements(ILayout)
+    grok.baseclass()
+    grok.context(ISilvaObject)
+
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+        self.view = None
+
+    def default_namespace(self):
+        namespace = {}
+        namespace['context'] = self.context
+        namespace['request'] = self.request
+        namespace['view'] = self.view
+        namespace['layout'] = self
+        return namespace
+
+    def namespace(self):
+        return {}
+
+    def update(self):
+        pass
+
+    @property
+    def response(self):
+        return self.request.response
+
+    def _render_template(self):
+        return self.template.render(self)
+
+    def render(self):
+        return self._render_template()
+
+    def __call__(self, view):
+        self.view = view
+        self.update()
+        return self.render()
+
+
 class Template(SilvaGrokView):
     """A view class not binded to a content.
     """
@@ -145,6 +189,23 @@ class Template(SilvaGrokView):
     grok.implements(ITemplate)
     grok.baseclass()
     grok.context(ISilvaObject)
+
+    def __init__(self, context, request):
+        super(Template, self).__init__(context, request)
+        self.layout = None
+
+    def default_namespace(self):
+        namespace = super(Template, self).default_namespace()
+        namespace['layout'] = self.layout
+        return namespace
+
+    def page(self):
+        return self.template.render(self)
+
+    def _render_template(self):
+        self.layout = component.getMultiAdapter(
+            (self.context, self.request), ILayout)
+        self.layout(self)
 
 
 class View(Template):
