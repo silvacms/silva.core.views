@@ -245,7 +245,34 @@ class View(SilvaGrokView):
         return {'content': self.content}
 
 
-class ContentProvider(grok.ViewletManager):
+class ViewletLayoutSupport(object):
+    """This add layout on the object and namespace if the view is an
+    ITemplate.
+    """
+
+    def __init__(self, *args):
+        super(ViewletLayoutSupport, self).__init__(*args)
+        self.layout = None
+        if ITemplate.providedBy(self.view):
+            self.layout = self.view.layout
+
+    def default_namespace(self):
+        namespace = super(ViewletLayoutSupport, self).default_namespace()
+        if self.layout:
+            namespace['layout'] = self.layout
+        return namespace
+
+
+class ViewletManager(ViewletLayoutSupport, grok.ViewletManager):
+    """A viewlet manager in Silva.
+    """
+
+    grok.implements(IViewletManager)
+    grok.baseclass()
+    grok.context(ISilvaObject)
+
+
+class ContentProvider(ViewletManager):
     """A content provider in Silva. In fact it's just a viewlet
     manager...
     """
@@ -257,27 +284,10 @@ class ContentProvider(grok.ViewletManager):
     def default_namespace(self):
         namespace = super(ContentProvider, self).default_namespace()
         namespace['provider'] = self
-        if IView.providedBy(self.view):
-            namespace['layout'] = self.view.layout
         return namespace
 
 
-class ViewletManager(grok.ViewletManager):
-    """A viewlet manager in Silva.
-    """
-
-    grok.implements(IViewletManager)
-    grok.baseclass()
-    grok.context(ISilvaObject)
-
-    def default_namespace(self):
-        namespace = super(ContentProvider, self).default_namespace()
-        if IView.providedBy(self.view):
-            namespace['layout'] = self.view.layout
-        return namespace
-
-
-class Viewlet(grok.Viewlet):
+class Viewlet(ViewletLayoutSupport, grok.Viewlet):
     """A viewlet in Silva
     """
 
@@ -285,9 +295,4 @@ class Viewlet(grok.Viewlet):
     grok.baseclass()
     grok.context(ISilvaObject)
 
-    def default_namespace(self):
-        namespace = super(ContentProvider, self).default_namespace()
-        if IView.providedBy(self.view):
-            namespace['layout'] = self.view.layout
-        return namespace
 
