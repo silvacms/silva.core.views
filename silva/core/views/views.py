@@ -177,6 +177,8 @@ class Layout(object):
     def render(self):
         return self._render_template()
 
+    render.base_method = True
+
     def __call__(self, view):
         self.view = view
         self.update()
@@ -218,7 +220,7 @@ class Template(SilvaGrokView):
         return self.layout(self)
 
 
-class View(Template):
+class View(SilvaGrokView):
     """View on Silva object, support view and preview
     """
 

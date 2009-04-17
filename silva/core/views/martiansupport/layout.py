@@ -17,9 +17,9 @@ class LayoutGrokker(martian.ClassGrokker):
     martian.directive(grokcore.component.context)
     martian.directive(grokcore.view.layer, default=IDefaultBrowserLayer)
 
-    def grok(self, factory, module_info, **kw):
+    def grok(self, name, factory, module_info, **kw):
         factory.module_info = module_info
-        return super(LayoutGrokker, self).grok(factory, module_info, **kw)
+        return super(LayoutGrokker, self).grok(name, factory, module_info, **kw)
 
     def execute(self, factory, config, context, layer, **kw):
         # find templates
@@ -33,9 +33,9 @@ class LayoutGrokker(martian.ClassGrokker):
 
         adapts = (context, layer)
         config.action(
-            discriminator=('adapter', adapts, ILayout, name),
+            discriminator=('adapter', adapts, ILayout),
             callable=zope.component.provideAdapter,
-            args=(factory, adapts, ILayout, name),
+            args=(factory, adapts, ILayout),
             )
         return True
 
