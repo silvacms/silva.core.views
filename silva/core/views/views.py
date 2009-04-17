@@ -227,6 +227,7 @@ class View(SilvaGrokView):
 
     grok.implements(IView)
     grok.baseclass()
+    grok.context(ISilvaObject)
     grok.name(u'content.html')
 
     @CachedProperty
