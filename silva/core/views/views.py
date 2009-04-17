@@ -204,7 +204,7 @@ class Template(SilvaGrokView):
         return namespace
 
     @property
-    def page(self):
+    def content(self):
         template = getattr(self, 'template', None)
         if template is not None:
             return self._render_template()
