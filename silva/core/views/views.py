@@ -6,7 +6,8 @@
 from zope.i18n import translate
 from zope.viewlet.interfaces import IViewletManager
 from zope.cachedescriptors.property import CachedProperty
-from zope import component
+from zope.publisher.publish import mapply
+import zope.component
 
 from grokcore.view.meta.views import default_view_name
 from five import grok
@@ -199,13 +200,22 @@ class Template(SilvaGrokView):
         namespace['layout'] = self.layout
         return namespace
 
-    def page(self):
-        return self.template.render(self)
+    @property
+    def page(self)
+        template = getattr(self, 'template', None)
+        if template is not None:
+            return self._render_template()
+        return mapply(self.render, (), self.request)
 
-    def _render_template(self):
-        self.layout = component.getMultiAdapter(
+    def __call__(self):
+        mapply(self.update, (), self.request)
+        if self.request.response.getStatus() in (302, 303):
+            # A redirect was triggered somewhere in update().  Don't
+            # continue rendering the template or doing anything else.
+            return
+        self.layout = zope.component.getMultiAdapter(
             (self.context, self.request), ILayout)
-        self.layout(self)
+        return self.layout(self)
 
 
 class View(Template):
