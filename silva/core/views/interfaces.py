@@ -35,6 +35,11 @@ class IFeedback(Interface):
     status_type = Attribute(u"Feedback type, error or feedback")
 
 
+class ILayout(Interface):
+    """Layout code.
+    """
+
+
 class IGrokCustomizable(Interface):
     """A grok template which can be customized with a TTW template.
 
@@ -65,12 +70,13 @@ class ITemplate(IGrokView, ITemplateCustomizable, IGrokCustomizable):
     """
 
 
-class IView(ITemplate):
+class IView(IGrokView):
     """A view in Silva.
     """
 
     is_preview = Attribute(u"Boolean which say if you're in preview mode.")
     content = Attribute(u"Version of the content to render.")
+
 
 class IZMIView(IGrokView):
     """A view in ZMI.

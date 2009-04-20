@@ -4,7 +4,8 @@
 # $Id$
 
 from zope.formlib import form
-from zope import event
+from zope.publisher.publish import mapply
+from zope import event, component
 from zope import lifecycleevent
 
 from Products.Five.formlib import formbase
@@ -14,7 +15,7 @@ from Products.Silva.ViewCode import ViewCode
 
 from silva.core.views.baseforms import SilvaMixinForm, SilvaMixinAddForm, SilvaMixinEditForm
 from silva.core.views.views import SMIView, Template
-from silva.core.views.interfaces import IDefaultAddFields, ISilvaFormlibForm
+from silva.core.views.interfaces import IDefaultAddFields, ISilvaFormlibForm, ILayout
 
 from five.grok.components import GrokForm
 from five import grok
@@ -41,7 +42,7 @@ class PageForm(SilvaGrokForm, formbase.PageForm, SMIView):
     grok.baseclass()
 
 
-class PublicForm(GrokForm, formbase.PageForm, Template):
+class PublicForm(Template, GrokForm, formbase.PageForm):
     """Generic form for the public interface.
     """
 
@@ -52,6 +53,21 @@ class PublicForm(GrokForm, formbase.PageForm, Template):
     @property
     def form_macros(self):
         return component.queryMultiAdapter((self, self.request,), name='form-macros')
+
+    @property
+    def content(self):
+        return self.render()
+
+    def __call__(self):
+        mapply(self.update, (), self.request)
+        if self.request.response.getStatus() in (302, 303):
+            # A redirect was triggered somewhere in update().  Don't
+            # continue rendering the template or doing anything else.
+            return
+        self.update_form()
+        self.layout = component.getMultiAdapter(
+            (self.context, self.request), ILayout)
+        return self.layout(self)
 
 
 class AddForm(SilvaMixinAddForm, SilvaGrokForm, formbase.AddForm, SMIView):

@@ -6,6 +6,8 @@
 from zope.i18n import translate
 from zope.viewlet.interfaces import IViewletManager
 from zope.cachedescriptors.property import CachedProperty
+from zope.publisher.publish import mapply
+import zope.component
 
 from grokcore.view.meta.views import default_view_name
 from five import grok
@@ -14,12 +16,14 @@ import urllib
 from Products.Silva.interfaces import ISilvaObject
 
 from silva.core.views.interfaces import IFeedback, IZMIView, ISMIView, ISMITab
-from silva.core.views.interfaces import ITemplate, IPreviewLayer, IView
+from silva.core.views.interfaces import ITemplate, IView, ILayout
+from silva.core.views.interfaces import IPreviewLayer
 from silva.core.views.interfaces import IContentProvider, IViewlet
 from silva.core.layout.interfaces import ISMILayer
 from silva.core.conf.utils import getSilvaViewFor
 
 from AccessControl import getSecurityManager
+import Acquisition
 
 # Simple views
 
@@ -135,6 +139,51 @@ class SMIView(SilvaGrokView):
                 'container': self._silvaContext.aq_inner,}
 
 
+class Layout(Acquisition.Explicit):
+    """A layout object.
+    """
+
+    grok.implements(ILayout)
+    grok.baseclass()
+    grok.context(ISilvaObject)
+
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+        self.view = None
+
+    def default_namespace(self):
+        namespace = {}
+        namespace['context'] = self.context
+        namespace['request'] = self.request
+        namespace['view'] = self.view
+        namespace['layout'] = self
+        return namespace
+
+    def namespace(self):
+        return {}
+
+    def update(self):
+        pass
+
+    @property
+    def response(self):
+        return self.request.response
+
+    def _render_template(self):
+        return self.template.render(self)
+
+    def render(self):
+        return self._render_template()
+
+    render.base_method = True
+
+    def __call__(self, view):
+        self.view = view
+        self.update()
+        return self.render()
+
+
 class Template(SilvaGrokView):
     """A view class not binded to a content.
     """
@@ -143,13 +192,40 @@ class Template(SilvaGrokView):
     grok.baseclass()
     grok.context(ISilvaObject)
 
+    def __init__(self, context, request):
+        super(Template, self).__init__(context, request)
+        self.layout = None
 
-class View(Template):
+    def default_namespace(self):
+        namespace = super(Template, self).default_namespace()
+        namespace['layout'] = self.layout
+        return namespace
+
+    @property
+    def content(self):
+        template = getattr(self, 'template', None)
+        if template is not None:
+            return self._render_template()
+        return mapply(self.render, (), self.request)
+
+    def __call__(self):
+        mapply(self.update, (), self.request)
+        if self.request.response.getStatus() in (302, 303):
+            # A redirect was triggered somewhere in update().  Don't
+            # continue rendering the template or doing anything else.
+            return
+        self.layout = zope.component.getMultiAdapter(
+            (self.context, self.request), ILayout)
+        return self.layout(self)
+
+
+class View(SilvaGrokView):
     """View on Silva object, support view and preview
     """
 
     grok.implements(IView)
     grok.baseclass()
+    grok.context(ISilvaObject)
     grok.name(u'content.html')
 
     @CachedProperty
@@ -166,7 +242,34 @@ class View(Template):
         return {'content': self.content}
 
 
-class ContentProvider(grok.ViewletManager):
+class ViewletLayoutSupport(object):
+    """This add layout on the object and namespace if the view is an
+    ITemplate.
+    """
+
+    def __init__(self, *args):
+        super(ViewletLayoutSupport, self).__init__(*args)
+        self.layout = None
+        if ITemplate.providedBy(self.view):
+            self.layout = self.view.layout
+
+    def default_namespace(self):
+        namespace = super(ViewletLayoutSupport, self).default_namespace()
+        if self.layout:
+            namespace['layout'] = self.layout
+        return namespace
+
+
+class ViewletManager(ViewletLayoutSupport, grok.ViewletManager):
+    """A viewlet manager in Silva.
+    """
+
+    grok.implements(IViewletManager)
+    grok.baseclass()
+    grok.context(ISilvaObject)
+
+
+class ContentProvider(ViewletManager):
     """A content provider in Silva. In fact it's just a viewlet
     manager...
     """
@@ -181,20 +284,12 @@ class ContentProvider(grok.ViewletManager):
         return namespace
 
 
-class ViewletManager(grok.ViewletManager):
-    """A viewlet manager in Silva.
-    """
-
-    grok.implements(IViewletManager)
-    grok.baseclass()
-    grok.context(ISilvaObject)
-
-
-class Viewlet(grok.Viewlet):
+class Viewlet(ViewletLayoutSupport, grok.Viewlet):
     """A viewlet in Silva
     """
 
     grok.implements(IViewlet)
     grok.baseclass()
     grok.context(ISilvaObject)
+
 
