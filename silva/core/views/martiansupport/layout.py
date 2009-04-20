@@ -1,6 +1,6 @@
-# Copyright (c) 2002-2009 Infrae. All rights reserved.
+# Copyright (c) 2009 Infrae. All rights reserved.
 # See also LICENSE.txt
-# $Id: layout.py 34685 2009-04-17 14:15:42Z sylvain $
+# $Id$
 
 import grokcore.component
 import martian
