@@ -9,7 +9,7 @@ from zope import interface
 import zope.cachedescriptors.property
 
 from Products.Silva.i18n import translate as _
-from Products.Silva.interfaces import IVersionedContent
+from silva.core.interfaces import IVersionedContent
 from Products.Silva.ExtensionRegistry import extensionRegistry
 from AccessControl import getSecurityManager
 

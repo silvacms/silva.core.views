@@ -13,7 +13,7 @@ from grokcore.view.meta.views import default_view_name
 from five import grok
 import urllib
 
-from Products.Silva.interfaces import ISilvaObject
+from silva.core.interfaces import ISilvaObject
 
 from silva.core.views.interfaces import IFeedback, IZMIView, ISMIView, ISMITab
 from silva.core.views.interfaces import ITemplate, IView, ILayout

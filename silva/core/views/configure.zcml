@@ -28,14 +28,14 @@
 
   <!-- Default page style -->
   <browser:page
-     for="Products.Silva.interfaces.IZMIObject"
+     for="silva.core.interfaces.IZMIObject"
      template="templates/zmi_template.pt"
      name="five_template"
      permission="zope.Public"
      />
 
   <browser:page
-     for="Products.Silva.interfaces.ISilvaObject"
+     for="silva.core.interfaces.ISilvaObject"
      template="templates/smi_template.pt"
      name="five_template"
      permission="zope.Public"
@@ -43,7 +43,7 @@
 
   <!-- AbsoluteURL views -->
   <view
-    for="Products.Silva.interfaces.ISilvaObject"
+    for="silva.core.interfaces.ISilvaObject"
     factory=".absoluteurl.AbsoluteURL"
     type="zope.publisher.interfaces.http.IHTTPRequest"
     permission="zope.Public"
@@ -51,7 +51,7 @@
   />
 
   <browser:page
-    for="Products.Silva.interfaces.ISilvaObject"
+    for="silva.core.interfaces.ISilvaObject"
     name="absolute_url"
     class=".absoluteurl.AbsoluteURL"
     permission="zope.Public"
@@ -60,7 +60,7 @@
 
   <!-- Site -->
   <browser:page
-     for="Products.Silva.interfaces.ISilvaObject"
+     for="silva.core.interfaces.ISilvaObject"
      name="virtual_site"
      class=".site.VirtualSite"
      permission="zope.Public"
@@ -68,7 +68,7 @@
      />
 
   <view
-     for="Products.Silva.interfaces.ISilvaObject"
+     for="silva.core.interfaces.ISilvaObject"
      factory=".site.VirtualSite"
      type="zope.publisher.interfaces.http.IHTTPRequest"
      permission="zope.Public"
@@ -77,7 +77,7 @@
 
   <!-- Default traverser for Silva views -->
   <adapter
-    for="Products.Silva.interfaces.ISilvaObject
+    for="silva.core.interfaces.ISilvaObject
          zope.publisher.interfaces.browser.IBrowserRequest"
     factory=".traverser.SilvaPublishTraverse"
     provides="zope.publisher.interfaces.browser.IBrowserPublisher"

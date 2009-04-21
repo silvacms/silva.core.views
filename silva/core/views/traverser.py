@@ -9,7 +9,7 @@ from zope.traversing.interfaces import ITraversable
 from five import grok
 
 from ZPublisher.BaseRequest import DefaultPublishTraverse
-from Products.Silva.interfaces import IPublication
+from silva.core.interfaces import IPublication
 
 from silva.core.views.interfaces import IPreviewLayer
 

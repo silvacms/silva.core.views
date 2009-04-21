@@ -11,7 +11,7 @@ from zope.interface import implements
 from OFS.interfaces import ITraversable
 from Products.Five import BrowserView
 
-from Products.Silva.interfaces import IRoot, IContent
+from silva.core.interfaces import IRoot, IContent
 
 from silva.core.views.interfaces import IPreviewLayer, ISilvaURL
 

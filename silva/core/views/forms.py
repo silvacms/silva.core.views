@@ -10,7 +10,7 @@ from zope import lifecycleevent
 
 from Products.Five.formlib import formbase
 from Products.Silva.i18n import translate as _
-from Products.Silva.interfaces import IVersionedContent
+from silva.core.interfaces import IVersionedContent
 from Products.Silva.ViewCode import ViewCode
 
 from silva.core.views.baseforms import SilvaMixinForm, SilvaMixinAddForm, SilvaMixinEditForm
