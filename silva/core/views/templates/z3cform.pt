@@ -30,8 +30,8 @@
                              description  widget/field/description;
                              error        widget/error;
                              idx          repeat/widget/index"
-                 tal:attributes="class python: widget_odd and ('odd' + ' row' + str(idx))
-                                 or ('even' + ' row' + str(idx))">
+                 tal:attributes="class python:widget_odd and ('odd' + ' row' + str(idx))
+                                 or ('even' + ' row' + str(idx)) + (error and ' field-error' or '')">
                <td class="designator"
                    style="width:25%">
                  <label tal:attributes="for widget/id"
