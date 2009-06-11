@@ -86,7 +86,6 @@ class SMIView(SilvaGrokView):
 
     grok.baseclass()
     grok.context(ISilvaObject)
-    grok.layer(ISMILayer)
 
     vein = 'contents'
 
