@@ -6,14 +6,14 @@
       tal:omit-tag="">
 
    <form action="." method="post"
-         tal:attributes="action request/getURL; enctype view/enctype">
+         tal:attributes="action request/getURL; enctype realview/enctype">
 
      <table class="listing">
 
        <tbody>
 
          <metal:label metal:define-macro="label">
-           <tal:label tal:define="label view/label | nothing"
+           <tal:label tal:define="label realview/label | nothing"
                       tal:condition="label">
              <tr class="top-controls">
                <td colspan="2">
@@ -24,7 +24,7 @@
          </metal:label>
 
          <metal:widgets metal:define-macro="widgets">
-           <tal:repeat tal:repeat="widget view/widgets/values">
+           <tal:repeat tal:repeat="widget realview/widgets/values">
              <tr class="#"
                  tal:define="widget_odd   repeat/widget/odd;
                              description  widget/field/description;
@@ -59,9 +59,9 @@
 
        <tfoot>
          <metal:actions metal:define-macro="actions">
-           <tr class="controls" tal:condition="view/actions">
+           <tr class="controls" tal:condition="realview/actions">
              <td class="align-right" colspan="2">
-               <input tal:repeat="action view/actions/values | nothing"
+               <input tal:repeat="action realview/actions/values | nothing"
                       tal:replace="structure action/render" />
              </td>
            </tr>

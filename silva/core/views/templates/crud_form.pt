@@ -63,25 +63,25 @@ ul.batch-navigation li a {
 
               <table class="listing">
                 <thead>
-                  <tr tal:condition="view/label">
+                  <tr tal:condition="realview/label">
                     <td class="top">
                       <h2 tal:attributes="title string:id: ${model/id}">
                         <img tal:replace="structure icon" />
-                        <tal:inline tal:content="view/label"
+                        <tal:inline tal:content="realview/label"
                                     i18n:translate="">table label</tal:inline>
                       </h2>
                     </td>
                   </tr>
                   <tr class="odd"
-                      tal:condition="view/description">
+                      tal:condition="realview/description">
                     <td class="designator"
-                        tal:content="view/description">
+                        tal:content="realview/description">
                     </td>
                   </tr>
                 </thead>
                 <tbody>
                   <tr class="top-controls"
-                      tal:define="formlabel view/formlabel | nothing"
+                      tal:define="formlabel realview/formlabel | nothing"
                       tal:condition="formlabel">
                     <td>
                       <h3 tal:content="formlabel"
@@ -91,10 +91,10 @@ ul.batch-navigation li a {
                     </td>
                   </tr>
                 </tbody>
-                <tfoot tal:condition="view/actions">
+                <tfoot tal:condition="realview/actions">
                   <tr class="controls">
                     <td>
-                      <tal:control tal:repeat="action view/actions/values">
+                      <tal:control tal:repeat="action realview/actions/values">
                         <input type="submit" tal:replace="structure action/render" />
                       </tal:control>
                     </td>
@@ -102,13 +102,13 @@ ul.batch-navigation li a {
                 </tfoot>
               </table>
 
-              <tal:repeat tal:repeat="form view/subforms"
+              <tal:repeat tal:repeat="form realview/subforms"
                           tal:replace="structure form/render">
               </tal:repeat>
 
             </td>
             <td class="right">
-              <metal:use use-macro="view/macro_user_lookup_clipboard/macros/clipboard" />
+              <metal:use use-macro="realview/macro_user_lookup_clipboard/macros/clipboard" />
             </td>
           </tr>
         </tbody>

@@ -29,9 +29,9 @@
         </metal:fill>
 
         <metal:fillhead fill-slot="main-head">
-          <tr tal:condition="view/label">
+          <tr tal:condition="realview/label">
             <th colspan="2"
-                tal:content="view/label">
+                tal:content="realview/label">
             </th>
           </tr>
           <tr>
@@ -46,7 +46,7 @@
         </metal:fillhead>
 
         <metal:fillbody fill-slot="main-body">
-          <metal:widgets metal:use-macro="view/form_macros/widgets" />
+          <metal:widgets metal:use-macro="realview/form_macros/widgets" />
        </metal:fillbody>
 
         <metal:fillfoot fill-slot="main-foot">
@@ -56,7 +56,7 @@
             </th>
             <th>&nbsp;</th>
           </tr>
-          <metal:widgets metal:use-macro="view/form_macros/actions" />
+          <metal:widgets metal:use-macro="realview/form_macros/actions" />
         </metal:fillfoot>
 
       </metal:use-macro>
