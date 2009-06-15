@@ -13,6 +13,7 @@ from grokcore.viewlet.interfaces import IViewletManager as IBaseViewletManager
 from zope import schema
 
 from grokcore.view.interfaces import IGrokView
+from z3c.form.interfaces import IButton, ISubForm as IBaseSubForm
 
 from silva.core.conf import schema as silvaschema
 
@@ -120,9 +121,12 @@ class ISilvaZ3CFormForm(ISilvaForm, ISilvaStyledForm):
     """A Silva form built using z3c.form.
     """
 
-# z3c.form Silva support
 
-from z3c.form.interfaces import IButton
+class ISubForm(IBaseSubForm):
+    """A Silva subform.
+    """
+
+# z3c.form Silva support
 
 class ICancelButton(IButton):
     """A button to cancel a form.

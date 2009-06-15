@@ -9,13 +9,16 @@ from Products.Silva.i18n import translate as _
 from Products.Silva.ViewCode import ViewCode
 
 from silva.core.views.interfaces import ISilvaZ3CFormForm, IDefaultAddFields, \
-    ICancelButton, ISilvaStyle, INoCancelButton, ISilvaStyledForm
+    ICancelButton, ISilvaStyle, INoCancelButton, ISilvaStyledForm, ISubForm
 from silva.core.views.views import SMIView, Template
 from silva.core.views.baseforms import SilvaMixinForm, SilvaMixinAddForm, \
     SilvaMixinEditForm
 from Products.Silva.interfaces import IVersionedContent
+
 from silva.core.conf import schema as silvaschema
+
 import grokcore.view
+import grokcore.viewlet.util
 from five import grok
 
 from five.megrok.z3cform.components import GrokForm
@@ -140,6 +143,7 @@ class EditForm(SilvaMixinEditForm, SilvaGrokForm, form.EditForm, SMIView):
         else:
             self.status = _(u'No changes')
 
+
 class SilvaGrokSubForm(SilvaGrokForm):
 
     grok.baseclass()
@@ -209,6 +213,51 @@ class CrudForm(SilvaGrokForm, crud.CrudForm, SMIView):
         addform.update()
         editform.update()
         self.subforms = [addform, editform]
+
+
+class ComposedForm(PageForm):
+    """A more generic form.
+    """
+
+    grok.implements(INoCancelButton)
+    grok.baseclass()
+
+    template = grok.PageTemplateFile('templates/composed_form.pt')
+
+    def updateForm(self):
+        super(PageForm, self).update()
+        subforms = map(lambda x: x[1], component.getAdapters(
+                (self.context, self.request,  self), ISubForm))
+        subforms = grokcore.viewlet.util.sort_components(subforms)
+        self.subforms = []
+        # Update form
+        for subform in subforms:
+            subform.update()
+            subform.updateForm()
+            self.subforms.append(subform)
+
+
+class SubForm(PageForm):
+    """A form going in a composed form.
+    """
+
+    grok.implements(INoCancelButton, ISubForm)
+    grok.baseclass()
+
+    template = grok.PageTemplateFile('templates/z3cform.pt')
+
+    def __init__(self, context, request, parentForm):
+        self.parentForm = self.__parent__ = parentForm
+        super(PageForm, self).__init__(context, request)
+
+    @apply
+    def status():
+        def get(self):
+            return self.parentForm.status
+        def set(self, status):
+            self.parentForm.status = status
+        return property(get, set)
+
 
 
 # Macros to render z3c forms
