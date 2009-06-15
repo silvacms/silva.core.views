@@ -258,6 +258,13 @@ class SubForm(PageForm):
             self.parentForm.status = status
         return property(get, set)
 
+    @apply
+    def status_type():
+        def get(self):
+            return self.parentForm.status_type
+        def set(self, status_type):
+            self.parentForm.status_type = status_type
+        return property(get, set)
 
 
 # Macros to render z3c forms
