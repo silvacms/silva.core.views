@@ -6,19 +6,15 @@
       xmlns:metal="http://xml.zope.org/namespaces/metal"
       xmlns:tal="http://xml.zope.org/namespaces/tal"
       xmlns:i18n="http://xml.zope.org/namespaces/i18n"
-      tal:define="vein string:'edit';
-                  active_tab string:'properties';
+      tal:define="vein view/label;
+                  active_tab view/tab_name;
                   maintitlecolspan string:1"
       i18n:domain="silva">
 
 <metal:use-macro use-macro="here/macro_index/macros/master">
 
-  <metal:fill-style-slot fill-slot="style">
-
-  </metal:fill-style-slot>
-
   <metal:block metal:fill-slot="middleground">
-
+    <tal:replace tal:replace="structure python:view.provider('smi.buttons')" />
   </metal:block>
 
   <metal:fill-editor-slot fill-slot="main">

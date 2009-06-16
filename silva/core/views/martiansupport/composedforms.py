@@ -26,7 +26,8 @@ class SubFormGrokker(martian.ClassGrokker):
         return super(SubFormGrokker, self).grok(name, factory, module_info, **kw)
 
     def execute(self, factory, config, context, layer, view, name, **kw):
-        factory.prefix = name
+        if not factory.prefix:
+            factory.prefix = name
         adapts = (context, layer, view)
         config.action(
             discriminator=('adapter', adapts, ISubForm, name),

@@ -139,6 +139,15 @@ class SMIView(SilvaGrokView):
                                   # in templates.
                 'container': self._silvaContext.aq_inner,}
 
+    def provider(self, name):
+        # XXX should be removed when Silva stop to do stupid with view in templates
+        context = self._silvaContext
+        provider =  zope.component.getMultiAdapter(
+            (context, self.request, self), name=name)
+        provider = provider.__of__(context)
+        provider.update()
+        return provider.render()
+
 
 class Layout(Acquisition.Explicit):
     """A layout object.
