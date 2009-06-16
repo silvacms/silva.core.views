@@ -30,6 +30,7 @@ from plone.z3cform import converter
 from plone.z3cform.widget import singlecheckboxwidget_factory
 from z3c.form.interfaces import DISPLAY_MODE, INPUT_MODE, NOVALUE
 import z3c.form.interfaces
+import z3c.form.converter
 
 # Base class to grok forms
 
@@ -510,6 +511,7 @@ class FileUploadDataConverter(
     def toFieldValue(self, value):
         return value
 
+
     def toWidgetValue(self, value):
         return super(FileUploadDataConverter, self).toFieldValue(value)
 
@@ -534,3 +536,16 @@ class ContentReferenceWidget(widget.Widget):
 @grok.provider(z3c.form.interfaces.IFieldWidget)
 def ContentReferenceFieldWidget(field, request):
     return widget.FieldWidget(field, ContentReferenceWidget(request))
+
+
+class ContentReferenceDataConverter(
+    z3c.form.converter.BaseDataConverter, grok.MultiAdapter):
+    grok.adapts(silvaschema.IContentReference, IContentReferenceWidget)
+
+    def toFieldValue(self, value):
+        container = self.widget.form.context.get_container()
+        return self.field.fromRelativePath(container, value)
+
+    def toWidgetValue(self, value):
+        container = self.widget.form.context.get_container()
+        return self.field.toRelativePath(container, value)
