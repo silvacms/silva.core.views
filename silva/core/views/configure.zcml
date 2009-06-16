@@ -2,7 +2,8 @@
    xmlns="http://namespaces.zope.org/zope"
    xmlns:browser="http://namespaces.zope.org/browser"
    xmlns:grok="http://namespaces.zope.org/grok"
-   xmlns:five="http://namespaces.zope.org/five">
+   xmlns:five="http://namespaces.zope.org/five"
+   xmlns:z3c="http://namespaces.zope.org/z3c">
 
   <five:registerPackage package="." />
   <include package="five.grok" />
@@ -68,5 +69,21 @@
 
   <!-- Grok this package -->
   <grok:grok package="." />
+
+
+  <!-- Z3C widgets -->
+  <adapter
+     factory=".z3cforms.ContentReferenceFieldWidget"
+     for="silva.core.conf.schema.IContentReference
+          z3c.form.interfaces.IFormLayer"
+     provides="z3c.form.interfaces.IFieldWidget"
+     />
+
+  <z3c:widgetTemplate
+     mode="input"
+     widget=".z3cforms.IContentReferenceWidget"
+     layer="z3c.form.interfaces.IFormLayer"
+     template="templates/contentreference_input.pt"
+     />
 
 </configure>

@@ -1,0 +1,9 @@
+<tal:lookup>
+  <input class="button transporter" type="button" onclick="#"
+         value="get reference..." name="#.button" style="margin-left: 0pt;"
+         tal:attributes="name string:${view/name}.button;
+                         onclick view/onclick" />
+  <input class="store" type="text" size="20" maxlength="" value="#" name="#"
+         tal:attributes="name view/name;
+                         value view/value" />
+</tal:lookup>

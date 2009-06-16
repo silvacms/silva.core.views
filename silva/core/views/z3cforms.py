@@ -22,6 +22,8 @@ import grokcore.view
 import grokcore.viewlet.util
 from five import grok
 
+from zope.traversing.browser import absoluteURL
+
 from five.megrok.z3cform.components import GrokForm
 from z3c.form import form, button, field, widget
 from plone.z3cform import converter
@@ -503,11 +505,32 @@ class SilvaAddActionHandler(button.ButtonActionHandler, grok.MultiAdapter):
 # We customize that to prevent z3c.form to destroy the FileUpload Object.
 class FileUploadDataConverter(
     converter.FileUploadDataConverter, grok.MultiAdapter):
-    grok.adapts(silvaschema.IBytes,
-                z3c.form.interfaces.IFileWidget)
+    grok.adapts(silvaschema.IBytes, z3c.form.interfaces.IFileWidget)
 
     def toFieldValue(self, value):
         return value
 
     def toWidgetValue(self, value):
         return super(FileUploadDataConverter, self).toFieldValue(value)
+
+
+# ContenteReferenceWidget
+class IContentReferenceWidget(z3c.form.interfaces.IFieldWidget):
+    pass
+
+
+class ContentReferenceWidget(widget.Widget):
+    grok.implements(IContentReferenceWidget)
+
+    js = "reference.getReference( function(path, id, title) { document.getElementsByName('%s')[0].value = path;; }, '%s', 'Container', true)"
+
+    @property
+    def onclick(self):
+        content_url = absoluteURL(self.form.context.get_container(), self.request)
+        return self.js % (self.name, content_url)
+
+
+@grok.adapter(silvaschema.IContentReference, z3c.form.interfaces.IFormLayer)
+@grok.provider(z3c.form.interfaces.IFieldWidget)
+def ContentReferenceFieldWidget(field, request):
+    return widget.FieldWidget(field, ContentReferenceWidget(request))
