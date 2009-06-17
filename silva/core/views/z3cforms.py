@@ -141,6 +141,7 @@ class EditForm(SilvaMixinEditForm, SilvaGrokForm, form.EditForm, SMIView):
         data, errors = self.extractData()
         if errors:
             self.status = self.formErrorsMessage
+            self.status_type = 'error'
             return
         changes = self.applyChanges(data)
         if changes:
@@ -190,7 +191,7 @@ class SubForm(PageForm):
 
     @property
     def prefix(self):
-        name = grok.name.bind().get(self, default=default_view_name)
+        name = grok.name.bind().get(self) or default_view_name(self)
         return str('%s' % name)
 
     @apply
@@ -214,11 +215,14 @@ class SubEditForm(SubForm, form.EditForm):
     """A subform which edit the content.
     """
 
+    grok.baseclass()
+
     @button.buttonAndHandler(_('save'), name='save')
     def handleSave(self, action):
         data, errors = self.extractData()
         if errors:
             self.status = self.formErrorsMessage
+            self.status_type = 'error'
             return
         changes = self.applyChanges(data)
         if changes:
