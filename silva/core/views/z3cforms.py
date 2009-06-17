@@ -20,6 +20,7 @@ from silva.core.conf import schema as silvaschema
 
 import grokcore.view
 import grokcore.viewlet.util
+from grokcore.view.meta.views import default_view_name
 from five import grok
 
 from zope.traversing.browser import absoluteURL
@@ -187,6 +188,11 @@ class SubForm(PageForm):
         self.parentForm = self.__parent__ = parentForm
         super(PageForm, self).__init__(context, request)
 
+    @property
+    def prefix(self):
+        name = grok.name.bind().get(self, default=default_view_name)
+        return str('%s' % name)
+
     @apply
     def status():
         def get(self):
@@ -202,6 +208,24 @@ class SubForm(PageForm):
         def set(self, status_type):
             self.parentForm.status_type = status_type
         return property(get, set)
+
+
+class SubEditForm(SubForm, form.EditForm):
+    """A subform which edit the content.
+    """
+
+    @button.buttonAndHandler(_('save'), name='save')
+    def handleSave(self, action):
+        data, errors = self.extractData()
+        if errors:
+            self.status = self.formErrorsMessage
+            return
+        changes = self.applyChanges(data)
+        if changes:
+            self.status = _(u'${meta_type} changed.',
+                            mapping={'meta_type': self.context.meta_type,})
+        else:
+            self.status = _(u'No changes')
 
 
 class CrudForm(ComposedForm):
