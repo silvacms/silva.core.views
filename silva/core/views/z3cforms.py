@@ -167,6 +167,8 @@ class ComposedForm(PageForm):
         self.subforms = []
         # Update form
         for subform in subforms:
+            if not subform.available():
+                continue
             subform.update()
             subform.updateForm()
             self.subforms.append(subform)
@@ -188,6 +190,9 @@ class SubForm(PageForm):
     def __init__(self, context, request, parentForm):
         self.parentForm = self.__parent__ = parentForm
         super(PageForm, self).__init__(context, request)
+
+    def available(self):
+        return self.getContent() is not None
 
     @property
     def prefix(self):
@@ -265,6 +270,9 @@ class CrudAddForm(SubForm):
 
     ignoreContext = True
 
+    def available(self):
+        return self.parentForm.getContent() is not None
+
     @property
     def label(self):
         return _(u"add ${label}", mapping=dict(label=self.parentForm.label))
@@ -297,6 +305,9 @@ class CrudEditForm(SubForm):
     grok.view(CrudForm)
     grok.name('crudeditform')
     template = grok.PageTemplateFile('templates/crud_editform.pt')
+
+    def available(self):
+        return bool(self.parentForm.getItems())
 
     @property
     def label(self):
@@ -552,12 +563,16 @@ class IContentReferenceWidget(z3c.form.interfaces.IFieldWidget):
 class ContentReferenceWidget(widget.Widget):
     grok.implements(IContentReferenceWidget)
 
-    js = "reference.getReference( function(path, id, title) { document.getElementsByName('%s')[0].value = path;; }, '%s', 'Container', true)"
+    js = "reference.getReference( function(path, id, title) { document.getElementsByName('%s')[0].value = path;; }, '%s', '', true)"
 
     @property
     def onclick(self):
         content_url = absoluteURL(self.form.context.get_container(), self.request)
         return self.js % (self.name, content_url)
+
+    @property
+    def current_url(self):
+        return self.field.get(self.form.getContent()).absolute_url()
 
 
 @grok.adapter(silvaschema.IContentReference, z3c.form.interfaces.IFormLayer)

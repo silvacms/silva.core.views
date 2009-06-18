@@ -6,4 +6,8 @@
   <input class="store" type="text" size="20" maxlength="" value="#" name="#"
          tal:attributes="name view/name;
                          value view/value" />
+  <tal:condition tal:condition="view/value">
+    (<a href="#" tal:attributes="href view/current_url;">
+      Current object</a>)
+  </tal:condition>
 </tal:lookup>
