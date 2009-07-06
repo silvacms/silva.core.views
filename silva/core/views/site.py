@@ -18,7 +18,7 @@ class VirtualSite(BrowserView):
         if root_path is None:
             return None
 
-        return self.context.restrictedTraverse(root_path, None)
+        return self.context.aq_inner.restrictedTraverse(root_path, None)
 
     def get_virtual_path(self):
         try:
