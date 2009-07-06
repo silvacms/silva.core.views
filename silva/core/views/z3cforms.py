@@ -250,7 +250,7 @@ class CrudForm(ComposedForm):
     def link(self, name, value):
         return None
 
-    def add(self, data):
+    def add(self, **data):
         raise NotImplementedError
 
     def remove(self, data):
@@ -289,7 +289,7 @@ class CrudAddForm(SubForm):
             self.status_type = 'error'
             return
         try:
-            item = self.parentForm.add(data)
+            item = self.parentForm.add(**data)
         except schema.ValidationError, e:
             self.status = e
         else:
@@ -565,14 +565,15 @@ class ContentReferenceWidget(widget.Widget):
 
     js = "reference.getReference( function(path, id, title) { document.getElementsByName('%s')[0].value = path;; }, '%s', '', true)"
 
-    @property
     def onclick(self):
         content_url = absoluteURL(self.form.context.get_container(), self.request)
         return self.js % (self.name, content_url)
 
-    @property
     def current_url(self):
-        return self.field.get(self.form.getContent()).absolute_url()
+        try:
+            return self.field.get(self.form.getContent()).absolute_url()
+        except AttributeError:
+            return None
 
 
 @grok.adapter(silvaschema.IContentReference, z3c.form.interfaces.IFormLayer)
