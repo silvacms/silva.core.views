@@ -18,13 +18,12 @@
                         rendered     widget;
 			error        widget/error"
             tal:attributes="class python:(widget_odd and 'odd' or 'even') + (error and ' field-error' or '')">
-          <td class="designator"
-              style="width:15%">
+          <td class="designator">
             <label tal:attributes="for widget/name"
                    tal:content="widget/label">
               Field Name
             </label>
-            <span class="warning"
+            <span class="required"
                   tal:condition="widget/required">
               *
             </span>
@@ -32,8 +31,7 @@
               Description
             </p>
           </td>
-          <td class="field"
-              style="width:45%">
+          <td class="field">
             <tal:error tal:condition="error"
                        tal:content="structure error">
               Validation error.
@@ -45,11 +43,10 @@
         </tr>
       </tal:repeat>
     </metal:widgets>
-
     <metal:actions metal:define-macro="actions">
-      <tr class="controls" tal:condition="view/availableActions">
-        <td class="align-right" colspan="2">
-          <input tal:repeat="action view/actions"
+      <tr class="controls" tal:condition="view/availableActions" border="1">
+        <td colspan="2">
+         <input tal:repeat="action view/actions"
                  tal:replace="structure action/render" />
         </td>
       </tr>
