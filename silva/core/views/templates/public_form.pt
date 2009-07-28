@@ -13,7 +13,7 @@
       <table class="public-form">
         <thead>
           <tr tal:condition="view/label">
-            <th colspan="2"
+            <th class="form-title" colspan="2"
                 tal:content="view/label">
             </th>
           </tr>
