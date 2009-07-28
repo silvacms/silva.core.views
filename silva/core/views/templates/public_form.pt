@@ -20,7 +20,7 @@
         </thead>
         <tbody>
           <metal:widgets metal:use-macro="view/form_macros/widgets" />
-          <tr>
+          <tr class="required-description">
             <th i18n:translate="">
               * required
             </th>
