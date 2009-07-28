@@ -21,10 +21,9 @@
         <tbody>
           <metal:widgets metal:use-macro="view/form_macros/widgets" />
           <tr class="required-description">
-            <th i18n:translate="">
+            <th colspan="2" i18n:translate="">
               * required
             </th>
-            <th>&nbsp;</th>
           </tr>
           <metal:widgets metal:use-macro="view/form_macros/actions" />
         </tbody>
