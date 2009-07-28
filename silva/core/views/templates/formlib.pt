@@ -43,8 +43,9 @@
         </tr>
       </tal:repeat>
     </metal:widgets>
+
     <metal:actions metal:define-macro="actions">
-      <tr class="controls" tal:condition="view/availableActions" border="1">
+      <tr class="controls" tal:condition="view/availableActions">
         <td colspan="2">
          <input tal:repeat="action view/actions"
                  tal:replace="structure action/render" />
