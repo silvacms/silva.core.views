@@ -55,6 +55,27 @@ class SilvaGrokForm(SilvaMixinForm, GrokForm, ViewCode):
             self._status_type = type
         return property(get, set)
 
+    def updateActions(self, refresh=True, only_refresh=False):
+        # Call the real update actions, and actions executes. This
+        # will let seperate from update the updateWidgets and
+        # updateActions.
+        if not only_refresh:
+            super(SilvaGrokForm, self).updateActions()
+            self.actions.execute()
+        if self.refreshActions and refresh:
+            super(SilvaGrokForm, self).updateActions()
+
+    def updateData(self):
+        # Update data to be displayed.
+        self.updateWidgets()
+
+    def updateForm(self, refresh=True):
+        # We seperate the update method in two: 1. Data,
+        # 2.Actions. This let us refresh the data if they have been
+        # modified outside of the current (sub)form.
+        self.updateData()
+        self.updateActions(refresh=refresh)
+
 
 class PageForm(SilvaGrokForm, form.Form, SMIView):
     """Generic form.
@@ -170,8 +191,13 @@ class ComposedForm(PageForm):
             if not subform.available():
                 continue
             subform.update()
-            subform.updateForm()
+            subform.updateForm(refresh=False)
             self.subforms.append(subform)
+
+        # Refresh widgets values
+        for subform in self.subforms:
+            subform.updateData()
+            subform.updateActions(only_refresh=True)
 
     def updateForm(self):
         self.updateSubForms()
@@ -323,9 +349,9 @@ class CrudEditForm(SubForm):
                 tuples.append((subform.contentId, subform.content))
         return tuples
 
-    def updateForm(self):
+    def updateData(self):
         self.updateSubForms()
-        super(SubForm, self).updateForm()
+        super(SubForm, self).updateData()
 
     def updateSubForms(self):
         self.subforms = []
