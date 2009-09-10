@@ -19,6 +19,10 @@
           </tr>
         </thead>
         <tbody>
+          <tr class="status-message"
+              tal:condition="view/status">
+            <th colspan="2" tal:content="view/status" />
+          </tr>
           <metal:widgets metal:use-macro="view/form_macros/widgets" />
           <tr class="required-description">
             <th colspan="2" i18n:translate="">
