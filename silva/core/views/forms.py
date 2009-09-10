@@ -54,7 +54,6 @@ class PublicForm(Template, GrokForm, formbase.PageForm):
     def form_macros(self):
         return component.queryMultiAdapter((self, self.request,), name='form-macros')
 
-    @property
     def content(self):
         return self.render()
 
