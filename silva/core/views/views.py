@@ -211,7 +211,6 @@ class Template(SilvaGrokView):
         namespace['layout'] = self.layout
         return namespace
 
-    @property
     def content(self):
         template = getattr(self, 'template', None)
         if template is not None:
