@@ -16,7 +16,7 @@
             tal:define="widget_odd   repeat/widget/odd;
                         description  widget/hint;
                         rendered     widget;
-			error        widget/error"
+			            error        widget/error"
             tal:attributes="class python:(widget_odd and 'odd' or 'even') + (error and ' field-error' or '')">
           <td class="designator">
             <label tal:attributes="for widget/name"

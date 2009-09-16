@@ -8,9 +8,8 @@ from zope.component import queryMultiAdapter
 from zope import interface
 import zope.cachedescriptors.property
 
-from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from Products.Silva.i18n import translate as _
-from Products.Silva.interfaces import IVersionedContent, ISilvaObject
+from Products.Silva.interfaces import IVersionedContent
 from Products.Silva.ExtensionRegistry import extensionRegistry
 from AccessControl import getSecurityManager
 
@@ -31,6 +30,7 @@ class SilvaMixinForm(object):
 
     def __init__(self, context, request):
         super(SilvaMixinForm, self).__init__(context, request)
+
         # Set model on request like SilvaViews
         self.request['model'] = self._silvaContext
         # Set id on template some macros uses template/id
@@ -88,6 +88,16 @@ class SilvaMixinAddForm(object):
         obj_id = str(data['id'])
         factory(parent, obj_id, data['title'])
         obj = getattr(parent, obj_id)
+        
+        #now move to position, if 'add_object_position' is in the request
+        position = self.request.get('add_object_position', None)
+        if position:
+            try:
+                position = int(position)
+                if position >= 0:
+                    parent.move_to([obj_id], position)
+            except ValueError:
+                pass
 
         editable_obj = obj.get_editable()
         for key, value in data.iteritems():

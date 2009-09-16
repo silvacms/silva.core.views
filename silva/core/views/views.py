@@ -122,7 +122,7 @@ class SMIView(SilvaGrokView):
             if ISMITab.implementedBy(base):
                 tab_class = base
         if tab_class:
-            name = silvaconf.name.bind()
+            name = grok.name.bind()
             return name.get(tab_class, default=default_view_name)
         return 'tab_edit'
 

@@ -571,11 +571,11 @@ class SilvaAddActionHandler(button.ButtonActionHandler, grok.MultiAdapter):
 # We customize that to prevent z3c.form to destroy the FileUpload Object.
 class FileUploadDataConverter(
     converter.FileUploadDataConverter, grok.MultiAdapter):
-    grok.adapts(silvaschema.IBytes, z3c.form.interfaces.IFileWidget)
+    grok.adapts(silvaschema.IBytes,
+                z3c.form.interfaces.IFileWidget)
 
     def toFieldValue(self, value):
         return value
-
 
     def toWidgetValue(self, value):
         return super(FileUploadDataConverter, self).toFieldValue(value)
