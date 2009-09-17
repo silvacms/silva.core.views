@@ -52,10 +52,14 @@ class PublicForm(Template, GrokForm, formbase.PageForm):
 
     @property
     def form_macros(self):
-        return component.queryMultiAdapter((self, self.request,), name='form-macros')
+        return component.queryMultiAdapter(
+            (self, self.request,), name='form-macros')
 
     def content(self):
-        return self.render()
+        template = getattr(self, 'template', None)
+        if template is not None:
+            return self._render_template()
+        return mapply(self.render, (), self.request)
 
     def __call__(self):
         mapply(self.update, (), self.request)
