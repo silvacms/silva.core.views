@@ -10,14 +10,17 @@ from zope import lifecycleevent
 
 from Products.Five.formlib import formbase
 from Products.Silva.i18n import translate as _
-from Products.Silva.interfaces import IVersionedContent
+from Products.Silva.interfaces import IVersionedContent, ISilvaObject
 from Products.Silva.ViewCode import ViewCode
 
-from silva.core.views.baseforms import SilvaMixinForm, SilvaMixinAddForm, SilvaMixinEditForm
-from silva.core.views.views import SMIView, Template
-from silva.core.views.interfaces import IDefaultAddFields, ISilvaFormlibForm, ILayout
+from silva.core.views.baseforms import SilvaMixinForm, SilvaMixinAddForm, \
+    SilvaMixinEditForm
+from silva.core.views.views import SMIView
+from silva.core.views.interfaces import IDefaultAddFields, ISilvaFormlibForm
 
 from five.grok.components import GrokForm
+from five.megrok.layout import Form as BasePageForm
+from megrok.layout.interfaces import IPage
 from five import grok
 
 # Forms
@@ -42,12 +45,14 @@ class PageForm(SilvaGrokForm, formbase.PageForm, SMIView):
     grok.baseclass()
 
 
-class PublicForm(Template, GrokForm, formbase.PageForm):
+class PublicForm(BasePageForm, formbase.PageForm):
     """Generic form for the public interface.
     """
 
-    grok.implements(ISilvaFormlibForm)
     grok.baseclass()
+    grok.context(ISilvaObject)
+    grok.implements(ISilvaFormlibForm, IPage)
+
     template = grok.PageTemplateFile('templates/public_form.pt')
 
     @property
@@ -55,22 +60,6 @@ class PublicForm(Template, GrokForm, formbase.PageForm):
         return component.queryMultiAdapter(
             (self, self.request,), name='form-macros')
 
-    def content(self):
-        template = getattr(self, 'template', None)
-        if template is not None:
-            return self._render_template()
-        return mapply(self.render, (), self.request)
-
-    def __call__(self):
-        mapply(self.update, (), self.request)
-        if self.request.response.getStatus() in (302, 303):
-            # A redirect was triggered somewhere in update().  Don't
-            # continue rendering the template or doing anything else.
-            return
-        self.update_form()
-        self.layout = component.getMultiAdapter(
-            (self.context, self.request), ILayout)
-        return self.layout(self)
 
 
 class AddForm(SilvaMixinAddForm, SilvaGrokForm, formbase.AddForm, SMIView):

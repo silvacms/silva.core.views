@@ -11,7 +11,7 @@ from ZODB.POSException import ConflictError
 
 from silva.core.views.interfaces import ISilvaZ3CFormForm, IDefaultAddFields, \
     ICancelButton, ISilvaStyle, INoCancelButton, ISilvaStyledForm, ISubForm
-from silva.core.views.views import SMIView, Template
+from silva.core.views.views import SMIView
 from silva.core.views.baseforms import SilvaMixinForm, SilvaMixinAddForm, \
     SilvaMixinEditForm
 from Products.Silva.interfaces import IVersionedContent
@@ -84,7 +84,7 @@ class PageForm(SilvaGrokForm, form.Form, SMIView):
     grok.baseclass()
 
 
-class PublicForm(GrokForm, form.Form, Template):
+class PublicForm(GrokForm, form.Form):
     """Generic form for the public interface.
     """
 
@@ -94,7 +94,8 @@ class PublicForm(GrokForm, form.Form, Template):
 
     @property
     def form_macros(self):
-        return component.queryMultiAdapter((self, self.request,), name='form-macros')
+        return component.queryMultiAdapter(
+            (self, self.request,), name='form-macros')
 
 
 class AddForm(SilvaMixinAddForm, SilvaGrokForm, form.AddForm, SMIView):
