@@ -98,6 +98,9 @@ class IViewlet(IBaseViewlet, IGrokCustomizable):
     """A customizable Viewlet.
     """
 
+class ITemplateCustomizable(IGrokCustomizable):
+    """A page that you can customize.
+    """
 
 # TTW Templates
 
