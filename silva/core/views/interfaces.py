@@ -13,6 +13,7 @@ from grokcore.viewlet.interfaces import IViewletManager as IBaseViewletManager
 from zope import schema
 
 from grokcore.view.interfaces import IGrokView
+from z3c.form.interfaces import IButton, ISubForm as IBaseSubForm
 
 from silva.core.conf import schema as silvaschema
 
@@ -35,11 +36,6 @@ class IFeedback(Interface):
     status_type = Attribute(u"Feedback type, error or feedback")
 
 
-class ILayout(Interface):
-    """Layout code.
-    """
-
-
 class IGrokCustomizable(Interface):
     """A grok template which can be customized with a TTW template.
 
@@ -59,14 +55,6 @@ class IGrokCustomizable(Interface):
 class ITemplateNotCustomizable(Interface):
     """Marker interface to put on view/template that you don't people be able
     to customize.
-    """
-
-class ITemplateCustomizable(Interface):
-    """This is a template used in Silva which can be customized.
-    """
-
-class ITemplate(IGrokView, ITemplateCustomizable, IGrokCustomizable):
-    """A template used in Silva which can be customized.
     """
 
 
@@ -161,9 +149,12 @@ class ISilvaZ3CFormForm(ISilvaForm, ISilvaStyledForm):
     """A Silva form built using z3c.form.
     """
 
-# z3c.form Silva support
 
-from z3c.form.interfaces import IButton
+class ISubForm(IBaseSubForm):
+    """A Silva subform.
+    """
+
+# z3c.form Silva support
 
 class ICancelButton(IButton):
     """A button to cancel a form.

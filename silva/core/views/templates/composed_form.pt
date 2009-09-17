@@ -6,48 +6,26 @@
       xmlns:metal="http://xml.zope.org/namespaces/metal"
       xmlns:tal="http://xml.zope.org/namespaces/tal"
       xmlns:i18n="http://xml.zope.org/namespaces/i18n"
-      tal:define="vein view/vein;
-                  active_tab view/active_tab;
+      tal:define="vein view/label;
+                  active_tab view/tab_name;
                   maintitlecolspan string:1"
       i18n:domain="silva">
 
 <metal:use-macro use-macro="here/macro_index/macros/master">
 
-  <metal:fill-style-slot fill-slot="style">
-    <style type="text/css">
-table.listing {
-  margin:0;
-}
-table.listing th.cell0 {
-width:5%;
-}
-#crud-edit-form-buttons-delete {
-  color: #fdeaea;
-  background-color: #752e2f;
-}
-input[value="Add"], input[value="Delete"] {
-  text-transform:lowercase;
-}
-ul.batch-navigation {
-  padding-left:0;
-}
-ul.batch-navigation li {
-  display:inline;
-}
-ul.batch-navigation li a {
-  display:inline;
-  padding:0 0.5em;
-}
-    </style>
-  </metal:fill-style-slot>
+  <metal:block fill-slot="script">
+    <script type="text/javascript"
+            tal:attributes="src here/reference.js/absolute_url">
+    </script>
+  </metal:block>
 
   <metal:block metal:fill-slot="middleground">
-    <tal:buttons tal:replace="structure model/@@tab_access_extra" />
+    <tal:replace tal:replace="structure python:view.provider('smi.buttons')" />
   </metal:block>
 
   <metal:fill-editor-slot fill-slot="main">
 
-    <table class="columns columns3">
+    <table class="columns columns2">
         <tbody>
           <tr>
             <td class="left">
@@ -73,7 +51,7 @@ ul.batch-navigation li a {
                     </td>
                   </tr>
                   <tr class="odd"
-                      tal:condition="realview/description">
+                      tal:condition="realview/description | nothing">
                     <td class="designator"
                         tal:content="realview/description">
                     </td>
@@ -91,7 +69,7 @@ ul.batch-navigation li a {
                     </td>
                   </tr>
                 </tbody>
-                <tfoot tal:condition="realview/actions">
+                <tfoot tal:condition="realview/actions | nothing">
                   <tr class="controls">
                     <td>
                       <tal:control tal:repeat="action realview/actions/values">
@@ -106,9 +84,6 @@ ul.batch-navigation li a {
                           tal:replace="structure form/render">
               </tal:repeat>
 
-            </td>
-            <td class="right">
-              <metal:use use-macro="realview/macro_user_lookup_clipboard/macros/clipboard" />
             </td>
           </tr>
         </tbody>

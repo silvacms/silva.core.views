@@ -4,33 +4,19 @@
       xmlns:i18n="http://xml.zope.org/namespaces/i18n"
       i18n:domain="silva"
       tal:omit-tag=""
-      tal:condition="view/subforms">
+      tal:condition="realview/subforms">
 
-  <form action="." method="post" tal:attributes="action request/getURL"
-        tal:define="batch view/batch">
-
-    <input type="hidden"
-           tal:condition="python:batch.total &gt; 1"
-           tal:attributes="name python:'%spage' % view.prefix;
-                           value python:batch.number-1"
-           />
+  <form action="." method="post" tal:attributes="action request/getURL">
 
     <table class="listing"
-           tal:define="rows view/subforms;
+           tal:define="rows realview/subforms;
                        row1 python:len(rows) and rows[0] or None;"
            tal:condition="python:row1 is not None">
       <tal:define tal:define="widgetsForTitles row1/getTitleWidgets;
                               niceTitles row1/getNiceTitles;
                               colspan python:len(widgetsForTitles)">
-        <thead>
-          <tr class="divider">
-            <td style="background-color:#c4d6e7"
-                tal:attributes="colspan colspan">
-            </td>
-          </tr>
-        </thead>
         <tbody>
-          <tal:label tal:define="label view/label | nothing"
+          <tal:label tal:define="label realview/label | nothing"
                      tal:condition="label">
             <tr class="top-controls">
               <td colspan="#"
@@ -50,30 +36,16 @@
               </th>
             </tal:series>
           </tr>
-          <tal:block repeat="row view/subforms">
-            <a name="" tal:attributes="name string:edit-${row/content_id}" />
+          <tal:block repeat="row realview/subforms">
+            <a name="" tal:attributes="name string:edit-${row/contentId}" />
             <tr tal:content="structure row/render"
                 tal:attributes="class python:repeat['row'].odd() and 'odd' or 'even'" />
           </tal:block>
-          <tr class="even" tal:define="batch_nav view/render_batch_navigation"
-              tal:condition="python: batch_nav != ''">
-            <td class="designator"
-                style="padding:0 0.3em; border-top:1px solid #789; text-align:center"
-                tal:attributes="colspan colspan">
-              <span class="matchlabel" style="float:left; padding-right:1em">
-                <span i18n:translate="">
-                  <span tal:replace="batch/total" i18n:name="number">3</span> pages
-                </span>
-              </span>
-              <ul tal:replace="structure batch_nav">
-              </ul>
-            </td>
-          </tr>
           <tr class="controls">
             <td colspan="#" class="align-right"
                 tal:attributes="colspan colspan">
               <input type="submit"
-                     tal:repeat="action view/actions/values"
+                     tal:repeat="action realview/actions/values"
                      tal:replace="structure action/render" />
             </td>
           </tr>

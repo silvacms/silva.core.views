@@ -3,19 +3,22 @@
 # See also LICENSE.txt
 # $Id$
 
-from zope import interface, component
+from zope import interface, component, event, schema, lifecycleevent
 
 from Products.Silva.i18n import translate as _
 from Products.Silva.ViewCode import ViewCode
 
 from silva.core.views.interfaces import ISilvaZ3CFormForm, IDefaultAddFields, \
     ICancelButton, ISilvaStyle, INoCancelButton, ISilvaStyledForm
-from silva.core.views.views import SMIView, Template
+from silva.core.views.views import SMIView
 from silva.core.views.baseforms import SilvaMixinForm, SilvaMixinAddForm, \
     SilvaMixinEditForm
 from silva.core.interfaces import IVersionedContent
 from silva.core.conf import schema as silvaschema
+
 import grokcore.view
+import grokcore.viewlet.util
+from grokcore.view.meta.views import default_view_name
 from five import grok
 
 from five.megrok.z3cform.components import GrokForm
@@ -46,6 +49,27 @@ class SilvaGrokForm(SilvaMixinForm, GrokForm, ViewCode):
             self._status_type = type
         return property(get, set)
 
+    def updateActions(self, refresh=True, only_refresh=False):
+        # Call the real update actions, and actions executes. This
+        # will let seperate from update the updateWidgets and
+        # updateActions.
+        if not only_refresh:
+            super(SilvaGrokForm, self).updateActions()
+            self.actions.execute()
+        if self.refreshActions and refresh:
+            super(SilvaGrokForm, self).updateActions()
+
+    def updateData(self):
+        # Update data to be displayed.
+        self.updateWidgets()
+
+    def updateForm(self, refresh=True):
+        # We seperate the update method in two: 1. Data,
+        # 2.Actions. This let us refresh the data if they have been
+        # modified outside of the current (sub)form.
+        self.updateData()
+        self.updateActions(refresh=refresh)
+
 
 class PageForm(SilvaGrokForm, form.Form, SMIView):
     """Generic form.
@@ -54,7 +78,7 @@ class PageForm(SilvaGrokForm, form.Form, SMIView):
     grok.baseclass()
 
 
-class PublicForm(GrokForm, form.Form, Template):
+class PublicForm(GrokForm, form.Form):
     """Generic form for the public interface.
     """
 
@@ -64,7 +88,8 @@ class PublicForm(GrokForm, form.Form, Template):
 
     @property
     def form_macros(self):
-        return component.queryMultiAdapter((self, self.request,), name='form-macros')
+        return component.queryMultiAdapter(
+            (self, self.request,), name='form-macros')
 
 
 class AddForm(SilvaMixinAddForm, SilvaGrokForm, form.AddForm, SMIView):
@@ -132,6 +157,7 @@ class EditForm(SilvaMixinEditForm, SilvaGrokForm, form.EditForm, SMIView):
         data, errors = self.extractData()
         if errors:
             self.status = self.formErrorsMessage
+            self.status_type = 'error'
             return
         changes = self.applyChanges(data)
         if changes:

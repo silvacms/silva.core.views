@@ -9,6 +9,7 @@
   <include package="silva.core.conf" />
   <include package="five.megrok.z3cform" file="meta.zcml" />
   <include package="five.megrok.z3cform" />
+  <include package="five.megrok.layout" />
 
   <!-- Register macros for form implementation -->
   <browser:page

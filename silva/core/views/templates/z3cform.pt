@@ -6,7 +6,8 @@
       tal:omit-tag="">
 
    <form action="." method="post"
-         tal:attributes="action request/getURL; enctype view/enctype">
+         tal:attributes="action request/getURL;
+                         enctype view/enctype">
 
      <table class="listing">
 
@@ -30,15 +31,17 @@
                              description  widget/field/description;
                              error        widget/error;
                              idx          repeat/widget/index"
-                 tal:attributes="class python: widget_odd and ('odd' + ' row' + str(idx))
-                                 or ('even' + ' row' + str(idx))">
-               <td class="designator"
-                   style="width:25%">
+                 tal:attributes="class python:widget_odd and ('odd' + ' row' + str(idx))
+                                 or ('even' + ' row' + str(idx)) + (error and ' field-error' or '')">
+               <td class="designator">
                  <label tal:attributes="for widget/id"
                         tal:content="widget/label">
                    Field Name
-                 </label><span class="warning"
-                   tal:condition="widget/required">*</span>
+                 </label>
+                 <span class="required"
+                   tal:condition="widget/required">
+                   *
+                 </span>
                  <p tal:condition="description" tal:content="description">
                    Description
                  </p>
@@ -60,7 +63,7 @@
        <tfoot>
          <metal:actions metal:define-macro="actions">
            <tr class="controls" tal:condition="view/actions">
-             <td class="align-right" colspan="2">
+             <td colspan="2">
                <input tal:repeat="action view/actions/values | nothing"
                       tal:replace="structure action/render" />
              </td>
