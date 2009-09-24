@@ -95,7 +95,7 @@ class SMIView(SilvaGrokView):
     def __init__(self, context, request):
         super(SMIView, self).__init__(context, request)
 
-        # Set model on request like SilvaViews
+        # Set model on request like silvaviews
         self.request['model'] = self._silvaContext
         # Set id on template some macros uses template/id
         self.template._template.id = self.__view_name__
@@ -113,6 +113,13 @@ class SMIView(SilvaGrokView):
         # silva macros.
         context = self._silvaContext
         return getSilvaViewFor(self.context, 'edit', context)
+
+    @CachedProperty
+    def silvaviews(self):
+        # XXX should be removed when silva stop to do stupid things
+        # with view in templates. This give access to the silvaviews
+        # directory from the view itself.
+        return self._silvaView()
 
     @property
     def tab_name(self):
@@ -134,8 +141,7 @@ class SMIView(SilvaGrokView):
         # Zope 2 and Silva templates.  Here should be bind at the
         # correct place in the Silva view registry so you should be
         # able to use silva macro in your templates.
-        view = self._silvaView()
-        return {'here': view,
+        return {'here': self.silvaviews,
                 'user': getSecurityManager().getUser(),
                 'realview': self, # XXX should be removed when silva
                                   # stop to do stupid things with view
@@ -243,3 +249,15 @@ class Viewlet(ViewletLayoutSupport, grok.Viewlet):
     grok.context(ISilvaObject)
     grok.implements(IViewlet)
 
+
+
+class SMIPortletManager(ViewletManager):
+    """Third SMI column manager.
+    """
+
+    grok.view(SMIView)
+
+    template = grok.PageTemplate(filename='templates/smiportletmanager.pt')
+
+    def enabled(self):
+        return len(self.viewlets) != 0
