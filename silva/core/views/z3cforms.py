@@ -55,26 +55,31 @@ class SilvaGrokForm(SilvaMixinForm, GrokForm, ViewCode):
             self._status_type = type
         return property(get, set)
 
-    def updateActions(self, refresh=True, only_refresh=False):
-        # Call the real update actions, and actions executes. This
-        # will let seperate from update the updateWidgets and
-        # updateActions.
-        if not only_refresh:
-            super(SilvaGrokForm, self).updateActions()
-            self.actions.execute()
-        if self.refreshActions and refresh:
-            super(SilvaGrokForm, self).updateActions()
-
     def updateData(self):
-        # Update data to be displayed.
         self.updateWidgets()
 
-    def updateForm(self, refresh=True):
-        # We seperate the update method in two: 1. Data,
-        # 2.Actions. This let us refresh the data if they have been
-        # modified outside of the current (sub)form.
+    def updateActions(self):
+        super(SilvaGrokForm, self).updateActions()
+        self.actions.execute()
+
+    def updateForm(self):
+        # Split the form update in two step: data and actions
         self.updateData()
-        self.updateActions(refresh=refresh)
+        self.updateActions()
+
+    def refreshData(self):
+        self.widgets.ignoreContext = self.ignoreContext
+        self.widgets.ignoreRequest = self.ignoreRequest
+        self.widgets.ignoreReadonly = self.ignoreReadonly
+        self.widgets.update()
+
+    def refreshActions(self):
+        # To refresh actions, you update them again.
+        super(SilvaGrokForm, self).updateActions()
+
+    def refreshForm(self):
+        self.refreshData()
+        self.refreshActions()
 
 
 class PageForm(SilvaGrokForm, form.Form, SMIView):
@@ -192,13 +197,12 @@ class ComposedForm(PageForm):
             if not subform.available():
                 continue
             subform.update()
-            subform.updateForm(refresh=False)
+            subform.updateForm()
             self.subforms.append(subform)
 
-        # Refresh widgets values
+        # Refresh values
         for subform in self.subforms:
-            subform.updateData()
-            subform.updateActions(only_refresh=True)
+            subform.refreshForm()
 
     def updateForm(self):
         self.updateSubForms()
@@ -321,6 +325,7 @@ class CrudAddForm(SubForm):
             self.status = e
         else:
             event.notify(lifecycleevent.ObjectCreatedEvent(item))
+            self.ignoreRequest = True
             self.status = _(u"Item added successfully.")
 
 
@@ -349,6 +354,11 @@ class CrudEditForm(SubForm):
             else:
                 tuples.append((subform.contentId, subform.content))
         return tuples
+
+    def refreshData(self):
+        for subform in self.subforms:
+            subform.refreshData()
+        super(SubForm, self).refreshData()
 
     def updateData(self):
         self.updateSubForms()
@@ -384,14 +394,16 @@ class CrudEditForm(SubForm):
                     self.status_type = 'error'
                     break
 
-            # We changed the amount of entries, so we update the subforms again.
+            # We changed the amount of entries, so we update the
+            # subforms again.
             self.updateSubForms()
         else:
             self.status = _(u"Please select items to delete.")
             self.status_type = 'error'
 
-    @button.buttonAndHandler(_('save'), name='save',
-                             condition=lambda form: form.parentForm.update_fields)
+    @button.buttonAndHandler(
+        _('save'), name='save',
+        condition=lambda form: form.parentForm.update_fields)
     def handleSave(self, action):
         success = _(u"Successfully updated")
         partly_success = _(u"Some of your changes could not be applied.")
@@ -593,7 +605,8 @@ class ContentReferenceWidget(widget.Widget):
     js = "reference.getReference( function(path, id, title) { document.getElementsByName('%s')[0].value = path;; }, '%s', '', true)"
 
     def onclick(self):
-        content_url = absoluteURL(self.form.context.get_container(), self.request)
+        content_url = absoluteURL(
+            self.form.context.get_container(), self.request)
         return self.js % (self.name, content_url)
 
     def current_url(self):
