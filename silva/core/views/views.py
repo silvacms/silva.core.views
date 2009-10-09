@@ -6,8 +6,6 @@
 from zope.i18n import translate
 from zope.viewlet.interfaces import IViewletManager
 from zope.cachedescriptors.property import CachedProperty
-from zope.publisher.publish import mapply
-import zope.component
 
 from grokcore.view.meta.views import default_view_name
 from five import grok
@@ -19,7 +17,6 @@ from silva.core.views.interfaces import IFeedback, IZMIView, ISMIView, ISMITab
 from silva.core.views.interfaces import IView
 from silva.core.views.interfaces import IPreviewLayer
 from silva.core.views.interfaces import IContentProvider, IViewlet
-from silva.core.layout.interfaces import ISMILayer
 from silva.core.conf.utils import getSilvaViewFor
 
 from five.megrok.layout import Page as BasePage
@@ -27,7 +24,6 @@ from five.megrok.layout import Layout as BaseLayout
 from megrok.layout.interfaces import IPage
 
 from AccessControl import getSecurityManager
-import Acquisition
 
 # Simple views
 
@@ -229,3 +225,15 @@ class Viewlet(ViewletLayoutSupport, grok.Viewlet):
     grok.context(ISilvaObject)
     grok.implements(IViewlet)
 
+
+
+class SMIPortletManager(ViewletManager):
+    """Third SMI column manager.
+    """
+
+    grok.view(SMIView)
+
+    template = grok.PageTemplate(filename='templates/smiportletmanager.pt')
+
+    def enabled(self):
+        return len(self.viewlets) != 0

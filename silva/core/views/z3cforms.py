@@ -7,9 +7,10 @@ from zope import interface, component, event, schema, lifecycleevent
 
 from Products.Silva.i18n import translate as _
 from Products.Silva.ViewCode import ViewCode
+from ZODB.POSException import ConflictError
 
 from silva.core.views.interfaces import ISilvaZ3CFormForm, IDefaultAddFields, \
-    ICancelButton, ISilvaStyle, INoCancelButton, ISilvaStyledForm
+    ICancelButton, ISilvaStyle, INoCancelButton, ISubForm
 from silva.core.views.views import SMIView
 from silva.core.views.baseforms import SilvaMixinForm, SilvaMixinAddForm, \
     SilvaMixinEditForm
@@ -23,9 +24,11 @@ from five import grok
 
 from five.megrok.z3cform.components import GrokForm
 from z3c.form import form, button, field
-from plone.z3cform.crud import crud
 from plone.z3cform import converter
+from plone.z3cform.widget import singlecheckboxwidget_factory
+from z3c.form.interfaces import DISPLAY_MODE, INPUT_MODE, NOVALUE
 import z3c.form.interfaces
+import z3c.form.converter
 
 # Base class to grok forms
 
@@ -49,26 +52,31 @@ class SilvaGrokForm(SilvaMixinForm, GrokForm, ViewCode):
             self._status_type = type
         return property(get, set)
 
-    def updateActions(self, refresh=True, only_refresh=False):
-        # Call the real update actions, and actions executes. This
-        # will let seperate from update the updateWidgets and
-        # updateActions.
-        if not only_refresh:
-            super(SilvaGrokForm, self).updateActions()
-            self.actions.execute()
-        if self.refreshActions and refresh:
-            super(SilvaGrokForm, self).updateActions()
-
     def updateData(self):
-        # Update data to be displayed.
         self.updateWidgets()
 
-    def updateForm(self, refresh=True):
-        # We seperate the update method in two: 1. Data,
-        # 2.Actions. This let us refresh the data if they have been
-        # modified outside of the current (sub)form.
+    def updateActions(self):
+        super(SilvaGrokForm, self).updateActions()
+        self.actions.execute()
+
+    def updateForm(self):
+        # Split the form update in two step: data and actions
         self.updateData()
-        self.updateActions(refresh=refresh)
+        self.updateActions()
+
+    def refreshData(self):
+        self.widgets.ignoreContext = self.ignoreContext
+        self.widgets.ignoreRequest = self.ignoreRequest
+        self.widgets.ignoreReadonly = self.ignoreReadonly
+        self.widgets.update()
+
+    def refreshActions(self):
+        # To refresh actions, you update them again.
+        super(SilvaGrokForm, self).updateActions()
+
+    def refreshForm(self):
+        self.refreshData()
+        self.refreshActions()
 
 
 class PageForm(SilvaGrokForm, form.Form, SMIView):
@@ -166,75 +174,348 @@ class EditForm(SilvaMixinEditForm, SilvaGrokForm, form.EditForm, SMIView):
         else:
             self.status = _(u'No changes')
 
-class SilvaGrokSubForm(SilvaGrokForm):
 
+class ComposedForm(PageForm):
+    """A more generic form which can be composed of many others.
+    """
+
+    grok.implements(INoCancelButton)
     grok.baseclass()
+
+    template = grok.PageTemplateFile('templates/composed_form.pt')
+
+    def updateSubForms(self):
+        subforms = map(lambda x: x[1], component.getAdapters(
+                (self.context, self.request,  self), ISubForm))
+        subforms = grokcore.viewlet.util.sort_components(subforms)
+        self.subforms = []
+        # Update form
+        for subform in subforms:
+            if not subform.available():
+                continue
+            subform.update()
+            subform.updateForm()
+            self.subforms.append(subform)
+
+        # Refresh values
+        for subform in self.subforms:
+            subform.refreshForm()
+
+    def updateForm(self):
+        self.updateSubForms()
+        super(PageForm, self).updateForm()
+
+
+class SubForm(PageForm):
+    """A form going in a composed form.
+    """
+
+    grok.implements(INoCancelButton, ISubForm)
+    grok.baseclass()
+
+    template = grok.PageTemplateFile('templates/z3cform.pt')
+
+    def __init__(self, context, request, parentForm):
+        self.parentForm = self.__parent__ = parentForm
+        super(PageForm, self).__init__(context, request)
+
+    def available(self):
+        return self.getContent() is not None
+
+    @property
+    def prefix(self):
+        name = grok.name.bind().get(self) or default_view_name(self)
+        return str('%s' % name)
 
     @apply
     def status():
         def get(self):
-            return self.context.status
+            return self.parentForm.status
         def set(self, status):
-            self.context.status = status
+            self.parentForm.status = status
+        return property(get, set)
+
+    @apply
+    def status_type():
+        def get(self):
+            return self.parentForm.status_type
+        def set(self, status_type):
+            self.parentForm.status_type = status_type
         return property(get, set)
 
 
-class CrudAddForm(SilvaGrokSubForm, crud.AddForm, SMIView):
+class SubEditForm(SubForm, form.EditForm):
+    """A subform which edit the content.
+    """
+
+    grok.baseclass()
+
+    @button.buttonAndHandler(_('save'), name='save')
+    def handleSave(self, action):
+        data, errors = self.extractData()
+        if errors:
+            self.status = self.formErrorsMessage
+            self.status_type = 'error'
+            return
+        changes = self.applyChanges(data)
+        if changes:
+            self.status = _(u'${meta_type} changed.',
+                            mapping={'meta_type': self.context.meta_type,})
+        else:
+            self.status = _(u'No changes')
+
+
+class CrudForm(ComposedForm):
+    """A Crud form is a special composed form.
+    """
+
+    grok.baseclass()
+
+    add_fields = field.Fields()
+    update_fields = field.Fields()
+    view_fields = field.Fields()
+
+    def link(self, name, value):
+        return None
+
+    def add(self, **data):
+        raise NotImplementedError
+
+    def remove(self, data):
+        raise NotImplementedError
+
+    def getItems(self):
+        raise NotImplementedError
+
+
+class CrudAddForm(SubForm):
     """The add form of a CRUD form.
     """
 
-    grok.baseclass()
-    grok.implements(INoCancelButton)
+    grok.order(20)
+    grok.view(CrudForm)
+    grok.name('crudaddform')
 
-    template = grokcore.view.PageTemplateFile('templates/z3cform.pt')
-    ignoreRequest = False
+    ignoreContext = True
+
+    def available(self):
+        return self.parentForm.getContent() is not None
 
     @property
     def label(self):
-        return _(u"add ${label}", mapping=dict(label=self.context.label))
+        return _(u"add ${label}", mapping=dict(label=self.parentForm.label))
+
+    @property
+    def fields(self):
+        return field.Fields(self.parentForm.add_fields)
+
+    @button.buttonAndHandler(_('add'), name='add')
+    def handleAdd(self, action):
+        data, errors = self.extractData()
+        if errors:
+            self.status = form.AddForm.formErrorsMessage
+            self.status_type = 'error'
+            return
+        try:
+            item = self.parentForm.add(**data)
+        except schema.ValidationError, e:
+            self.status = e
+        else:
+            event.notify(lifecycleevent.ObjectCreatedEvent(item))
+            self.ignoreRequest = True
+            self.status = _(u"Item added successfully.")
 
 
-class CrudEditSubForm(crud.EditSubForm):
-    """An crud edit sub-form.
-    """
-
-    grok.implements(ISilvaStyledForm)
-
-
-class CrudEditForm(SilvaGrokSubForm, crud.EditForm, SMIView):
+class CrudEditForm(SubForm):
     """The edit form of a CRUD form.
     """
 
-    grok.implements(INoCancelButton)
-    grok.baseclass()
+    grok.order(10)
+    grok.view(CrudForm)
+    grok.name('crudeditform')
+    template = grok.PageTemplateFile('templates/crud_editform.pt')
 
-    editsubform_factory = CrudEditSubForm
-    template = grokcore.view.PageTemplateFile('templates/crud_editform.pt')
+    def available(self):
+        return bool(self.parentForm.getItems())
 
     @property
     def label(self):
-        return _(u"modify ${label}", mapping=dict(label=self.context.label))
+        return _(u"modify ${label}", mapping=dict(label=self.parentForm.label))
+
+    def selectedItems(self):
+        tuples = []
+        for subform in self.subforms:
+            data = subform.widgets['select'].extract()
+            if not data or data is NOVALUE:
+                continue
+            else:
+                tuples.append((subform.contentId, subform.content))
+        return tuples
+
+    def refreshData(self):
+        for subform in self.subforms:
+            subform.refreshData()
+        super(SubForm, self).refreshData()
+
+    def updateData(self):
+        self.updateSubForms()
+        super(SubForm, self).updateData()
+
+    def updateSubForms(self):
+        self.subforms = []
+        for iid, item in self.parentForm.getItems():
+            subform =  component.getMultiAdapter(
+                (self.context, self.request, self), ISubForm,
+                name='crudeditsubform')
+            subform.content = item
+            subform.contentId = iid
+            subform.update()
+            subform.updateForm()
+            self.subforms.append(subform)
+
+    @button.buttonAndHandler(_('delete'), name='delete')
+    def handleDelete(self, action):
+        selected = self.selectedItems()
+        if selected:
+            self.status = _(u"Successfully deleted items.")
+            for id, item in selected:
+                try:
+                    self.parentForm.remove((id, item))
+                except ConflictError:
+                    raise
+                except:
+                    # In case an exception is raised, we'll catch it
+                    # and notify the user; in general, this is
+                    # unexpected behavior:
+                    self.status = _(u'Unable to remove one or more items.')
+                    self.status_type = 'error'
+                    break
+
+            # We changed the amount of entries, so we update the
+            # subforms again.
+            self.updateSubForms()
+        else:
+            self.status = _(u"Please select items to delete.")
+            self.status_type = 'error'
+
+    @button.buttonAndHandler(
+        _('save'), name='save',
+        condition=lambda form: form.parentForm.update_fields)
+    def handleSave(self, action):
+        success = _(u"Successfully updated")
+        partly_success = _(u"Some of your changes could not be applied.")
+        status = no_changes = _(u"No changes made.")
+        for subform in self.subforms:
+            # With the ``extractData()`` call, validation will occur,
+            # and errors will be stored on the widgets amongst other
+            # places.  After this we have to be extra careful not to
+            # call (as in ``__call__``) the subform again, since
+            # that'll remove the errors again.  With the results that
+            # no changes are applied but also no validation error is
+            # shown.
+            data, errors = subform.extractData()
+            if errors:
+                if status is no_changes:
+                    status = subform.formErrorsMessage
+                elif status is success:
+                    status = partly_success
+                continue
+            del data['select']
+            changes = subform.applyChanges(data)
+            if changes:
+                if status is no_changes:
+                    status = success
+                elif status is subform.formErrorsMessage:
+                    status = partly_success
+
+                # If there were changes, we'll update the view widgets
+                # again, so that they'll actually display the changes
+                for widget in  subform.widgets.values():
+                    if widget.mode == DISPLAY_MODE:
+                        widget.update()
+                        event.notify(widget.AfterWidgetUpdateEvent(widget))
+        self.status = status
 
 
-class CrudForm(SilvaGrokForm, crud.CrudForm, SMIView):
-    """Crud form.
+class CrudEditSubForm(SubForm, form.EditForm):
+    """An crud edit sub-form.
     """
 
-    grok.implements(INoCancelButton)
-    grok.baseclass()
+    grok.name('crudeditsubform')
+    grok.view(CrudEditForm)
 
-    template = grokcore.view.PageTemplateFile('templates/crud_form.pt')
-    addform_factory = CrudAddForm
-    editform_factory = CrudEditForm
+    template = grok.PageTemplateFile('templates/crud_editrow.pt')
 
-    def update(self):
-        form.Form.update(self)
+    # These are set by the parent form
+    content = None
+    contentId = None
 
-        addform = self.addform_factory(self, self.request)
-        editform = self.editform_factory(self, self.request)
-        addform.update()
-        editform.update()
-        self.subforms = [addform, editform]
+    @property
+    def fields(self):
+        fields = field.Fields(self._selectField())
+        crud_form = self.parentForm.parentForm
+        update_fields = crud_form.update_fields
+        if update_fields is not None:
+            fields += field.Fields(update_fields)
+
+        view_fields = crud_form.view_fields
+        if view_fields is not None:
+            view_fields = field.Fields(view_fields)
+            for f in view_fields.values():
+                f.mode = DISPLAY_MODE
+                # This is to allow a field to appear in both view
+                # and edit mode at the same time:
+                if not f.__name__.startswith('view_'):
+                    f.__name__ = 'view_' + f.__name__
+            fields += view_fields
+
+        return fields
+
+    @property
+    def prefix(self):
+        return str('crudeditsubform.%s' % self.contentId)
+
+    def link(self, name):
+        return self.parentForm.parentForm.link(name , self.getContent())
+
+    def getContent(self):
+        return self.content
+
+    def _selectField(self):
+        select_field = field.Field(
+            schema.Bool(__name__='select',
+                        required=False,
+                        title=_(u'select')))
+        select_field.widgetFactory[INPUT_MODE] = singlecheckboxwidget_factory
+        return select_field
+
+    # XXX: The three following methods, 'getCombinedWidgets',
+    # 'getTitleWidgets', and 'getNiceTitles' are hacks to support the
+    # page template.  Let's get rid of them.
+    def getCombinedWidgets(self):
+        """Returns pairs of widgets to improve layout"""
+        widgets = self.widgets.items()
+        combined = []
+        seen = set()
+        for name, widget in list(widgets):
+            if widget.mode == INPUT_MODE:
+                view_widget = self.widgets.get('view_%s' % name)
+                if view_widget is not None:
+                    combined.append((widget, view_widget))
+                    seen.add(view_widget)
+                else:
+                    combined.append((widget,))
+            else:
+                if widget not in seen:
+                    combined.append((widget,))
+        return combined
+
+    def getTitleWidgets(self):
+        return [widget[0] for widget in self.getCombinedWidgets()]
+
+    def getNiceTitles(self):
+        return [widget.field.title for widget in self.getTitleWidgets()]
+
 
 
 # Macros to render z3c forms

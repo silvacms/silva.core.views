@@ -1,0 +1,5 @@
+<td class="right" tal:condition="viewletmanager/enabled">
+  <tal:portlets tal:repeat="viewlet viewletmanager/viewlets">
+    <tal:content tal:content="structure viewlet/render" />
+  </tal:portlets>
+</td>

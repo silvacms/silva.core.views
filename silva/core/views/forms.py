@@ -4,7 +4,6 @@
 # $Id$
 
 from zope.formlib import form
-from zope.publisher.publish import mapply
 from zope import event, component
 from zope import lifecycleevent
 

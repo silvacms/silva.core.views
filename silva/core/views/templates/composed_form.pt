@@ -25,7 +25,7 @@
 
   <metal:fill-editor-slot fill-slot="main">
 
-    <table class="columns columns2">
+    <table class="columns">
         <tbody>
           <tr>
             <td class="left">
@@ -85,6 +85,7 @@
               </tal:repeat>
 
             </td>
+            <tal:portlets tal:replace="structure provider:smiportletmanager" />
           </tr>
         </tbody>
       </table>
