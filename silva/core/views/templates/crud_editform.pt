@@ -4,19 +4,19 @@
       xmlns:i18n="http://xml.zope.org/namespaces/i18n"
       i18n:domain="silva"
       tal:omit-tag=""
-      tal:condition="realview/subforms">
+      tal:condition="view/subforms">
 
   <form action="." method="post" tal:attributes="action request/getURL">
 
     <table class="listing"
-           tal:define="rows realview/subforms;
+           tal:define="rows view/subforms;
                        row1 python:len(rows) and rows[0] or None;"
            tal:condition="python:row1 is not None">
       <tal:define tal:define="widgetsForTitles row1/getTitleWidgets;
                               niceTitles row1/getNiceTitles;
                               colspan python:len(widgetsForTitles)">
         <tbody>
-          <tal:label tal:define="label realview/label | nothing"
+          <tal:label tal:define="label view/label | nothing"
                      tal:condition="label">
             <tr class="top-controls">
               <td colspan="#"
@@ -36,7 +36,7 @@
               </th>
             </tal:series>
           </tr>
-          <tal:block repeat="row realview/subforms">
+          <tal:block repeat="row view/subforms">
             <a name="" tal:attributes="name string:edit-${row/contentId}" />
             <tr tal:content="structure row/render"
                 tal:attributes="class python:repeat['row'].odd() and 'odd' or 'even'" />
@@ -45,7 +45,7 @@
             <td colspan="#" class="align-right"
                 tal:attributes="colspan colspan">
               <input type="submit"
-                     tal:repeat="action realview/actions/values"
+                     tal:repeat="action view/actions/values"
                      tal:replace="structure action/render" />
             </td>
           </tr>

@@ -13,15 +13,9 @@
 
 <metal:use-macro use-macro="here/macro_index/macros/master">
 
-  <metal:block fill-slot="script">
-    <script type="text/javascript"
-            tal:attributes="src here/reference.js/absolute_url">
-    </script>
-  </metal:block>
-
-  <metal:block metal:fill-slot="middleground">
-    <tal:replace tal:replace="structure python:view.provider('smi.buttons')" />
-  </metal:block>
+  <metal:middleground metal:fill-slot="middleground">
+    <tal:replace tal:replace="structure provider:smimiddlegroundmanager" />
+  </metal:middleground>
 
   <metal:fill-editor-slot fill-slot="main">
 
@@ -41,25 +35,25 @@
 
               <table class="listing">
                 <thead>
-                  <tr tal:condition="realview/label">
+                  <tr tal:condition="view/label">
                     <td class="top">
                       <h2 tal:attributes="title string:id: ${model/id}">
                         <img tal:replace="structure icon" />
-                        <tal:inline tal:content="realview/label"
+                        <tal:inline tal:content="view/label"
                                     i18n:translate="">table label</tal:inline>
                       </h2>
                     </td>
                   </tr>
                   <tr class="odd"
-                      tal:condition="realview/description | nothing">
+                      tal:condition="view/description | nothing">
                     <td class="designator"
-                        tal:content="realview/description">
+                        tal:content="view/description">
                     </td>
                   </tr>
                 </thead>
                 <tbody>
                   <tr class="top-controls"
-                      tal:define="formlabel realview/formlabel | nothing"
+                      tal:define="formlabel view/formlabel | nothing"
                       tal:condition="formlabel">
                     <td>
                       <h3 tal:content="formlabel"
@@ -69,10 +63,10 @@
                     </td>
                   </tr>
                 </tbody>
-                <tfoot tal:condition="realview/actions | nothing">
+                <tfoot tal:condition="view/actions | nothing">
                   <tr class="controls">
                     <td>
-                      <tal:control tal:repeat="action realview/actions/values">
+                      <tal:control tal:repeat="action view/actions/values">
                         <input type="submit" tal:replace="structure action/render" />
                       </tal:control>
                     </td>
@@ -80,7 +74,7 @@
                 </tfoot>
               </table>
 
-              <tal:repeat tal:repeat="form realview/subforms"
+              <tal:repeat tal:repeat="form view/subforms"
                           tal:replace="structure form/render">
               </tal:repeat>
 
