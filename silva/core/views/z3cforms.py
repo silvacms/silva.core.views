@@ -356,8 +356,7 @@ class CrudEditForm(SubForm):
         return tuples
 
     def refreshData(self):
-        for subform in self.subforms:
-            subform.refreshData()
+        self.updateSubForms()
         super(SubForm, self).refreshData()
 
     def updateData(self):
