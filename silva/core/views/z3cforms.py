@@ -65,10 +65,8 @@ class SilvaGrokForm(SilvaMixinForm, GrokForm, ViewCode):
         self.updateActions()
 
     def refreshData(self):
-        self.widgets.ignoreContext = self.ignoreContext
-        self.widgets.ignoreRequest = self.ignoreRequest
-        self.widgets.ignoreReadonly = self.ignoreReadonly
-        self.widgets.update()
+        # Nothing else works.
+        self.updateWidgets()
 
     def refreshActions(self):
         # To refresh actions, you update them again.
@@ -353,8 +351,7 @@ class CrudEditForm(SubForm):
         return tuples
 
     def refreshData(self):
-        for subform in self.subforms:
-            subform.refreshData()
+        self.updateSubForms()
         super(SubForm, self).refreshData()
 
     def updateData(self):
