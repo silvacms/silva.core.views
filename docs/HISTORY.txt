@@ -1,10 +1,14 @@
 Changelog
 =========
 
-2.1b3 (unreleased)
-------------------
+2.1 (2009-11-18)
+----------------
 
 * Fix resources on 2.1.
+* Use megrok.layout to implement the layout.
+* Define composed z3c.form, update crud forms.
+* Define a SMI third column.
+* Various improvements.
 
 2.1b2 (2009-03-18)
 ------------------
