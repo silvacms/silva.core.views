@@ -23,8 +23,8 @@ from Products.Silva.i18n import translate as _
 # View
 
 class IZMIObject(Interface):
-	"""ZMI Object.
-	"""
+        """ZMI Object.
+        """
 
 class IFeedback(Interface):
     """Feedback information.
@@ -153,4 +153,23 @@ class IVirtualSite(Interface):
 
     def get_virtal_path():
         """Return the virtual path or None.
+        """
+
+
+class IHTTPResponseHeaders(Interface):
+    """ Set some headers on the response from the context
+
+    Headers can be cache control settings, ...
+    """
+
+    def cache_headers():
+        """ Set the cache and Last modified settings
+        """
+
+    def content_type_headers():
+        """ Set the content type
+        """
+
+    def __call__():
+        """Set headers on the response
         """
