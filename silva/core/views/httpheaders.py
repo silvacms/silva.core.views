@@ -21,15 +21,7 @@ class HTTPResponseHeaders(grok.MultiAdapter):
 
     def cache_headers(self):
         authenticated = getSecurityManager().getUser().has_role('Authenticated')
-        is_preview = 'preview_html' in self.request['URL']
-        if is_preview:
-            content = self.context.get_previewable()
-        else:
-            content = self.context.get_viewable()
-        if content is not None:
-            mod_date = content.get_modification_datetime()
-            self.response.setHeader('Last-Modified', rfc1123_date(mod_date))
-        if is_preview or authenticated:
+        if authenticated:
             # No cache when in preview mode
             self.response.setHeader(
                 'Cache-Control',
