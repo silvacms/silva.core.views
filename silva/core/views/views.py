@@ -16,7 +16,7 @@ import urllib
 from Products.Silva.interfaces import ISilvaObject
 
 from silva.core.views.interfaces import IFeedback, IZMIView, ISMIView, ISMITab
-from silva.core.views.interfaces import IView
+from silva.core.views.interfaces import IView, IHTTPResponseHeaders
 from silva.core.views.interfaces import IContentProvider, IViewlet
 from silva.core.layout.interfaces import ISMILayer
 from silva.core.conf.utils import getSilvaViewFor
@@ -35,6 +35,27 @@ class SilvaGrokView(grok.View):
     """
 
     grok.baseclass()
+
+    def getPhysicalPath(self):
+        return self.context.getPhysicalPath() + ('/@@' + self.__name__,)
+
+    def publishTraverse(self, request, name):
+        if request.method == name and hasattr(self.aq_base, name):
+            return getattr(self.aq_base, name)
+        return super(SilvaGrokView, self).publishTraverse(request, name)
+
+    def browserDefault(self, request):
+        if request.method in ('HEAD',):
+            if hasattr(self.aq_base, request.method):
+                return self, (request.method,)
+        return super(SilvaGrokView, self).browserDefault(request)
+
+    def HEAD(self):
+        """Reply to HEAD requests.
+        """
+        zope.component.getMultiAdapter(
+            (self.context, self.request), IHTTPResponseHeaders)()
+        return ''
 
     def redirect(self, url):
         # Override redirect to send status information if there is.
