@@ -26,6 +26,7 @@ from five.megrok.layout import Layout as BaseLayout
 from megrok.layout.interfaces import IPage
 
 from AccessControl import getSecurityManager
+from zExceptions import Unauthorized
 import Acquisition
 
 # Simple views
@@ -194,6 +195,12 @@ class Page(BasePage):
 
     grok.baseclass()
     grok.context(ISilvaObject)
+    grok.require('zope2.View')
+
+    def __call__(self):
+        if not getSecurityManager().checkPermission('View', self.context):
+            raise Unauthorized, "Please login"
+        return super(Page, self).__call__()
 
 
 class View(SilvaGrokView):
@@ -204,6 +211,7 @@ class View(SilvaGrokView):
     grok.context(ISilvaObject)
     grok.implements(IView)
     grok.name(u'content.html')
+    grok.require('zope2.View')
 
     @CachedProperty
     def is_preview(self):
@@ -219,6 +227,11 @@ class View(SilvaGrokView):
 
     def namespace(self):
         return {'content': self.content}
+
+    def __call__(self):
+        if not getSecurityManager().checkPermission('View', self.context):
+            raise Unauthorized,  "Please login"
+        return super(View, self).__call__()
 
 
 class ViewletLayoutSupport(object):

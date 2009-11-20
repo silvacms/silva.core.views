@@ -6,6 +6,7 @@ Changelog
 
 * Add support to genericly set httpheaders.
 * Views replies correctly to head requests.
+* Fix default permissions on view and pages.
 
 2.1 (2009-11-18)
 ----------------
