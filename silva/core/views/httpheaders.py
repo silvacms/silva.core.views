@@ -32,9 +32,12 @@ class HTTPResponseHeaders(grok.MultiAdapter):
             self.response.setHeader(
                 'Cache-Control','max-age=86400, must-revalidate')
 
-    def content_type_headers(self):
-        self.response.setHeader('Content-Type', 'text/html;charset=utf-8')
+    def other_headers(self, headers):
+        default = {'Content-Type': 'text/html;charset=utf-8'}
+        headers.update(default)
+        for key, value in headers.items():
+            self.response.setHeader(key, value)
 
-    def __call__(self):
+    def __call__(self, **headers):
         self.cache_headers()
-        self.content_type_headers()
+        self.other_headers(headers)
