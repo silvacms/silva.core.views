@@ -166,10 +166,10 @@ class IHTTPResponseHeaders(Interface):
         """ Set the cache and Last modified settings
         """
 
-    def content_type_headers():
-        """ Set the content type
+    def other_headers(headers):
+        """ Set other headers
         """
 
-    def __call__():
+    def __call__(**headers):
         """Set headers on the response
         """
