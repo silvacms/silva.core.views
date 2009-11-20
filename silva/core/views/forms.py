@@ -16,7 +16,8 @@ from Products.Silva.ViewCode import ViewCode
 from silva.core.views.baseforms import SilvaMixinForm, SilvaMixinAddForm, \
     SilvaMixinEditForm
 from silva.core.views.views import SMIView
-from silva.core.views.interfaces import IDefaultAddFields, ISilvaFormlibForm
+from silva.core.views.interfaces import IDefaultAddFields, ISilvaFormlibForm, \
+    IHTTPResponseHeaders
 
 from five.grok.components import GrokForm
 from five.megrok.layout import Form as BasePageForm
@@ -54,6 +55,28 @@ class PublicForm(BasePageForm, formbase.PageForm):
     grok.implements(ISilvaFormlibForm, IPage)
 
     template = grok.PageTemplateFile('templates/public_form.pt')
+
+    def getPhysicalPath(self):
+        return self.context.getPhysicalPath() + ('/@@' + self.__name__,)
+
+    def publishTraverse(self, request, name):
+        if request.method == name and hasattr(self.aq_base, name):
+            return getattr(self.aq_base, name)
+        return super(PublicForm, self).publishTraverse(request, name)
+
+    def browserDefault(self, request):
+        if request.method in ('HEAD',):
+            if hasattr(self.aq_base, request.method):
+                return self, (request.method,)
+        return super(PublicForm, self).browserDefault(request)
+
+    def HEAD(self):
+        """Reply to HEAD requests.
+        """
+        component.getMultiAdapter(
+            (self.context, self.request), IHTTPResponseHeaders)()
+        return ''
+
 
     @property
     def form_macros(self):
