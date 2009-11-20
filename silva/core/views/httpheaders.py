@@ -30,7 +30,7 @@ class HTTPResponseHeaders(grok.MultiAdapter):
             self.response.setHeader('Pragma', 'no-cache')
         else:
             self.response.setHeader(
-                'Cache-Control','max-age=7200, must-revalidate')
+                'Cache-Control','max-age=86400, must-revalidate')
 
     def content_type_headers(self):
         self.response.setHeader('Content-Type', 'text/html;charset=utf-8')
