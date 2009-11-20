@@ -6,11 +6,16 @@
    xmlns:z3c="http://namespaces.zope.org/z3c">
 
   <five:registerPackage package="." />
+
   <include package="five.grok" />
   <include package="silva.core.conf" />
   <include package="five.megrok.z3cform" file="meta.zcml" />
   <include package="five.megrok.z3cform" />
   <include package="five.megrok.layout" />
+
+  <!-- Include SilvaLayout because we want to change the behavior -->
+  <include package="Products.SilvaLayout" />
+  <includeOverrides file="overrides.zcml" />
 
   <!-- Register macros for form implementation -->
   <browser:page

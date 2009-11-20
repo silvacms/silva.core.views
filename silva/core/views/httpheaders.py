@@ -10,9 +10,9 @@ from silva.core.views.interfaces import IHTTPResponseHeaders
 
 
 class HTTPResponseHeaders(grok.MultiAdapter):
-
     grok.adapts(ISilvaObject, IBrowserRequest)
     grok.implements(IHTTPResponseHeaders)
+    grok.provides(IHTTPResponseHeaders)
 
     def __init__(self, context, request):
         self.context = context
@@ -38,6 +38,13 @@ class HTTPResponseHeaders(grok.MultiAdapter):
         for key, value in headers.items():
             self.response.setHeader(key, value)
 
-    def __call__(self, **headers):
+    def set_headers(self, **headers):
+        """Set the headers on the response. Called directly to
+        implement HEAD requests as well.
+        """
         self.cache_headers()
         self.other_headers(headers)
+        return ''
+
+    def __call__(self, **headers):
+        self.set_headers(**headers)

@@ -1,0 +1,12 @@
+<configure
+   xmlns="http://namespaces.zope.org/zope">
+
+  <!-- Change publication traverser to manage HEAD requests -->
+  <adapter
+     for="Products.Silva.interfaces.IPublication
+          zope.publisher.interfaces.browser.IBrowserRequest"
+     factory=".traverser.SilvaPublishTraverse"
+     provides="zope.publisher.interfaces.browser.IBrowserPublisher"
+     />
+
+</configure>
