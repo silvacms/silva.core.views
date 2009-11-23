@@ -4,8 +4,8 @@ from zope.component import getUtility, getMultiAdapter
 from zope.publisher.interfaces.browser import IBrowserRequest
 from zope.datetime import rfc1123_date
 from AccessControl import getSecurityManager
-
 from Products.Silva.interfaces import ISilvaObject
+from Products.Silva.adapters.interfaces import IViewerSecurity
 from silva.core.views.interfaces import IHTTPResponseHeaders
 
 
@@ -14,15 +14,18 @@ class HTTPResponseHeaders(grok.MultiAdapter):
     grok.implements(IHTTPResponseHeaders)
     grok.provides(IHTTPResponseHeaders)
 
+    max_age = 86400
+
     def __init__(self, context, request):
         self.context = context
         self.request = request
         self.response = request.response
 
     def cache_headers(self):
-        authenticated = getSecurityManager().getUser().has_role('Authenticated')
-        if authenticated:
-            # No cache when in preview mode
+        vs = IViewerSecurity(self.context)
+        is_private = vs.getMinimumRole() != 'Anonymous'
+        if is_private:
+            # No cache when private
             self.response.setHeader(
                 'Cache-Control',
                 'no-cache, must-revalidate, post-check=0, pre-check=0')
@@ -30,7 +33,8 @@ class HTTPResponseHeaders(grok.MultiAdapter):
             self.response.setHeader('Pragma', 'no-cache')
         else:
             self.response.setHeader(
-                'Cache-Control','max-age=86400, must-revalidate')
+                'Cache-Control',
+                'max-age=%d, must-revalidate' % self.max_age)
 
     def other_headers(self, headers):
         default = {'Content-Type': 'text/html;charset=utf-8'}
@@ -45,6 +49,9 @@ class HTTPResponseHeaders(grok.MultiAdapter):
         self.cache_headers()
         self.other_headers(headers)
         return ''
+        
+    def __is_preview(self):
+        self.request
 
     def __call__(self, **headers):
         self.set_headers(**headers)
