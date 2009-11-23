@@ -197,11 +197,6 @@ class Page(BasePage):
     grok.context(ISilvaObject)
     grok.require('zope2.View')
 
-    def __call__(self):
-        if not getSecurityManager().checkPermission('View', self.context):
-            raise Unauthorized, "Please login"
-        return super(Page, self).__call__()
-
 
 class View(SilvaGrokView):
     """View on Silva object, support view and preview
@@ -227,11 +222,6 @@ class View(SilvaGrokView):
 
     def namespace(self):
         return {'content': self.content}
-
-    def __call__(self):
-        if not getSecurityManager().checkPermission('View', self.context):
-            raise Unauthorized,  "Please login"
-        return super(View, self).__call__()
 
 
 class ViewletLayoutSupport(object):
@@ -260,6 +250,7 @@ class ViewletManager(ViewletLayoutSupport, grok.ViewletManager):
     grok.context(ISilvaObject)
     grok.implements(IViewletManager)
 
+
 class ContentProvider(ViewletManager):
     """A content provider in Silva. In fact it's just a viewlet
     manager...
@@ -282,6 +273,7 @@ class Viewlet(ViewletLayoutSupport, grok.Viewlet):
     grok.baseclass()
     grok.context(ISilvaObject)
     grok.implements(IViewlet)
+    grok.require('zope2.View')
 
 
 

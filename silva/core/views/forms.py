@@ -53,6 +53,7 @@ class PublicForm(BasePageForm, formbase.PageForm):
     grok.baseclass()
     grok.context(ISilvaObject)
     grok.implements(ISilvaFormlibForm, IPage)
+    grok.require('zope2.View')
 
     template = grok.PageTemplateFile('templates/public_form.pt')
 
@@ -76,7 +77,6 @@ class PublicForm(BasePageForm, formbase.PageForm):
         component.getMultiAdapter(
             (self.context, self.request), IHTTPResponseHeaders)()
         return ''
-
 
     @property
     def form_macros(self):
