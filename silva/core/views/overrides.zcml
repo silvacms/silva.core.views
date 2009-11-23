@@ -5,7 +5,7 @@
   <adapter
      for="Products.Silva.interfaces.IPublication
           zope.publisher.interfaces.browser.IBrowserRequest"
-     factory=".traverser.SilvaPublishTraverse"
+     factory=".traverser.SilvaPubPublishTraverse"
      provides="zope.publisher.interfaces.browser.IBrowserPublisher"
      />
 
