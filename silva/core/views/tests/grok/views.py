@@ -40,19 +40,28 @@ If the view is private you should not have cache headers
 
     >>> from Products.Silva.tests import SilvaTestCase
     >>> import base64
-    >>> AUTH_TOKEN = '%s:%s' % ('manager', SilvaTestCase.user_password)
-    >>> AUTH = 'Authorization: Basic %s' % base64.b64encode(AUTH_TOKEN)
+    >>> AUTH_TOKEN = '%s:%s' % ('SilvaTestCase', '')
+    >>> AUTH = 'Basic %s' % base64.b64encode(AUTH_TOKEN)
     >>> from Products.Silva.adapters.interfaces import IViewerSecurity
     >>> IViewerSecurity(app.root.myfolder).setMinimumRole('Authenticated')
-    >>> reply = http('GET /root/myfolder/myprivateview HTTP/1.1\\r\\n%s' % AUTH)
+    >>> request = 'GET /root/++skin++Porto/myfolder/myprivateview HTTP/1.1\\r\\n%s' % AUTH
+    >>> browser.open('http://localhost/root/myfolder/myprivateview')
+    >>> browser.addHeader("Authorization", AUTH)
+    >>> browser.headers['status']
+    '200 Ok'
+    >>> request
+    ''
+    >>> reply = http(request)
     >>> reply.header_output.status
     200
     >>> reply.getBody()
     ''
     >>> reply.header_output.headers
     {'Content-Length': '0',
+     'Expires': 'Mon, 26 Jul 1997 05:00:00 GMT',
      'Content-Type': 'text/html;charset=utf-8',
-     'Cache-Control': 'max-age=86400, must-revalidate'}
+     'Pragma': 'no-cache',
+     'Cache-Control': 'no-cache, must-revalidate, post-check=0, pre-check=0'}
 """
 
 
