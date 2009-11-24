@@ -9,11 +9,11 @@ AUTH_TOKEN = '%s:%s' % ('manager', SilvaTestCase.user_password)
 AUTH = {'Authorization': 'Basic %s' % base64.b64encode(AUTH_TOKEN)}
 
 PUBLIC_HEADERS_EXPECTED = {
-    # 'Content-Length': '0',
+    'Content-Length': '0',
     'Content-Type': 'text/html;charset=utf-8',
     'Cache-Control': 'max-age=86400, must-revalidate'}
 PRIVATE_HEADERS_EXPECTED = {
-    # 'Content-Length': '0',
+    'Content-Length': '0',
     'Expires': 'Mon, 26 Jul 1997 05:00:00 GMT',
     'Content-Type': 'text/html;charset=utf-8',
     'Pragma': 'no-cache',
