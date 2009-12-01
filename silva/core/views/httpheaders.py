@@ -5,7 +5,7 @@ from zope.publisher.interfaces.browser import IBrowserRequest
 from zope.datetime import rfc1123_date
 from AccessControl import getSecurityManager
 
-from Products.Silva.interfaces import ISilvaObject, IVersionedContent
+from silva.core.interfaces import ISilvaObject, IVersionedContent
 from silva.core.views.interfaces import IHTTPResponseHeaders, IPreviewLayer
 
 class HTTPResponseHeaders(grok.MultiAdapter):
