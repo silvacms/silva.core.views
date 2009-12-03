@@ -6,8 +6,6 @@
 from zope.contentprovider.interfaces import IContentProvider \
     as IBaseContentProvider
 from zope.interface import Interface, Attribute
-from zope.publisher.interfaces.browser import IBrowserRequest
-from zope.traversing.browser.interfaces import IAbsoluteURL
 from zope.viewlet.interfaces import IViewlet as IBaseViewlet
 from grokcore.viewlet.interfaces import IViewletManager as IBaseViewletManager
 from zope import schema
@@ -19,12 +17,11 @@ from silva.core.conf import schema as silvaschema
 
 from Products.Silva.i18n import translate as _
 
-
 # View
 
 class IZMIObject(Interface):
-        """ZMI Object.
-        """
+    """ZMI Object.
+    """
 
 class IFeedback(Interface):
     """Feedback information.
@@ -145,6 +142,14 @@ class IVirtualSite(Interface):
 
     def get_root():
         """Return the virtual root of the current site.
+        """
+
+    def get_root_url():
+        """
+        """
+
+    def get_silva_root():
+        """
         """
 
     def get_virtual_root():

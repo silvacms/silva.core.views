@@ -3,22 +3,33 @@
 # See also LICENSE.txt
 # $Id$
 
-from Products.Five import BrowserView
+from zope.app.component.hooks import getSite
+from zope.traversing.browser import absoluteURL
 
-class VirtualSite(BrowserView):
+class VirtualSite(object):
+
+    def __init__(self, request):
+        self.request = request
 
     def get_root(self):
         root = self.get_virtual_root()
         if root is None:
-            return self.context.get_root()
+            return self.get_silva_root()
         return root
+
+    def get_root_url(self):
+        return absoluteURL(self.get_root(), self.request)
+
+    def get_silva_root(self):
+        # XXX Check for nested localsites in Silva
+        return getSite()
 
     def get_virtual_root(self):
         root_path = self.get_virtual_path()
         if root_path is None:
             return None
 
-        return self.context.restrictedTraverse(root_path, None)
+        return getSite().restrictedTraverse(root_path, None)
 
     def get_virtual_path(self):
         try:
@@ -27,4 +38,3 @@ class VirtualSite(BrowserView):
             root_path =  None
 
         return root_path
-

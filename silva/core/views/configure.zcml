@@ -49,19 +49,9 @@
      />
 
   <!-- Site -->
-  <browser:page
-     for="Products.Silva.interfaces.ISilvaObject"
-     name="virtual_site"
-     class=".site.VirtualSite"
-     permission="zope.Public"
-     allowed_interface=".interfaces.IVirtualSite"
-     />
-
-  <view
-     for="Products.Silva.interfaces.ISilvaObject"
+  <adapter
+     for="zope.publisher.interfaces.http.IHTTPRequest"
      factory=".site.VirtualSite"
-     type="zope.publisher.interfaces.http.IHTTPRequest"
-     permission="zope.Public"
      provides=".interfaces.IVirtualSite"
      />
 
