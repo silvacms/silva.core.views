@@ -3,10 +3,18 @@
 # See also LICENSE.txt
 # $Id$
 
+from five import grok
 from zope.app.component.hooks import getSite
+from zope.publisher.interfaces.http import IHTTPRequest
 from zope.traversing.browser import absoluteURL
 
-class VirtualSite(object):
+from silva.core.views.interfaces import IVirtualSite
+
+
+class VirtualSite(grok.Adapter):
+    grok.implements(IVirtualSite)
+    grok.provides(IVirtualSite)
+    grok.context(IHTTPRequest)
 
     def __init__(self, request):
         self.request = request
