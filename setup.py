@@ -5,7 +5,7 @@
 from setuptools import setup, find_packages
 import os
 
-version = '2.1.3'
+version = '2.1.4dev'
 
 setup(name='silva.core.views',
       version=version,
