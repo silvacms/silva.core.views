@@ -48,6 +48,14 @@
      permission="zope.Public"
      />
 
+  <!-- Site -->
+  <adapter
+     for="Products.Silva.interfaces.ISilvaObject"
+     factory=".site.VirtualSite"
+     permission="zope.Public"
+     provides=".interfaces.IVirtualSite"
+     />
+
   <!-- Default traverser for Silva views -->
   <adapter
     for="Products.Silva.interfaces.ISilvaObject
