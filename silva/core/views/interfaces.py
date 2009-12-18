@@ -187,6 +187,14 @@ class IVirtualSite(Interface):
         """Return the virtual root of the current site.
         """
 
+    def get_root_url():
+        """
+        """
+
+    def get_silva_root():
+        """
+        """
+
     def get_virtual_root():
         """Return the virtual root or None.
         """
@@ -195,20 +203,21 @@ class IVirtualSite(Interface):
         """Return the virtual path or None.
         """
 
+
 class IHTTPResponseHeaders(Interface):
     """ Set some headers on the response from the context
-    
+
     Headers can be cache control settings, ...
     """
-    
+
     def cache_headers():
         """ Set the cache and Last modified settings
         """
-    
-    def content_type_headers():
-        """ Set the content type
+
+    def other_headers(headers):
+        """ Set other headers
         """
-    
-    def __call__():
+
+    def __call__(**headers):
         """Set headers on the response
         """
