@@ -220,4 +220,6 @@ class IHTTPResponseHeaders(Interface):
 
     def __call__(**headers):
         """Set headers on the response
+        
+        method should accept **kwargs argument to override headers
         """
