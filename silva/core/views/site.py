@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) 2009 Infrae. All rights reserved.
+# Copyright (c) 2009-2010 Infrae. All rights reserved.
 # See also LICENSE.txt
 # $Id$
 

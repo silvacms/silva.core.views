@@ -1,29 +1,30 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) 2002-2009 Infrae. All rights reserved.
+# Copyright (c) 2002-2010 Infrae. All rights reserved.
 # See also LICENSE.txt
 # $Id$
 
+from zope import component
+from zope.cachedescriptors.property import CachedProperty
 from zope.i18n import translate
 from zope.viewlet.interfaces import IViewletManager
-from zope.cachedescriptors.property import CachedProperty
 
 from grokcore.view.meta.views import default_view_name
-from five import grok
 import urllib
 
-from silva.core.interfaces import ISilvaObject
-
-from silva.core.views.interfaces import IFeedback, IZMIView, ISMIView, ISMITab
-from silva.core.views.interfaces import IView
-from silva.core.views.interfaces import IPreviewLayer
-from silva.core.views.interfaces import IContentProvider, IViewlet
 from silva.core.conf.utils import getSilvaViewFor
+from silva.core.interfaces import ISilvaObject
+from silva.core.views.interfaces import IContentProvider, IViewlet
+from silva.core.views.interfaces import IFeedback, IZMIView, ISMIView, ISMITab
+from silva.core.views.interfaces import IPreviewLayer
+from silva.core.views.interfaces import IView, IHTTPResponseHeaders
 
-from five.megrok.layout import Page as BasePage
+from five import grok
 from five.megrok.layout import Layout as BaseLayout
+from five.megrok.layout import Page as BasePage
 from megrok.layout.interfaces import IPage
 
 from AccessControl import getSecurityManager
+
 
 # Simple views
 
@@ -32,6 +33,36 @@ class SilvaGrokView(grok.View):
     """
 
     grok.baseclass()
+
+    def getPhysicalPath(self):
+        return self.context.getPhysicalPath() + ('/@@' + self.__name__,)
+
+    def publishTraverse(self, request, name):
+        if request.method == name and hasattr(self.aq_base, name):
+            return getattr(self.aq_base, name)
+        return super(SilvaGrokView, self).publishTraverse(request, name)
+
+    def browserDefault(self, request):
+        if request.method in ('HEAD',):
+            if hasattr(self.aq_base, request.method):
+                return self, (request.method,)
+        return super(SilvaGrokView, self).browserDefault(request)
+
+    def setHTTPHeaders(self):
+        component.getMultiAdapter(
+            (self.context, self.request), IHTTPResponseHeaders)()
+
+    def HEAD(self):
+        """Reply to HEAD requests.
+        """
+        self.setHTTPHeaders()
+        return ''
+
+    def __call__(self):
+        """Render the view.
+        """
+        self.setHTTPHeaders()
+        return super(SilvaGrokView, self).__call__()
 
     def redirect(self, url):
         # Override redirect to send status information if there is.
@@ -92,7 +123,7 @@ class SMIView(SilvaGrokView):
     def __init__(self, context, request):
         super(SMIView, self).__init__(context, request)
 
-        # Set model on request like SilvaViews
+        # Set model on request like silvaviews
         self.request['model'] = self._silvaContext
         # Set id on template some macros uses template/id
         self.template._template.id = self.__view_name__
@@ -151,6 +182,7 @@ class Page(BasePage):
 
     grok.baseclass()
     grok.context(ISilvaObject)
+    grok.require('zope2.View')
 
 
 class View(SilvaGrokView):
@@ -161,6 +193,7 @@ class View(SilvaGrokView):
     grok.context(ISilvaObject)
     grok.implements(IView)
     grok.name(u'content.html')
+    grok.require('zope2.View')
 
     @CachedProperty
     def is_preview(self):
@@ -202,6 +235,7 @@ class ViewletManager(ViewletLayoutSupport, grok.ViewletManager):
     grok.context(ISilvaObject)
     grok.implements(IViewletManager)
 
+
 class ContentProvider(ViewletManager):
     """A content provider in Silva. In fact it's just a viewlet
     manager...
@@ -224,6 +258,7 @@ class Viewlet(ViewletLayoutSupport, grok.Viewlet):
     grok.baseclass()
     grok.context(ISilvaObject)
     grok.implements(IViewlet)
+    grok.require('zope2.View')
 
 
 

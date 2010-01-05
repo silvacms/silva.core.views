@@ -1,4 +1,4 @@
-# Copyright (c) 2008-2009 Infrae. All rights reserved.
+# Copyright (c) 2008-2010 Infrae. All rights reserved.
 # See also LICENSE.txt
 # $Id$
 """
@@ -7,7 +7,7 @@
     >>> logAsUser(app, 'manager')
 
  We grok this test file:
-    >>> grok('silva.core.views.tests.grok.views')
+    >>> grok('silva.core.views.tests.grok.view_cache_headers')
 
  Now we add a folder:
 
@@ -15,14 +15,15 @@
     >>> id = factory.manage_addFolder('myfolder', 'My Folder')
     >>> app.root.myfolder
     <Silva Folder instance myfolder>
-    
+
  When requesting the view the response should include cache control
- headers.
+ headers:
+
     >>> browser.open('http://localhost/root/myfolder/mytestview')
     >>> browser.headers['status']
     '200 Ok'
     >>> browser.contents
-    ''
+    'This is a view!'
     >>> browser.headers.has_key('cache-control')
     True
     >>> browser.headers['Cache-Control']
@@ -30,15 +31,15 @@
 
  We can do HEAD requests:
 
-    # >>> reply = http('HEAD /root/myfolder/mytestview HTTP/1.1')
-    # >>> reply.header_output.headers
-    # {'Content-Length': '0',
-    #  'Content-Type': 'text/html;charset=utf-8',
-    #  'Cache-Control': 'max-age=86400, must-revalidate'}
-    # >>> reply.getBody()
-    # ''
+    >>> reply = http('HEAD /root/myfolder/mytestview HTTP/1.1')
+    >>> reply.header_output.headers
+    {'Content-Length': '0',
+     'Content-Type': 'text/html;charset=utf-8',
+     'Cache-Control': 'max-age=86400, must-revalidate'}
+    >>> reply.getBody()
+    ''
 
- We now create a protected folder.
+ We now create a protected folder:
 
     >>> from Products.Silva.tests import SilvaTestCase
     >>> import base64
@@ -47,16 +48,18 @@
     >>> from silva.core.interfaces.adapters import IViewerSecurity
     >>> IViewerSecurity(app.root.myfolder).setMinimumRole('Authenticated')
 
- If the view is private you should not have cache headers.
+ If the view is private you should not have cache headers:
 
     >>> browser.addHeader("Authorization", AUTH)
-    >>> browser.open('http://localhost/root/myfolder/myprivateview')
+    >>> browser.open('http://localhost/root/myfolder/mytestview')
     >>> browser.headers['status']
     '200 Ok'
     >>> browser.contents
-    ''
+    'This is a view!'
     >>> browser.headers.has_key('cache-control')
-    False
+    True
+    >>> browser.headers['Cache-Control']
+    'no-cache, must-revalidate, post-check=0, pre-check=0'
     >>> browser.headers.has_key('pragma')
     True
     >>> browser.headers['Pragma']
@@ -73,17 +76,10 @@ from five import grok
 class MyFolderView(silvaviews.View):
     grok.name('mytestview')
     grok.context(Folder)
-    
-    def render(self):
-        return "Hello render!"
-
-
-class MyPrivateFolderView(silvaviews.View):
-    grok.name('myprivateview')
-    grok.context(Folder)
-    grok.require('zope2.ViewManagementScreens')
 
     def render(self):
-        return "Hello render!"
+        return "This is a view!"
+
+
 
 
