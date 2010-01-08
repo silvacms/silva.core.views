@@ -16,7 +16,7 @@ from silva.core.views.interfaces import IPreviewLayer
 
 class PreviewTraversable(grok.MultiAdapter):
     """Traverser to display versioned contents in SMI preview.
-    
+
     Add the preview layer on the request if needed.
     """
     grok.adapts(IPublication, IBrowserRequest)
@@ -45,7 +45,7 @@ class SilvaPublishTraverse(DefaultPublishTraverse):
         if request.method in ('GET', 'POST',):
             return super(SilvaPublishTraverse, self).browserDefault(request)
         if request.method == 'HEAD':
-            return SilvaHead(self.context, request), ('HEAD',)            
+            return SilvaHead(self.context, request), ('HEAD',)
         return self.context, tuple()
 
 
