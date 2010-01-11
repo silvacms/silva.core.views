@@ -3,26 +3,26 @@
 # See also LICENSE.txt
 # $Id$
 
-from zope.i18n import translate
-from zope.viewlet.interfaces import IViewletManager
 from zope.cachedescriptors.property import CachedProperty
+from zope.i18n import translate
 from zope.publisher.publish import mapply
+from zope.viewlet.interfaces import IViewletManager
 import zope.component
 
 from grokcore.view.meta.views import default_view_name
-from five import grok
 import urllib
 
 from Products.Silva.interfaces import ISilvaObject
 
+from silva.core.conf.utils import getSilvaViewFor
+from silva.core.layout.interfaces import ISMILayer
+from silva.core.views.interfaces import IContentProvider, IViewlet
 from silva.core.views.interfaces import IFeedback, IZMIView, ISMIView, ISMITab
 from silva.core.views.interfaces import IView, IHTTPResponseHeaders
-from silva.core.views.interfaces import IContentProvider, IViewlet
-from silva.core.layout.interfaces import ISMILayer
-from silva.core.conf.utils import getSilvaViewFor
 
-from five.megrok.layout import Page as BasePage
+from five import grok
 from five.megrok.layout import Layout as BaseLayout
+from five.megrok.layout import Page as BasePage
 from megrok.layout.interfaces import IPage
 
 from AccessControl import getSecurityManager
@@ -30,6 +30,46 @@ from zExceptions import Unauthorized
 import Acquisition
 
 # Simple views
+
+class SilvaErrorSupplement(object):
+    """Add more information about an error on a view in a traceback.
+    """
+
+    def __init__(self, klass, full_information=False):
+        self.context = klass.context
+        self.request = klass.request
+        self.klass = klass
+        self.full_information = full_information
+
+    def getInfo(self, as_html=0):
+        object_path = '/'.join(self.context.getPhysicalPath())
+        info = list()
+        info.append((u'Class', '%s.%s' % (
+                    self.klass.__module__, self.klass.__class__.__name__)))
+        info.append((u'Object path', object_path,))
+        info.append((u'Object type', getattr(self.context, 'meta_type', None,)))
+        if self.full_information:
+            request_value = lambda x: self.request.get(x, 'n/a')
+            info.append((u'Request URL',
+                         request_value('URL'),))
+            info.append((u'Request method',
+                         request_value('method'),))
+            info.append((u'Authenticated user',
+                         request_value('AUTHENTICATED_USER'),))
+            info.append((u'User-agent',
+                         request_value('HTTP_USER_AGENT'),))
+            info.append((u'Referer',
+                         request_value('HTTP_REFERER'),))
+
+        if not as_html:
+            return '   - ' + '\n   - '.join(map(lambda x: '%s: %s' % x, info))
+
+        from cgi import escape
+        return u'<p>Extra information:<br /><li>%s</li></p>' % ''.join(map(
+            lambda x: u'<li><b>%s</b>: %s</li>' % (
+                escape(str(x[0])), escape(str(x[1]))),
+            info))
+
 
 class SilvaGrokView(grok.View):
     """Grok View on Silva objects.
@@ -51,12 +91,24 @@ class SilvaGrokView(grok.View):
                 return self, (request.method,)
         return super(SilvaGrokView, self).browserDefault(request)
 
+    def setHTTPHeaders(self):
+        headers = component.queryMultiAdapter(
+            (self.context, self.request), IHTTPResponseHeaders)
+        if headers is not None:
+            headers.set_headers()
+
     def HEAD(self):
         """Reply to HEAD requests.
         """
-        zope.component.getMultiAdapter(
-            (self.context, self.request), IHTTPResponseHeaders)()
+        self.setHTTPHeaders()
         return ''
+
+    def __call__(self):
+        """Render the view.
+        """
+        __traceback_supplement__ = (SilvaErrorSupplement, self, False)
+        self.setHTTPHeaders()
+        return super(SilvaGrokView, self).__call__()
 
     def redirect(self, url):
         # Override redirect to send status information if there is.
@@ -119,8 +171,9 @@ class SMIView(SilvaGrokView):
 
         # Set model on request like silvaviews
         self.request['model'] = self._silvaContext
-        # Set id on template some macros uses template/id
-        self.template._template.id = self.__view_name__
+        if hasattr(self, 'template') and self.template is not None:
+            # Set id on template some macros uses template/id
+            self.template._template.id = self.__view_name__
 
     @CachedProperty
     def _silvaContext(self):
@@ -188,6 +241,12 @@ class Layout(BaseLayout):
     grok.baseclass()
     grok.context(ISilvaObject)
 
+    def __call__(self, view):
+        """Render the layout.
+        """
+        __traceback_supplement__ = (SilvaErrorSupplement, self, False)
+        return super(Layout, self).__call__(view)
+
 
 class Page(BasePage):
     """A page class using a layout to render itself.
@@ -196,6 +255,12 @@ class Page(BasePage):
     grok.baseclass()
     grok.context(ISilvaObject)
     grok.require('zope2.View')
+
+    def __call__(self):
+        """Render the page.
+        """
+        __traceback_supplement__ = (SilvaErrorSupplement, self, True)
+        return super(Page, self).__call__()
 
 
 class View(SilvaGrokView):
