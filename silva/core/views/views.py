@@ -28,6 +28,46 @@ from AccessControl import getSecurityManager
 
 # Simple views
 
+class SilvaErrorSupplement(object):
+    """Add more information about an error on a view in a traceback.
+    """
+
+    def __init__(self, klass, full_information=False):
+        self.context = klass.context
+        self.request = klass.request
+        self.klass = klass
+        self.full_information = full_information
+
+    def getInfo(self, as_html=0):
+        object_path = '/'.join(self.context.getPhysicalPath())
+        info = list()
+        info.append((u'Class', '%s.%s' % (
+                    self.klass.__module__, self.klass.__class__.__name__)))
+        info.append((u'Object path', object_path,))
+        info.append((u'Object type', getattr(self.context, 'meta_type', None,)))
+        if self.full_information:
+            request_value = lambda x: self.request.get(x, 'n/a')
+            info.append((u'Request URL',
+                         request_value('URL'),))
+            info.append((u'Request method',
+                         request_value('method'),))
+            info.append((u'Authenticated user',
+                         request_value('AUTHENTICATED_USER'),))
+            info.append((u'User-agent',
+                         request_value('HTTP_USER_AGENT'),))
+            info.append((u'Referer',
+                         request_value('HTTP_REFERER'),))
+
+        if not as_html:
+            return '   - ' + '\n   - '.join(map(lambda x: '%s: %s' % x, info))
+
+        from cgi import escape
+        return u'<p>Extra information:<br /><li>%s</li></p>' % ''.join(map(
+            lambda x: u'<li><b>%s</b>: %s</li>' % (
+                escape(str(x[0])), escape(str(x[1]))),
+            info))
+
+
 class SilvaGrokView(grok.View):
     """Grok View on Silva objects.
     """
@@ -63,6 +103,7 @@ class SilvaGrokView(grok.View):
     def __call__(self):
         """Render the view.
         """
+        __traceback_supplement__ = (SilvaErrorSupplement, self, False)
         self.setHTTPHeaders()
         return super(SilvaGrokView, self).__call__()
 
@@ -178,6 +219,12 @@ class Layout(BaseLayout):
     grok.baseclass()
     grok.context(ISilvaObject)
 
+    def __call__(self, view):
+        """Render the layout.
+        """
+        __traceback_supplement__ = (SilvaErrorSupplement, self, False)
+        return super(Layout, self).__call__(view)
+
 
 class Page(BasePage):
     """A page class using a layout to render itself.
@@ -186,6 +233,12 @@ class Page(BasePage):
     grok.baseclass()
     grok.context(ISilvaObject)
     grok.require('zope2.View')
+
+    def __call__(self):
+        """Render the page.
+        """
+        __traceback_supplement__ = (SilvaErrorSupplement, self, True)
+        return super(Page, self).__call__()
 
 
 class View(SilvaGrokView):
