@@ -201,6 +201,9 @@ class SMIView(SilvaGrokView):
             return name.get(tab_class, default=default_view_name)
         return 'tab_edit'
 
+    def __call__(self, **kwargs):
+        return super(SMIView, self).__call__()
+
     def namespace(self):
         # This add to the template namespace global variable used in
         # Zope 2 and Silva templates.  Here should be bind at the
