@@ -37,5 +37,6 @@ setup(name='silva.core.views',
               'five.megrok.layout',
               'plone.z3cform > 0.5.2',
               'silva.core.conf',
+              'silva.translations',
               ],
       )

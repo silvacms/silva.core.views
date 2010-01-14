@@ -3,21 +3,21 @@
 # See also LICENSE.txt
 # $Id$
 
+from zope import schema
 from zope.contentprovider.interfaces import IContentProvider \
     as IBaseContentProvider
 from zope.interface import Interface, Attribute
 from zope.publisher.interfaces.browser import IBrowserRequest
 from zope.traversing.browser.interfaces import IAbsoluteURL
 from zope.viewlet.interfaces import IViewlet as IBaseViewlet
-from grokcore.viewlet.interfaces import IViewletManager as IBaseViewletManager
-from zope import schema
 
 from grokcore.view.interfaces import IGrokView
+from grokcore.viewlet.interfaces import IViewletManager as IBaseViewletManager
 from z3c.form.interfaces import IButton, ISubForm as IBaseSubForm
 
 from silva.core.conf import schema as silvaschema
+from silva.translations import translate as _
 
-from Products.Silva.i18n import translate as _
 
 # Preview layer
 
