@@ -4,24 +4,23 @@
 # $Id$
 
 from zope.formlib import form
-from zope import event, component
-from zope import lifecycleevent
+from zope import component, event, lifecycleevent
 
 from Products.Five.formlib import formbase
-from Products.Silva.i18n import translate as _
-from silva.core.interfaces import IVersionedContent, ISilvaObject
 from Products.Silva.ViewCode import ViewCode
 
+from silva.core.interfaces import IVersionedContent, ISilvaObject
 from silva.core.views.baseforms import SilvaMixinForm, SilvaMixinAddForm, \
     SilvaMixinEditForm
 from silva.core.views.views import SMIView
 from silva.core.views.interfaces import IDefaultAddFields, ISilvaFormlibForm, \
     IHTTPResponseHeaders
+from silva.translations import translate as _
 
+from five import grok
 from five.grok.components import GrokForm
 from five.megrok.layout import Form as BasePageForm
 from megrok.layout.interfaces import IPage
-from five import grok
 
 # Forms
 

@@ -3,20 +3,20 @@
 # See also LICENSE.txt
 # $Id$
 
-from zope.configuration.name import resolve
-from zope.component import queryMultiAdapter
+from five import grok
 from zope import interface
+from zope.component import queryMultiAdapter
+from zope.configuration.name import resolve
 import zope.cachedescriptors.property
 
-from Products.Silva.i18n import translate as _
-from silva.core.interfaces import IVersionedContent
 from Products.Silva.ExtensionRegistry import extensionRegistry
 from AccessControl import getSecurityManager
 
-from five import grok
-
-from silva.core.views.interfaces import IFeedback, IDefaultAddFields
 from silva.core.conf.utils import getFactoryName
+from silva.core.interfaces import IVersionedContent
+from silva.core.views.interfaces import IFeedback, IDefaultAddFields
+from silva.translations import translate as _
+
 
 class SilvaMixinForm(object):
     """Silva grok form mixin.

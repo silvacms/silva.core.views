@@ -4,31 +4,32 @@
 # $Id$
 
 from zope import interface, component, event, schema, lifecycleevent
-
-from Products.Silva.i18n import translate as _
-from Products.Silva.ViewCode import ViewCode
 from ZODB.POSException import ConflictError
 
+from Products.Silva.ViewCode import ViewCode
+
+from five import grok
+from five.megrok.z3cform.components import GrokForm
+from grokcore.view.meta.views import default_view_name
+import grokcore.view
+import grokcore.viewlet.util
+
+from plone.z3cform import converter
+from plone.z3cform.widget import singlecheckboxwidget_factory
+from z3c.form import form, button, field
+from z3c.form.interfaces import DISPLAY_MODE, INPUT_MODE, NOVALUE
+import z3c.form.converter
+import z3c.form.interfaces
+
+from silva.core.conf import schema as silvaschema
+from silva.core.interfaces import IVersionedContent
 from silva.core.views.interfaces import ISilvaZ3CFormForm, IDefaultAddFields, \
     ICancelButton, ISilvaStyle, INoCancelButton, ISubForm
 from silva.core.views.views import SMIView
 from silva.core.views.baseforms import SilvaMixinForm, SilvaMixinAddForm, \
     SilvaMixinEditForm
-from silva.core.interfaces import IVersionedContent
-from silva.core.conf import schema as silvaschema
+from silva.translations import translate as _
 
-import grokcore.view
-import grokcore.viewlet.util
-from grokcore.view.meta.views import default_view_name
-from five import grok
-
-from five.megrok.z3cform.components import GrokForm
-from z3c.form import form, button, field
-from plone.z3cform import converter
-from plone.z3cform.widget import singlecheckboxwidget_factory
-from z3c.form.interfaces import DISPLAY_MODE, INPUT_MODE, NOVALUE
-import z3c.form.interfaces
-import z3c.form.converter
 
 # Base class to grok forms
 
