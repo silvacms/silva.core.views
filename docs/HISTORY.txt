@@ -1,8 +1,13 @@
 Changelog
 =========
 
-2.2b1 - (2010-01-22)
---------------------
+2.2 (unreleased)
+----------------
+
+* ...
+
+2.2b1 (2010-01-22)
+------------------
 
 * Add some support to set HTTP headers on content and views.
 
@@ -25,8 +30,8 @@ Changelog
 * Use silva.translations for translations support.
 
 
-2.2a2 - (2009-01-12)
---------------------
+2.2a2 (2009-01-12)
+------------------
 
 * Add generic ZMI form.
 
@@ -35,8 +40,8 @@ Changelog
 * Use five.grok viewlets instead of a local implementation.
 
 
-2.2a1 - (2008-11-18)
---------------------
+2.2a1 (2008-11-18)
+------------------
 
 * Initial release
 
