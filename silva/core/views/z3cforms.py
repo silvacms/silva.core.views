@@ -11,14 +11,12 @@ from Products.Silva.ViewCode import ViewCode
 from five import grok
 from five.megrok.z3cform.components import GrokForm
 from grokcore.view.meta.views import default_view_name
-import grokcore.view
 import grokcore.viewlet.util
 
 from plone.z3cform import converter
 from plone.z3cform.widget import singlecheckboxwidget_factory
 from z3c.form import form, button, field
 from z3c.form.interfaces import DISPLAY_MODE, INPUT_MODE, NOVALUE
-import z3c.form.converter
 import z3c.form.interfaces
 
 from silva.core.conf import schema as silvaschema

@@ -1,18 +1,28 @@
 Changelog
 =========
 
-2.2b1 - (unreleased)
+2.2b1 - (2010-01-22)
 --------------------
+
+* Add some support to set HTTP headers on content and views.
+
+* Manage HEAD requests on content and views.
+
+* Create a layout support by using five.megrok.layout.
+
+* Add support to create public forms.
 
 * Add the possibility to change widget rendering style between
   different z3c forms.
 
-* Improve form templates, more support for status messages.
+* Improve form and form templates, more support for status messages.
 
 * Add the possiblity to remove the cancel button on z3c forms by using
   an interface.
 
 * SMI forms should be registered on the SMI layer.
+
+* Use silva.translations for translations support.
 
 
 2.2a2 - (2009-01-12)
