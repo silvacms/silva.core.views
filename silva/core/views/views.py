@@ -3,11 +3,11 @@
 # See also LICENSE.txt
 # $Id$
 
+from zope import component
 from zope.cachedescriptors.property import CachedProperty
 from zope.i18n import translate
 from zope.publisher.publish import mapply
 from zope.viewlet.interfaces import IViewletManager
-import zope.component
 
 from grokcore.view.meta.views import default_view_name
 import urllib
@@ -227,7 +227,7 @@ class SMIView(SilvaGrokView):
         # XXX should be removed when Silva stop to do stupid with view
         # in templates
         context = self._silvaContext
-        provider =  zope.component.getMultiAdapter(
+        provider =  component.getMultiAdapter(
             (context, self.request, self), name=name)
         provider = provider.__of__(context)
         provider.update()
