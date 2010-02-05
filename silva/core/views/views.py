@@ -167,10 +167,8 @@ class SMIView(SilvaGrokView):
         super(SMIView, self).__init__(context, request)
 
         # Set model on request like silvaviews
+        # XXX: to remove
         self.request['model'] = self._silvaContext
-        if hasattr(self, 'template') and self.template is not None:
-            # Set id on template some macros uses template/id
-            self.template._template.id = self.__view_name__
 
     @CachedProperty
     def _silvaContext(self):

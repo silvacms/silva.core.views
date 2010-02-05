@@ -32,9 +32,8 @@ class SilvaMixinForm(object):
         super(SilvaMixinForm, self).__init__(context, request)
 
         # Set model on request like SilvaViews
+        # XXX: to be removed
         self.request['model'] = self._silvaContext
-        # Set id on template some macros uses template/id
-        self.template._template.id = self.__view_name__
 
         # Default feedback
         self._status_type = None
@@ -88,7 +87,7 @@ class SilvaMixinAddForm(object):
         obj_id = str(data['id'])
         factory(parent, obj_id, data['title'])
         obj = getattr(parent, obj_id)
-        
+
         #now move to position, if 'add_object_position' is in the request
         position = self.request.get('add_object_position', None)
         if position:
