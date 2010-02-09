@@ -78,13 +78,13 @@ class SilvaGrokView(grok.View):
         return self.context.getPhysicalPath() + ('/@@' + self.__name__,)
 
     def publishTraverse(self, request, name):
-        if request.method == name and hasattr(self.aq_base, name):
-            return getattr(self.aq_base, name)
+        if request.method == name and hasattr(self, name):
+            return getattr(self, name)
         return super(SilvaGrokView, self).publishTraverse(request, name)
 
     def browserDefault(self, request):
         if request.method in ('HEAD',):
-            if hasattr(self.aq_base, request.method):
+            if hasattr(self, request.method):
                 return self, (request.method,)
         return super(SilvaGrokView, self).browserDefault(request)
 

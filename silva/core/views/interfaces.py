@@ -199,7 +199,7 @@ class IVirtualSite(Interface):
         """Return the virtual root or None.
         """
 
-    def get_virtal_path():
+    def get_virtual_path():
         """Return the virtual path or None.
         """
 
@@ -220,6 +220,6 @@ class IHTTPResponseHeaders(Interface):
 
     def __call__(**headers):
         """Set headers on the response
-        
+
         method should accept **kwargs argument to override headers
         """
