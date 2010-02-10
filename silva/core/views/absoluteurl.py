@@ -75,3 +75,28 @@ class AbsoluteURL(BrowserView):
 
         return base
 
+
+class TestAbsoluteURL(BrowserView):
+    """An absolute URL provider for TestRequest. This is mainly to get
+    test working.
+    """
+
+    implements(ISilvaURL)
+
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+
+    def url(self, preview=False):
+        return u'http://localhost/root'
+
+    def preview(self):
+        return self.url(preview=True)
+
+    def __str__(self):
+        return self.url()
+
+    __call__ = __repr__ = __unicode__ = __str__
+
+    def breadcrumbs(self):
+        return tuple()

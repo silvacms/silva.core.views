@@ -19,6 +19,11 @@ from silva.core.conf import schema as silvaschema
 from silva.translations import translate as _
 
 
+class ITestRequest(IBrowserRequest):
+    """Marker interface to mark a TestRequest.
+    """
+
+
 # Preview layer
 
 class IPreviewLayer(IBrowserRequest):
