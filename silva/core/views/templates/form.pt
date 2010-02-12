@@ -43,7 +43,7 @@
 
             <td class="main">
               <form method="post" name="silvaObjects" action="#"
-                    tal:attributes="action template/id">
+                    tal:attributes="action view/__name__">
                 <table class="listing"
                        tal:define="have_widgets nocall:view/widgets">
                   <thead>

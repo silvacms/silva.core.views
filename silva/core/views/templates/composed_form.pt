@@ -26,7 +26,7 @@
               <metal:use-macro use-macro="here/macro_vein_navigation/macros/vein">
                 <metal:fill-slot fill-slot="sidebar">
                   <tal:block
-                    tal:define="template_id template/id"
+                    tal:define="template_id view/__name__"
                     tal:replace="structure python: here.service_sidebar.render(model, template_id, vein)" />
                 </metal:fill-slot>
               </metal:use-macro>
