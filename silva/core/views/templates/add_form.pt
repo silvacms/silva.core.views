@@ -10,15 +10,18 @@
                   active_tab view/active_tab;"
       i18n:domain="silva">
 
-  <metal:use-macro use-macro="here/macro_index/macros/master">
+  <metal:use-macro metal:use-macro="here/macro_index/macros/master">
 
-    <metal:fill-add-slot fill-slot="main">
-<script type="text/javascript"
-  tal:define="
-    metatype request/meta_type;
-    focusfield python:metatype == 'Silva Image' and 'form.widgets.title' or 'form.widgets.id'"
-  tal:content="structure python:here.focus_editor(focusfield)"
-/>
+    <metal:resources metal:fill-slot="style">
+      <!-- Temporary fix -->
+      <tal:resource tal:replace="structure provider:resources" />
+    </metal:resources>
+
+    <metal:main metal:fill-slot="main">
+      <script type="text/javascript"
+              tal:define="metatype request/meta_type;
+                          focusfield python:metatype == 'Silva Image' and 'form.widgets.title' or 'form.widgets.id'"
+              tal:content="structure python:here.focus_editor(focusfield)"              />
       <div class="focus-rectangle">
         <form method="post"
               action="add_object"
@@ -27,7 +30,7 @@
               tal:define="meta_type request/meta_type">
           <input type="hidden" name="meta_type"
                  tal:attributes="value meta_type" />
-          <input name="add_object_position" type="hidden" 
+          <input name="add_object_position" type="hidden"
                  tal:condition="request/add_object_position|nothing"
                  tal:attributes="value request/add_object_position|nothing" />
           <table class="listing">
@@ -72,7 +75,7 @@
           </table>
         </form>
       </div>
-    </metal:fill-add-slot>
+    </metal:main>
 
   </metal:use-macro>
 
