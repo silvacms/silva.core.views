@@ -13,7 +13,6 @@
   <metal:use-macro metal:use-macro="here/macro_index/macros/master">
 
     <metal:resources metal:fill-slot="style">
-      <!-- Temporary fix -->
       <tal:resource tal:replace="structure provider:resources" />
     </metal:resources>
 

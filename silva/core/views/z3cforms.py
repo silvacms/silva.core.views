@@ -4,8 +4,11 @@
 # $Id$
 
 from zope import interface, component, event, schema, lifecycleevent
+from zope.schema.interfaces import IField
 from ZODB.POSException import ConflictError
 
+from Acquisition import aq_base
+from AccessControl import ZopeGuards
 from Products.Silva.ViewCode import ViewCode
 
 from five import grok
@@ -15,12 +18,12 @@ import grokcore.viewlet.util
 
 from plone.z3cform import converter
 from plone.z3cform.widget import singlecheckboxwidget_factory
-from z3c.form import form, button, field
+from z3c.form import form, button, field, datamanager
 from z3c.form.interfaces import DISPLAY_MODE, INPUT_MODE, NOVALUE
 import z3c.form.interfaces
 
 from silva.core.conf import schema as silvaschema
-from silva.core.interfaces import IVersionedContent
+from silva.core.interfaces import IVersionedContent, ISilvaObject, IVersion
 from silva.core.views.interfaces import ISilvaZ3CFormForm, IDefaultAddFields, \
     ICancelButton, ISilvaStyle, INoCancelButton, ISubForm
 from silva.core.views.views import SMIView
@@ -585,3 +588,49 @@ class FileUploadDataConverter(
 
     def toWidgetValue(self, value):
         return super(FileUploadDataConverter, self).toFieldValue(value)
+
+
+class SilvaDataManager(datamanager.AttributeField, grok.MultiAdapter):
+    grok.adapts(ISilvaObject, IField)
+
+    def get(self):
+        context = self.context
+        name = self.field.__name__
+        if hasattr(aq_base(context), 'get_%s' % name):
+            getter = getattr(context, 'get_%s' % name)
+            return getter()
+        if not hasattr(aq_base(context), name):
+            # For Acquisition
+            raise AttributeError(name)
+        return getattr(context, name)
+
+    def set(self, value):
+        context = self.context
+        name = self.field.__name__
+        if hasattr(aq_base(context), 'set_%s' % name):
+            setter = getattr(context, 'set_%s' % name)
+            return setter(value)
+        return setattr(context, name, value)
+
+    def _authorized(self, attribute):
+        try:
+            ZopeGuards.guarded_getattr(self.context, attribute)
+            return True
+        except:
+            return False
+
+    def canAccess(self):
+        name = self.field.__name__
+        if hasattr(aq_base(self.context), 'get_%s' % name):
+            return self._authorized('get_%s' % name)
+        return self._authorized(name)
+
+    def canWrite(self):
+        name = self.field.__name__
+        if hasattr(aq_base(self.context), 'set_%s' % name):
+            return self._authorized('set_%s' % name)
+        return self._authorized(name)
+
+
+class VersionDataManager(SilvaDataManager):
+    grok.adapts(IVersion, IField)
