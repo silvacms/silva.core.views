@@ -47,6 +47,11 @@
                   </h2>
                 </td>
               </tr>
+              <tr tal:condition="view/description | nothing">
+                <td colspan="2"
+                    tal:content="view/description">
+                </td>
+              </tr>
               <tr>
                 <th style="width:33%"
                     i18n:translate="">
