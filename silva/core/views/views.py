@@ -3,7 +3,7 @@
 # See also LICENSE.txt
 # $Id$
 
-from zope import component
+from zope import component, interface
 from zope.cachedescriptors.property import CachedProperty
 from zope.i18n import translate
 from zope.viewlet.interfaces import IViewletManager
@@ -71,7 +71,6 @@ class SilvaErrorSupplement(object):
 class SilvaGrokView(grok.View):
     """Grok View on Silva objects.
     """
-
     grok.baseclass()
 
     def getPhysicalPath(self):
@@ -127,7 +126,6 @@ class SilvaGrokView(grok.View):
 class ZMIView(SilvaGrokView):
     """View in ZMI.
     """
-
     grok.baseclass()
     grok.require('zope2.ViewManagementScreens')
     grok.implements(IZMIView)
@@ -136,7 +134,6 @@ class ZMIView(SilvaGrokView):
 class ZMIForm(grok.Form, ZMIView):
     """A simple form in ZMI.
     """
-
     grok.baseclass()
 
     # ZMI Templates requires Zope2 engine.
@@ -146,7 +143,6 @@ class ZMIForm(grok.Form, ZMIView):
 class ZMIEditForm(grok.EditForm, ZMIView):
     """An edit form in ZMI.
     """
-
     grok.baseclass()
 
     # ZMI Templates requires Zope2 engine.
@@ -156,7 +152,6 @@ class ZMIEditForm(grok.EditForm, ZMIView):
 class SMIView(SilvaGrokView):
     """A view in SMI.
     """
-
     grok.baseclass()
     grok.context(ISilvaObject)
     grok.implements(ISMIView)
@@ -216,7 +211,6 @@ class SMIView(SilvaGrokView):
 class Layout(BaseLayout):
     """A layout object.
     """
-
     grok.baseclass()
     grok.context(ISilvaObject)
 
@@ -230,7 +224,6 @@ class Layout(BaseLayout):
 class Page(BasePage):
     """A page class using a layout to render itself.
     """
-
     grok.baseclass()
     grok.context(ISilvaObject)
     grok.require('zope2.View')
@@ -245,7 +238,6 @@ class Page(BasePage):
 class View(SilvaGrokView):
     """View on Silva object, support view and preview
     """
-
     grok.baseclass()
     grok.context(ISilvaObject)
     grok.implements(IView)
@@ -287,7 +279,6 @@ class ViewletLayoutSupport(object):
 class ViewletManager(ViewletLayoutSupport, grok.ViewletManager):
     """A viewlet manager in Silva.
     """
-
     grok.baseclass()
     grok.context(ISilvaObject)
     grok.implements(IViewletManager)
@@ -297,7 +288,6 @@ class ContentProvider(ViewletManager):
     """A content provider in Silva. In fact it's just a viewlet
     manager...
     """
-
     grok.baseclass()
     grok.context(ISilvaObject)
     grok.implements(IContentProvider)
@@ -311,21 +301,16 @@ class ContentProvider(ViewletManager):
 class Viewlet(ViewletLayoutSupport, grok.Viewlet):
     """A viewlet in Silva
     """
-
     grok.baseclass()
     grok.context(ISilvaObject)
     grok.implements(IViewlet)
     grok.require('zope2.View')
 
 
-
 class SMIPortletManager(ViewletManager):
     """Third SMI column manager.
     """
-
-    grok.view(SMIView)
-
-    template = grok.PageTemplate(filename='templates/smiportletmanager.pt')
+    grok.view(interface.Interface)
 
     def enabled(self):
         return len(self.viewlets) != 0

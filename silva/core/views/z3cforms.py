@@ -3,7 +3,8 @@
 # See also LICENSE.txt
 # $Id$
 
-from zope import interface, component, event, schema, lifecycleevent
+from zope import interface, component, schema, lifecycleevent
+from zope.event import notify
 from zope.schema.interfaces import IField
 from ZODB.POSException import ConflictError
 
@@ -169,8 +170,10 @@ class EditForm(SilvaMixinEditForm, SilvaGrokForm, form.EditForm, SMIView):
             return
         changes = self.applyChanges(data)
         if changes:
+            content = self.getContent()
             self.status = _(u'${meta_type} changed.',
                             mapping={'meta_type': self.context.meta_type,})
+            notify(lifecycleevent.ObjectModifiedEvent(content))
         else:
             self.status = _(u'No changes')
 
@@ -259,8 +262,10 @@ class SubEditForm(SubForm, form.EditForm):
             return
         changes = self.applyChanges(data)
         if changes:
+            content = self.getContent()
             self.status = _(u'${meta_type} changed.',
                             mapping={'meta_type': self.context.meta_type,})
+            notify(lifecycleevent.ObjectModifiedEvent(content))
         else:
             self.status = _(u'No changes')
 
@@ -321,7 +326,7 @@ class CrudAddForm(SubForm):
         except schema.ValidationError, e:
             self.status = e
         else:
-            event.notify(lifecycleevent.ObjectCreatedEvent(item))
+            # ObjectCreatedEvent is sent by factories when the object is built
             self.ignoreRequest = True
             self.status = _(u"Item added successfully.")
 
@@ -432,7 +437,7 @@ class CrudEditForm(SubForm):
                 for widget in  subform.widgets.values():
                     if widget.mode == DISPLAY_MODE:
                         widget.update()
-                        event.notify(widget.AfterWidgetUpdateEvent(widget))
+                        notify(widget.AfterWidgetUpdateEvent(widget))
         self.status = status
 
 
