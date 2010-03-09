@@ -7,6 +7,7 @@ from zope.interface import implements
 from zope.app.container.interfaces import IObjectRemovedEvent
 import zope.component
 
+import Acquisition
 from AccessControl import getSecurityManager
 from AccessControl import Unauthorized
 
@@ -34,8 +35,8 @@ class TTWViewTemplate(ZopePageTemplate):
         self.view = view
         self.permission = permission
         self.name = name
-        super(TTWViewTemplate, self).__init__(id, text, content_type, encoding,
-                                              strict)
+        super(TTWViewTemplate, self).__init__(
+            id, text, content_type, encoding, strict)
 
     def __call__(self, *args):
         #XXX raise a sensible exception if context and request are
@@ -48,11 +49,12 @@ class TTWViewTemplate(ZopePageTemplate):
                                    'required "%s" permission'
                                    % self.permission)
 
-        class_ = makeClass('FrankensteinTTWTemplate',
-                           (TTWViewTemplateRenderer, self.view),
-                           {'__name__': self.name,
-                            '__view_name__': self.name,
-                            'module_info': FakeModuleInfoForGrok(self.view.__module__)})
+        class_ = makeClass(
+            'FrankensteinTTWTemplate',
+            (TTWViewTemplateRenderer, self.view),
+            {'__name__': self.name,
+             '__view_name__': self.name,
+             'module_info': FakeModuleInfoForGrok(self.view.__module__)})
 
         return class_(self, self.view, args)
 
@@ -68,7 +70,8 @@ class FakeModuleInfoForGrok(object):
     def __init__(self, path):
         self.package_dotted_name = path
 
-class TTWViewTemplateRenderer(object):
+
+class TTWViewTemplateRenderer(Acquisition.Implicit):
     """The view object for the TTW View Template.
 
     When a TTWViewTemplate-based view is looked up, an object of this
@@ -76,6 +79,7 @@ class TTWViewTemplateRenderer(object):
     TTWViewTemplate object which it will use in the render process
     (__call__).
     """
+    __allow_access_to_unprotected_subobjects__ = 1
 
     def __init__(self, template, view, args):
         self.template = template
@@ -89,7 +93,6 @@ class TTWViewTemplateRenderer(object):
     def render(self, *args, **kwargs):
         """Render the view
         """
-
         # we need to override the template's context and request as
         # they generally point to the wrong objects (a template's
         # context usually is what it was acquired from, which isn't
@@ -107,19 +110,12 @@ class TTWViewTemplateRenderer(object):
         return self.template._exec(bound_names, args, kwargs)
 
 
-    def __getitem__(self, name):
-        # In Five, __getitem__ is define to look on index. We don't
-        # have index, so we use template.
-        if name == 'macros':
-            return self.template.macros
-        return self.template.macros[name]
-
 
 @silvaconf.subscribe(TTWViewTemplate, IObjectRemovedEvent)
 def unregisterViewWhenZPTIsDeleted(template, event):
     components = zope.component.getSiteManager(template)
-    for reg in components.registeredAdapters():
-        if reg.factory == template:
-            components.unregisterAdapter(reg.factory, reg.required,
-                                         reg.provided, reg.name)
+    for view in components.registeredAdapters():
+        if view.factory == template:
+            components.unregisterAdapter(
+                view.factory, view.required, view.provided, view.name)
             break
