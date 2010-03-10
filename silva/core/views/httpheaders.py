@@ -13,12 +13,13 @@ class ResponseHeaderHandler(grok.MultiAdapter):
         self.context = context
         self.request = request
         self.response = request.response
-        self.response.setHeader('Content-Type', 'text/html;charset=utf-8')
 
     def cache_headers(self):
         pass
 
     def other_headers(self, headers):
+        if 'Content-Type' not in headers:
+            headers['Content-Type'] = 'text/html;charset=utf-8'
         for key, value in headers.items():
             self.response.setHeader(key, value)
 
