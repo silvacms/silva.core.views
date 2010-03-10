@@ -39,8 +39,8 @@ class SilvaPublishTraverse(DefaultPublishTraverse):
         # We don't want to lookup five views if we have other than a
         # GET or POST request.
         if request.method in ('GET', 'HEAD',):
-            response_headers = getMultiAdapter((self.context, self.request),
-                                                IHTTPResponseHeaders)
+            response_headers = getMultiAdapter(
+                (self.context, self.request), IHTTPResponseHeaders)
             response_headers()
         if request.method in ('GET', 'POST',):
             return super(SilvaPublishTraverse, self).browserDefault(request)
@@ -58,5 +58,6 @@ class SilvaHead(object):
     def HEAD(self, *args, **kw):
         """Return empty response body
         """
+        self.request.response.setHeader('Content-Length', '0')
         return ""
 
