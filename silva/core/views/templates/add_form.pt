@@ -12,10 +12,6 @@
 
   <metal:use-macro metal:use-macro="here/macro_index/macros/master">
 
-    <metal:resources metal:fill-slot="style">
-      <tal:resource tal:replace="structure provider:resources" />
-    </metal:resources>
-
     <metal:main metal:fill-slot="main">
       <script type="text/javascript"
               tal:define="metatype request/meta_type;
