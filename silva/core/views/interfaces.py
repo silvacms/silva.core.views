@@ -187,40 +187,49 @@ class ISilvaStyle(Interface):
 # Adapters
 
 class IVirtualSite(Interface):
+    """This adapts the request and let you access the root object of
+    the current site. If Virtual Host Monster, the root object for
+    your might not be your Silva root.
+    """
 
     def get_root():
-        """Return the virtual root of the current site.
+        """Return the root of the current site, which will be either
+        the virtual root or the Silva if Virtual Host Monster
+        rewriting is used for the request, and where.
         """
 
     def get_root_url():
-        """
+        """Return the URL of the root of the current site.
         """
 
     def get_silva_root():
-        """
+        """Return the Silva root.
         """
 
     def get_virtual_root():
-        """Return the virtual root or None.
+        """Return the virtual root defined by the Virtual Host Monster
+        or None.
         """
 
     def get_virtual_path():
-        """Return the virtual path or None.
+        """Return the path to the virtual defined by the Virtual Host
+        Monster or None.
         """
 
 
 class IHTTPResponseHeaders(Interface):
-    """ Set some headers on the response from the context
+    """Adapter on a context and a request which is used to set HTTP
+    headers on the response.
 
     Headers can be cache control settings, ...
     """
 
     def cache_headers():
-        """ Set the cache and Last modified settings
+        """ Set the cache and Last modified settings.
         """
 
     def other_headers(headers):
-        """ Set other headers
+        """ Set other headers.
         """
 
     def __call__(**headers):
