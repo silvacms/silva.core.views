@@ -33,7 +33,7 @@ class SilvaMixinForm(object):
 
         # Set model on request like SilvaViews
         # XXX: to be removed
-        self.request['model'] = self._silvaContext
+        # self.request['model'] = self._silvaContext
 
         # Default feedback
         self._status_type = None

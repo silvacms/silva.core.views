@@ -36,7 +36,6 @@ class SilvaErrorSupplement(object):
         self.context = klass.context
         self.request = klass.request
         self.klass = klass
-        self.full_information = full_information
 
     def getInfo(self, as_html=0):
         object_path = '/'.join(self.context.getPhysicalPath())
@@ -45,19 +44,6 @@ class SilvaErrorSupplement(object):
                     self.klass.__module__, self.klass.__class__.__name__)))
         info.append((u'Object path', object_path,))
         info.append((u'Object type', getattr(self.context, 'meta_type', None,)))
-        if self.full_information:
-            request_value = lambda x: self.request.get(x, 'n/a')
-            info.append((u'Request URL',
-                         request_value('URL'),))
-            info.append((u'Request method',
-                         request_value('method'),))
-            info.append((u'Authenticated user',
-                         request_value('AUTHENTICATED_USER'),))
-            info.append((u'User-agent',
-                         request_value('HTTP_USER_AGENT'),))
-            info.append((u'Referer',
-                         request_value('HTTP_REFERER'),))
-
         if not as_html:
             return '   - ' + '\n   - '.join(map(lambda x: '%s: %s' % x, info))
 
@@ -102,7 +88,7 @@ class SilvaGrokView(grok.View):
     def __call__(self):
         """Render the view.
         """
-        __traceback_supplement__ = (SilvaErrorSupplement, self, False)
+        __traceback_supplement__ = (SilvaErrorSupplement, self)
         self.setHTTPHeaders()
         return super(SilvaGrokView, self).__call__()
 
@@ -163,20 +149,20 @@ class SMIView(SilvaGrokView):
 
         # Set model on request like silvaviews
         # XXX: to remove
-        self.request['model'] = self._silvaContext
+        # self.request['model'] = self._silvaContext
 
-    @CachedProperty
-    def _silvaContext(self):
-        context = self.context
-        while not ISilvaObject.providedBy(context) and \
-                hasattr(context, 'context'):
-            context = context.context
-        return context.aq_inner
+    # @CachedProperty
+    # def _silvaContext(self):
+    #     context = self.context
+    #     while not ISilvaObject.providedBy(context) and \
+    #             hasattr(context, 'context'):
+    #         context = context.context
+    #     return context.aq_inner
 
     def _silvaView(self):
         # Lookup the correct Silva edit view so forms are able to use
         # silva macros.
-        context = self._silvaContext
+        context = self.request['model']
         return getSilvaViewFor(self.context, 'edit', context)
 
     @property
@@ -205,7 +191,7 @@ class SMIView(SilvaGrokView):
         view = self._silvaView()
         return {'here': view,
                 'user': getSecurityManager().getUser(),
-                'container': self._silvaContext.aq_inner,}
+                'container': self.request['model'],}
 
 
 class Layout(BaseLayout):
@@ -217,7 +203,7 @@ class Layout(BaseLayout):
     def __call__(self, view):
         """Render the layout.
         """
-        __traceback_supplement__ = (SilvaErrorSupplement, self, False)
+        __traceback_supplement__ = (SilvaErrorSupplement, self)
         return super(Layout, self).__call__(view)
 
 
@@ -231,7 +217,7 @@ class Page(BasePage):
     def __call__(self):
         """Render the page.
         """
-        __traceback_supplement__ = (SilvaErrorSupplement, self, True)
+        __traceback_supplement__ = (SilvaErrorSupplement, self)
         return super(Page, self).__call__()
 
 
