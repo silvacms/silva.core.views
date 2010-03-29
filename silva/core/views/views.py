@@ -144,21 +144,6 @@ class SMIView(SilvaGrokView):
 
     vein = 'contents'
 
-    def __init__(self, context, request):
-        super(SMIView, self).__init__(context, request)
-
-        # Set model on request like silvaviews
-        # XXX: to remove
-        # self.request['model'] = self._silvaContext
-
-    # @CachedProperty
-    # def _silvaContext(self):
-    #     context = self.context
-    #     while not ISilvaObject.providedBy(context) and \
-    #             hasattr(context, 'context'):
-    #         context = context.context
-    #     return context.aq_inner
-
     def _silvaView(self):
         # Lookup the correct Silva edit view so forms are able to use
         # silva macros.
