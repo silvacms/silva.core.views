@@ -62,7 +62,7 @@
                     </tr>
                     <tr class="odd" tal:condition="view/description">
                       <td class="designator" colspan="2"
-                          tal:content="view/description">
+                          tal:content="structure view/description">
                       </td>
                     </tr>
                     <tr tal:condition="have_widgets">
