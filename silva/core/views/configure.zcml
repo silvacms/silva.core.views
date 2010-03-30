@@ -45,20 +45,36 @@
 
   <!-- AbsoluteURL views -->
   <view
-    for="silva.core.interfaces.ISilvaObject"
-    factory=".absoluteurl.AbsoluteURL"
-    type="zope.publisher.interfaces.http.IHTTPRequest"
-    permission="zope.Public"
-    provides=".interfaces.ISilvaURL"
-  />
+     for="silva.core.interfaces.ISilvaObject"
+     factory=".absoluteurl.AbsoluteURL"
+     type="zope.publisher.interfaces.http.IHTTPRequest"
+     permission="zope.Public"
+     provides=".interfaces.ISilvaURL"
+     />
 
   <browser:page
-    for="silva.core.interfaces.ISilvaObject"
-    name="absolute_url"
-    class=".absoluteurl.AbsoluteURL"
-    permission="zope.Public"
-    allowed_interface=".interfaces.ISilvaURL"
-  />
+     for="silva.core.interfaces.ISilvaObject"
+     name="absolute_url"
+     class=".absoluteurl.AbsoluteURL"
+     permission="zope.Public"
+     allowed_interface=".interfaces.ISilvaURL"
+     />
+
+  <view
+     for="silva.core.interfaces.IVersion"
+     factory=".absoluteurl.VersionAbsoluteURL"
+     type="zope.publisher.interfaces.http.IHTTPRequest"
+     permission="zope.Public"
+     provides=".interfaces.ISilvaURL"
+     />
+
+  <browser:page
+     for="silva.core.interfaces.IVersion"
+     name="absolute_url"
+     class=".absoluteurl.VersionAbsoluteURL"
+     permission="zope.Public"
+     allowed_interface=".interfaces.ISilvaURL"
+     />
 
   <!-- AbsoluteURL views for tests -->
   <class class="zope.publisher.browser.TestRequest">

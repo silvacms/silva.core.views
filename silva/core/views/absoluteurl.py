@@ -10,10 +10,12 @@ from zope.interface import implements
 # Zope 2
 from OFS.interfaces import ITraversable
 from Products.Five import BrowserView
+from Acquisition import aq_parent, aq_inner
 
 from silva.core.interfaces import IRoot, IContent
 
 from silva.core.views.interfaces import IPreviewLayer, ISilvaURL
+
 
 class AbsoluteURL(BrowserView):
     """An adapter for Zope3-style absolute_url using Zope2 methods
@@ -26,8 +28,9 @@ class AbsoluteURL(BrowserView):
     def __init__(self, context, request):
         self.context = context
         self.request = request
+        self._preview_ns = '++preview++'
 
-    def url(self, preview=False, preview_name=''):
+    def url(self, preview=False):
         path = list(self.context.getPhysicalPath())
         # Insert back the preview namespace. Maybe there is a better
         # way to do it, but have to do it by hand here since
@@ -39,14 +42,11 @@ class AbsoluteURL(BrowserView):
             virtual_path = self.request.other.get(
                 'VirtualRootPhysicalPath', ('',))
             preview_pos = max(len(root_path), len(virtual_path))
-            preview_ns = '++preview++'
-            if preview_name:
-                preview_ns += preview_name
-            path.insert(preview_pos, preview_ns)
+            path.insert(preview_pos, self._preview_ns)
         return self.request.physicalPathToURL(path)
 
-    def preview(self, preview_name=''):
-        return self.url(preview=True, preview_name=preview_name)
+    def preview(self):
+        return self.url(preview=True)
 
     def __str__(self):
         return self.url(preview=IPreviewLayer.providedBy(self.request))
@@ -54,8 +54,8 @@ class AbsoluteURL(BrowserView):
     __call__ = __repr__ = __unicode__ = __str__
 
     def breadcrumbs(self):
-        context = self.context.aq_inner
-        container = context.aq_parent
+        context = aq_inner(self.context)
+        container = aq_parent(context)
         request = self.request
 
         name = context.get_short_title()
@@ -80,6 +80,17 @@ class AbsoluteURL(BrowserView):
             base += ({'name': name, 'url': self.__str__()},)
 
         return base
+
+
+class VersionAbsoluteURL(AbsoluteURL):
+    """AbsoluteURL for a version
+    """
+
+    def __init__(self, context, request):
+        # Set context to the object in fact
+        self.context = context.object()
+        self.request = request
+        self._preview_ns = '++preview++' + context.getId()
 
 
 class TestAbsoluteURL(BrowserView):
