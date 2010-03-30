@@ -226,7 +226,7 @@ class View(SilvaGrokView):
         version = None
         if self.is_preview:
             version = self.get_previewable()
-            if version is None:
+        if version is None:
             version = self.get_viewable()
         return version
 
