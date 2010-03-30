@@ -221,7 +221,14 @@ class View(SilvaGrokView):
 
     @CachedProperty
     def content(self):
-        return self.request['model']
+        if 'model' in self.request:
+            return self.request['model']
+        version = None
+        if self.is_preview:
+            version = self.get_previewable()
+            if version is None:
+            version = self.get_viewable()
+        return version
 
     def namespace(self):
         return {'content': self.content}
