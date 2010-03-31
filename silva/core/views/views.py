@@ -225,9 +225,9 @@ class View(SilvaGrokView):
             return self.request['model']
         version = None
         if self.is_preview:
-            version = self.get_previewable()
+            version = self.context.get_previewable()
         if version is None:
-            version = self.get_viewable()
+            version = self.context.get_viewable()
         return version
 
     def namespace(self):
