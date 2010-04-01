@@ -105,7 +105,12 @@ class TestAbsoluteURL(BrowserView):
         self.request = request
 
     def url(self, preview=False):
-        return u'http://localhost/root'
+        path = list(self.context.getPhysicalPath())
+        if len(path) < 2:
+            return u'http://localhost/root'
+        if preview is True:
+            path.insert(1, '++preview++')
+        return u'http://localhost' + '/'.join(path)
 
     def preview(self):
         return self.url(preview=True)
