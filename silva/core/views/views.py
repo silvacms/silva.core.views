@@ -7,6 +7,7 @@ from zope import component, interface
 from zope.cachedescriptors.property import CachedProperty
 from zope.i18n import translate
 from zope.viewlet.interfaces import IViewletManager
+from zope.publisher.interfaces.browser import IBrowserRequest
 
 from grokcore.view.meta.views import default_view_name
 import urllib
@@ -14,6 +15,7 @@ import urllib
 from silva.core.conf.utils import getSilvaViewFor
 from silva.core.interfaces import ISilvaObject
 from silva.core.views.interfaces import IContentProvider, IViewlet
+from silva.core.views.interfaces import ILayoutFactory
 from silva.core.views.interfaces import IFeedback, IZMIView, ISMIView, ISMITab
 from silva.core.views.interfaces import IPreviewLayer
 from silva.core.views.interfaces import IView, IHTTPResponseHeaders
@@ -197,7 +199,7 @@ class LayoutFactory(grok.Adapter):
     grok.adapts(IBrowserRequest, None)
     grok.implements(ILayoutFactory)
 
-    def __init__(request, context):
+    def __init__(self, request, context):
         self.request = request
         self.context = context
 
@@ -226,8 +228,8 @@ class Page(BasePage):
         __traceback_supplement__ = (SilvaErrorSupplement, self)
 
         try:
-            layout_factory = \
-                getMultiAdapter((self.request, self.content,), ILayoutFactory)
+            layout_factory = getMultiAdapter(
+                (self.request, self.content,), ILayoutFactory)
             if layout_factory is not None:
                 layout = layout_factory(self)
                 if layout is None: return

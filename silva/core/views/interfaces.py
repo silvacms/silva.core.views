@@ -237,3 +237,8 @@ class IHTTPResponseHeaders(Interface):
 
         method should accept **kwargs argument to override headers
         """
+
+
+class ILayoutFactory(Interface):
+    """ A factory that lookup the layout and return it
+    """
