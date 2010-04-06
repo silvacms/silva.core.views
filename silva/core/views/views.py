@@ -192,6 +192,27 @@ class Layout(BaseLayout):
         return super(Layout, self).__call__(view)
 
 
+class LayoutFactory(grok.Adapter):
+
+    grok.adapts(IBrowserRequest, None)
+    grok.implements(ILayoutFactory)
+
+    def __init__(request, context):
+        self.request = request
+        self.context = context
+
+    def __call__(self, view):
+        """ Default behavior of megrok.layout Page
+        """
+        mapply(view.update, (), self.request)
+        if self.request.response.getStatus() in (302, 303):
+            # A redirect was triggered somewhere in update().  Don't
+            # continue rendering the template or doing anything else.
+            return
+        return zope.component.getMultiAdapter(
+            (self.request, self.context), ILayout)
+
+
 class Page(BasePage):
     """A page class using a layout to render itself.
     """
@@ -203,7 +224,17 @@ class Page(BasePage):
         """Render the page.
         """
         __traceback_supplement__ = (SilvaErrorSupplement, self)
-        return super(Page, self).__call__()
+
+        try:
+            layout_factory = \
+                getMultiAdapter((self.request, self.content,), ILayoutFactory)
+            if layout_factory is not None:
+                layout = layout_factory(self)
+                if layout is None: return
+                self.layout = layout
+                return self.layout(self)
+        except zope.component.ComponentLookupError:
+            return super(Page, self).__call__()
 
 
 class View(SilvaGrokView):
