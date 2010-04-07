@@ -198,6 +198,7 @@ class LayoutFactory(grok.Adapter):
 
     grok.adapts(IBrowserRequest, None)
     grok.implements(ILayoutFactory)
+    grok.provides(ILayoutFactory)
 
     def __init__(self, request, context):
         self.request = request
