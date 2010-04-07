@@ -9,6 +9,8 @@ from zope.i18n import translate
 from zope.viewlet.interfaces import IViewletManager
 from zope.publisher.interfaces.browser import IBrowserRequest
 
+from ZPublisher.mapply import mapply
+
 from grokcore.view.meta.views import default_view_name
 import urllib
 
@@ -23,7 +25,7 @@ from silva.core.views.interfaces import IView, IHTTPResponseHeaders
 from five import grok
 from five.megrok.layout import Layout as BaseLayout
 from five.megrok.layout import Page as BasePage
-from megrok.layout.interfaces import IPage
+from megrok.layout.interfaces import IPage, ILayout
 
 from AccessControl import getSecurityManager
 
@@ -194,9 +196,8 @@ class Layout(BaseLayout):
         return super(Layout, self).__call__(view)
 
 
-class LayoutFactory(grok.Adapter):
-
-    grok.adapts(IBrowserRequest, None)
+class LayoutFactory(grok.MultiAdapter):
+    grok.adapts(IBrowserRequest, ISilvaObject)
     grok.implements(ILayoutFactory)
     grok.provides(ILayoutFactory)
 
@@ -212,7 +213,7 @@ class LayoutFactory(grok.Adapter):
             # A redirect was triggered somewhere in update().  Don't
             # continue rendering the template or doing anything else.
             return
-        return zope.component.getMultiAdapter(
+        return component.getMultiAdapter(
             (self.request, self.context), ILayout)
 
 
@@ -229,14 +230,14 @@ class Page(BasePage):
         __traceback_supplement__ = (SilvaErrorSupplement, self)
 
         try:
-            layout_factory = getMultiAdapter(
+            layout_factory = component.getMultiAdapter(
                 (self.request, self.content,), ILayoutFactory)
             if layout_factory is not None:
                 layout = layout_factory(self)
                 if layout is None: return
                 self.layout = layout
                 return self.layout(self)
-        except zope.component.ComponentLookupError:
+        except component.ComponentLookupError:
             return super(Page, self).__call__()
 
 
