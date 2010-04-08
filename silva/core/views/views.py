@@ -208,11 +208,6 @@ class LayoutFactory(grok.MultiAdapter):
     def __call__(self, view):
         """ Default behavior of megrok.layout Page
         """
-        mapply(view.update, (), self.request)
-        if self.request.response.getStatus() in (302, 303):
-            # A redirect was triggered somewhere in update().  Don't
-            # continue rendering the template or doing anything else.
-            return
         return component.getMultiAdapter(
             (self.request, self.context), ILayout)
 
@@ -229,16 +224,16 @@ class Page(BasePage):
         """
         __traceback_supplement__ = (SilvaErrorSupplement, self)
 
-        try:
-            layout_factory = component.getMultiAdapter(
-                (self.request, self.content,), ILayoutFactory)
-            if layout_factory is not None:
-                layout = layout_factory(self)
-                if layout is None: return
-                self.layout = layout
-                return self.layout(self)
-        except component.ComponentLookupError:
-            return super(Page, self).__call__()
+        mapply(self.update, (), self.request)
+        if self.request.response.getStatus() in (302, 303):
+            # A redirect was triggered somewhere in update().  Don't
+            # continue rendering the template or doing anything else.
+            return
+
+        layout_factory = component.getMultiAdapter(
+            (self.request, self.content,), ILayoutFactory)
+        self.layout = layout_factory(self)
+        return self.layout(self)
 
 
 class View(SilvaGrokView):
