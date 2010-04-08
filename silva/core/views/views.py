@@ -231,7 +231,7 @@ class Page(BasePage):
             return
 
         layout_factory = component.getMultiAdapter(
-            (self.request, self.content,), ILayoutFactory)
+            (self.request, self.context,), ILayoutFactory)
         self.layout = layout_factory(self)
         return self.layout(self)
 
