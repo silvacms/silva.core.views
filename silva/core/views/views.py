@@ -197,7 +197,7 @@ class Layout(BaseLayout):
 
 
 class LayoutFactory(grok.MultiAdapter):
-    grok.adapts(IBrowserRequest, ISilvaObject)
+    grok.adapts(None, None)
     grok.implements(ILayoutFactory)
     grok.provides(ILayoutFactory)
 
