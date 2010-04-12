@@ -197,7 +197,7 @@ class Layout(BaseLayout):
 
 
 class LayoutFactory(grok.MultiAdapter):
-    grok.adapts(None, None)
+    grok.adapts(interface.Interface, interface.Interface)
     grok.implements(ILayoutFactory)
     grok.provides(ILayoutFactory)
 
