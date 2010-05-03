@@ -8,7 +8,7 @@
 
       <form action="." method="post" enctype="multipart/form-data"
             tal:attributes="action request/URL"
-	    class="form-element">
+        class="form-element">
 
         <h3 i18n:translate=""
             tal:condition="view/label"
@@ -41,11 +41,11 @@
             <div class="field" style="padding-bottom: 10px;"
                  tal:define="description  widget/hint;
                              rendered     widget;
-				             error        widget/error"
+                             error        widget/error"
                  tal:attributes="class python:'field'+(error and ' error' or '')">
               <label style="font-weight: bold; font-size: 90%"
                      tal:attributes="for widget/name">
-		        <span i18n:translate=""
+                <span i18n:translate=""
                       tal:content="widget/label">label</span>
               </label>
               <span class="fieldRequired" title="Required"
@@ -63,7 +63,7 @@
               <div class="widget" tal:content="structure rendered">
                 Widget!
               </div>
-	        </div>
+            </div>
           </tal:block>
 
           <div id="actionsView">
@@ -77,7 +77,7 @@
       </form>
 
       <script type="text/javascript"
-		      tal:define="extra_script view/extra_script | nothing"
+              tal:define="extra_script view/extra_script | nothing"
               tal:condition="extra_script"
               tal:content="structure extra_script" />
     </div>
