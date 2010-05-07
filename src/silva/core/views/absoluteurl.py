@@ -3,7 +3,6 @@
 # $Id$
 
 # Zope 3
-
 import zope.component
 from zope.interface import implements
 

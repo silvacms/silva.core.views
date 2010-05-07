@@ -4,7 +4,7 @@
 # $Id$
 
 from five import grok
-from zope.app.component.hooks import getSite
+from zope.site.hooks import getSite
 from zope.publisher.interfaces.http import IHTTPRequest
 from zope.traversing.browser import absoluteURL
 

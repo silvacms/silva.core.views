@@ -3,8 +3,8 @@
 # See also LICENSE.txt
 # $Id$
 
-from zope.interface import implements
-from zope.app.container.interfaces import IObjectRemovedEvent
+from five import grok
+from zope.container.interfaces import IObjectRemovedEvent
 import zope.component
 
 import Acquisition
@@ -14,17 +14,14 @@ from AccessControl import Unauthorized
 from Products.Five.metaclass import makeClass
 from Products.PageTemplates.ZopePageTemplate import ZopePageTemplate
 
-from silva.core import conf as silvaconf
-
-from interfaces import IGrokCustomizable, ICustomizedTemplate
+from silva.core.views.interfaces import IGrokCustomizable, ICustomizedTemplate
 
 
 class TTWViewTemplate(ZopePageTemplate):
     """A template class used to generate Zope 3 views TTW"""
 
     meta_type="Silva TTW View Template"
-
-    implements(ICustomizedTemplate)
+    grok.implements(ICustomizedTemplate)
 
     manage_options = (
         ZopePageTemplate.manage_options[0],
@@ -111,7 +108,7 @@ class TTWViewTemplateRenderer(Acquisition.Implicit):
 
 
 
-@silvaconf.subscribe(TTWViewTemplate, IObjectRemovedEvent)
+@grok.subscribe(TTWViewTemplate, IObjectRemovedEvent)
 def unregisterViewWhenZPTIsDeleted(template, event):
     components = zope.component.getSiteManager(template)
     for view in components.registeredAdapters():
