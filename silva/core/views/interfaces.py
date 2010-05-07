@@ -3,20 +3,14 @@
 # See also LICENSE.txt
 # $Id$
 
-from zope import schema
-from zope.contentprovider.interfaces import IContentProvider \
-    as IBaseContentProvider
+from grokcore.view.interfaces import IGrokView
+from grokcore.viewlet.interfaces import IViewletManager as IBaseViewletManager
+from zope.contentprovider.interfaces import (
+    IContentProvider as IBaseContentProvider)
 from zope.interface import Interface, Attribute
 from zope.publisher.interfaces.browser import IBrowserRequest
 from zope.traversing.browser.interfaces import IAbsoluteURL
 from zope.viewlet.interfaces import IViewlet as IBaseViewlet
-
-from grokcore.view.interfaces import IGrokView
-from grokcore.viewlet.interfaces import IViewletManager as IBaseViewletManager
-from z3c.form.interfaces import IButton, ISubForm as IBaseSubForm
-
-from silva.core.conf import schema as silvaschema
-from silva.translations import translate as _
 
 
 class ITestRequest(IBrowserRequest):
@@ -75,14 +69,13 @@ class IZMIView(IGrokView):
     """A view in ZMI.
     """
 
-
 class ISMIView(IGrokView):
     """A view in SMI.
     """
-
     tab_name = Attribute("Name of the current tab.")
     active_tab = Attribute(u"Which is the current active tab")
     vein = Attribute(u"What's the vein to display")
+
 
 class ISMITab(ISMIView):
     """A tab in SMI.
@@ -119,69 +112,6 @@ class ISilvaURL(IAbsoluteURL):
 
     def preview():
         """Return URL for preview.
-        """
-
-# Silva forms
-
-class IDefaultAddFields(Interface):
-    """Default fields used in a add form. You don't have to defines
-    this fields.
-    """
-
-    id = silvaschema.ID(
-        title=_(u"id"),
-        description=_(u"No spaces or special characters besides ‘_’ or ‘-’ or ‘.’"),
-        required=True)
-    title = schema.TextLine(
-        title=_(u"title"),
-        description=_(u"The title will be publicly visible, and is used for the link in indexes."),
-        required=True)
-
-
-class ISilvaForm(Interface):
-    """A Silva form.
-    """
-
-
-class ISilvaFormlibForm(ISilvaForm):
-    """A Silva form built using formlib.
-    """
-
-
-class ISilvaStyledForm(Interface):
-    """A form with a Silva style.
-    """
-
-
-class ISilvaZ3CFormForm(ISilvaForm, ISilvaStyledForm):
-    """A Silva form built using z3c.form.
-    """
-
-
-class ISubForm(IBaseSubForm):
-    """A Silva subform.
-    """
-
-# z3c.form Silva support
-
-class ICancelButton(IButton):
-    """A button to cancel a form.
-    """
-
-
-class INoCancelButton(Interface):
-    """Marker interface for Z3CForm to say that you don't want a
-    cancel button.
-    """
-
-
-class ISilvaStyle(Interface):
-    """Adapter used to apply new style information on z3c.form
-    elements.
-    """
-
-    def style(widget):
-        """Apply Silva style to that element.
         """
 
 # Adapters

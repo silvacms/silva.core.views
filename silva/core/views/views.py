@@ -7,7 +7,6 @@ from zope import component, interface
 from zope.cachedescriptors.property import CachedProperty
 from zope.i18n import translate
 from zope.viewlet.interfaces import IViewletManager
-from zope.publisher.interfaces.browser import IBrowserRequest
 
 from ZPublisher.mapply import mapply
 
@@ -119,24 +118,6 @@ class ZMIView(SilvaGrokView):
     grok.baseclass()
     grok.require('zope2.ViewManagementScreens')
     grok.implements(IZMIView)
-
-
-class ZMIForm(grok.Form, ZMIView):
-    """A simple form in ZMI.
-    """
-    grok.baseclass()
-
-    # ZMI Templates requires Zope2 engine.
-    template = grok.PageTemplate(filename='templates/zmi_form.pt')
-
-
-class ZMIEditForm(grok.EditForm, ZMIView):
-    """An edit form in ZMI.
-    """
-    grok.baseclass()
-
-    # ZMI Templates requires Zope2 engine.
-    template = grok.PageTemplate(filename='templates/zmi_form.pt')
 
 
 class SMIView(SilvaGrokView):
