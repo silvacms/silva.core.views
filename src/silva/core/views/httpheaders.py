@@ -1,3 +1,7 @@
+# Copyright (c) 2002-2010 Infrae. All rights reserved.
+# See also LICENSE.txt
+# $Id$
+
 from five import grok
 from zope.publisher.interfaces.browser import IBrowserRequest
 from silva.core.interfaces import ISilvaObject
@@ -6,10 +10,9 @@ from silva.core.views.interfaces import IHTTPResponseHeaders, IPreviewLayer
 
 
 class ResponseHeaderHandler(grok.MultiAdapter):
-
     grok.baseclass()
 
-    def __init__(self, context, request):
+    def __init__(self, request, context):
         self.context = context
         self.request = request
         self.response = request.response
@@ -43,7 +46,7 @@ class ResponseHeaderHandler(grok.MultiAdapter):
 
 
 class ErrorHeaders(ResponseHeaderHandler):
-    grok.adapts(Exception, IBrowserRequest)
+    grok.adapts(IBrowserRequest, Exception)
     grok.implements(IHTTPResponseHeaders)
     grok.provides(IHTTPResponseHeaders)
 
@@ -52,7 +55,7 @@ class ErrorHeaders(ResponseHeaderHandler):
 
 
 class HTTPResponseHeaders(ResponseHeaderHandler):
-    grok.adapts(ISilvaObject, IBrowserRequest)
+    grok.adapts(IBrowserRequest, ISilvaObject)
     grok.implements(IHTTPResponseHeaders)
     grok.provides(IHTTPResponseHeaders)
 

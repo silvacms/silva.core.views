@@ -89,7 +89,7 @@ class HEADTestCase(SilvaTestCase.SilvaFunctionalTestCase):
     def __set_private(self, context):
         vs = IViewerSecurity(context)
         vs.setMinimumRole('Authenticated')
-    
+
     def assertEmptyResponse(self):
         self.assertEquals("", self.response.getBody(), "response should be empty")
 

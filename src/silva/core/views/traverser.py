@@ -1,6 +1,7 @@
 # Copyright (c) 2002-2010 Infrae. All rights reserved.
 # See also LICENSE.txt
 # $Id$
+
 from zope.interface import alsoProvides, implements
 from zope.component import getMultiAdapter
 from zope.publisher.interfaces.browser import IBrowserRequest
@@ -59,16 +60,18 @@ class SilvaPublishTraverse(DefaultPublishTraverse):
         # GET or POST request.
         if request.method in ('GET', 'HEAD',):
             response_headers = getMultiAdapter(
-                (self.context, self.request), IHTTPResponseHeaders)
+                (self.request, self.context), IHTTPResponseHeaders)
             response_headers()
         if request.method in ('GET', 'POST',):
             return super(SilvaPublishTraverse, self).browserDefault(request)
         if request.method == 'HEAD':
-            return SilvaHead(self.context, request), ('HEAD',)
+            return SilvaHEADRequest(self.context, request), ('HEAD',)
         return self.context, tuple()
 
 
-class SilvaHead(object):
+class SilvaHEADRequest(object):
+    """Reply to an HEAD request on a Silva object.
+    """
 
     def __init__(self, context, request):
         self.context = context

@@ -14,7 +14,7 @@
     >>> factory = app.root.manage_addProduct['Silva']
     >>> id = factory.manage_addFolder('myfolder', 'My Folder')
     >>> app.root.myfolder
-    <Silva Folder instance myfolder>
+    <Folder at /root/myfolder>
 
  When requesting the view the response should include cache control
  headers:

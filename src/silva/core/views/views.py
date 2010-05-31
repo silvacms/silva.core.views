@@ -78,7 +78,7 @@ class SilvaGrokView(grok.View):
 
     def setHTTPHeaders(self):
         headers = component.queryMultiAdapter(
-            (self.context, self.request), IHTTPResponseHeaders)
+            (self.request, self.context), IHTTPResponseHeaders)
         if headers is not None:
             headers.set_headers()
 
