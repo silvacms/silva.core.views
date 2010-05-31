@@ -2,15 +2,14 @@
 # Copyright (c) 2009-2010 Infrae. All rights reserved.
 # See also LICENSE.txt
 # $Id$
-from Products.Silva.tests import SilvaTestCase
-from Testing.ZopeTestCase.zopedoctest.functional import http
+
+from Products.Silva.testing import FunctionalLayer, http
 from silva.core.interfaces.adapters import IViewerSecurity
 
 import unittest
-import base64
 
-AUTH_TOKEN = '%s:%s' % ('manager', SilvaTestCase.user_password)
-AUTH = {'Authorization': 'Basic %s' % base64.b64encode(AUTH_TOKEN)}
+AUTH = {
+    'Authorization': 'Basic manager:manager'}
 
 PUBLIC_HEADERS_EXPECTED = {
     'Content-Length': '0',
@@ -24,15 +23,19 @@ PRIVATE_HEADERS_EXPECTED = {
     'Cache-Control': 'no-cache, must-revalidate, post-check=0, pre-check=0'}
 
 
-class HEADTestCase(SilvaTestCase.SilvaFunctionalTestCase):
+class HEADTestCase(unittest.TestCase):
+    layer = FunctionalLayer
+
+    def setUp(self):
+        self.root = self.layer.get_application()
 
     def check_headers(self, method, path, headers, expected_headers):
         request = '%s %s HTTP/1.1' % (method, path)
         for header in headers.items():
             request += '\r\n%s: %s' % header
-        self.response = http(request)
-        self.failUnless(self.response.header_output.status, 200)
-        response_headers = self.response.header_output.headers
+        self.response = http(request, parsed=True)
+        self.failUnless(self.response.getStatus(), 200)
+        response_headers = self.response.getHeaders()
         for key, value in expected_headers.items():
             reply_value = response_headers.get(key, None)
             self.assertEquals(
@@ -40,58 +43,73 @@ class HEADTestCase(SilvaTestCase.SilvaFunctionalTestCase):
                 'Invalid header for "%s", expected: "%s", was: "%s"' %
                     (key, value, reply_value))
 
-    def test_silvaroot(self):
+    def set_private(self, context):
+        IViewerSecurity(context).setMinimumRole('Authenticated')
+
+    def assertEmptyResponse(self):
+        self.assertEquals(
+            "", self.response.getBody(), "response should be empty")
+
+    def test_root(self):
         self.check_headers('HEAD', '/root', {}, PUBLIC_HEADERS_EXPECTED)
         self.assertEmptyResponse()
 
-    def test_silvaroot_auth(self):
+    def test_root_auth(self):
         self.check_headers('HEAD', '/root', AUTH, PUBLIC_HEADERS_EXPECTED)
         self.assertEmptyResponse()
 
-    def test_silvaroot_auth_private(self):
-        self.__set_private(self.root)
+    def test_root_auth_private(self):
+        self.set_private(self.root)
         self.check_headers('HEAD', '/root', AUTH, PRIVATE_HEADERS_EXPECTED)
         self.assertEmptyResponse()
 
-    def test_silvapublication(self):
-        self.add_document(self.root, 'publication', 'Publication')
-        self.check_headers('HEAD', '/root/publication', {}, PUBLIC_HEADERS_EXPECTED)
+    def test_publication(self):
+        factory = self.root.manage_addProduct['Silva']
+        factory.manage_addPublication('publication', 'Publication')
+        self.check_headers(
+            'HEAD', '/root/publication', {}, PUBLIC_HEADERS_EXPECTED)
         self.assertEmptyResponse()
 
-    def test_silvapublication_auth(self):
-        self.add_document(self.root, 'publication', 'Publication')
-        self.check_headers('HEAD', '/root/publication', AUTH, PUBLIC_HEADERS_EXPECTED)
+    def test_publication_auth(self):
+        factory = self.root.manage_addProduct['Silva']
+        factory.manage_addPublication('publication', 'Publication')
+        self.check_headers(
+            'HEAD', '/root/publication', AUTH, PUBLIC_HEADERS_EXPECTED)
         self.assertEmptyResponse()
 
-    def test_silvapublication_auth_private(self):
-        publication = self.add_document(self.root, 'publication', 'Publication')
-        self.__set_private(publication)
-        self.check_headers('HEAD', '/root/publication', AUTH, PRIVATE_HEADERS_EXPECTED)
+    def test_publication_auth_private(self):
+        factory = self.root.manage_addProduct['Silva']
+        factory.manage_addPublication('publication', 'Publication')
+        self.set_private(self.root.publication)
+        self.check_headers(
+            'HEAD', '/root/publication', AUTH, PRIVATE_HEADERS_EXPECTED)
         self.assertEmptyResponse()
 
-    def test_silvadocument(self):
-        self.add_document(self.root, 'document', 'Document')
-        self.check_headers('HEAD', '/root/document', {}, PUBLIC_HEADERS_EXPECTED)
+    def test_document(self):
+        factory = self.root.manage_addProduct['SilvaDocument']
+        factory.manage_addDocument('document', 'Document')
+        self.check_headers(
+            'HEAD', '/root/document', {}, PUBLIC_HEADERS_EXPECTED)
         self.assertEmptyResponse()
 
-    def test_silvadocument_auth(self):
-        self.add_document(self.root, 'document', 'Document')
-        self.check_headers('HEAD', '/root/document', AUTH, PUBLIC_HEADERS_EXPECTED)
-        self.assertEquals("", self.response.getBody(), "response should be empty")
+    def test_document_auth(self):
+        factory = self.root.manage_addProduct['SilvaDocument']
+        factory.manage_addDocument('document', 'Document')
+        self.check_headers(
+            'HEAD', '/root/document', AUTH, PUBLIC_HEADERS_EXPECTED)
+        self.assertEquals(
+            "", self.response.getBody(), "response should be empty")
         self.assertEmptyResponse()
 
-    def test_silvadocument_auth_private(self):
-        document = self.add_document(self.root, 'document', 'Document')
-        self.__set_private(document)
-        self.check_headers('HEAD', '/root/document', AUTH, PRIVATE_HEADERS_EXPECTED)
+    def test_document_auth_private(self):
+        factory = self.root.manage_addProduct['SilvaDocument']
+        factory.manage_addDocument('document', 'Document')
+        self.set_private(self.root.document)
+        self.check_headers(
+            'HEAD', '/root/document', AUTH, PRIVATE_HEADERS_EXPECTED)
         self.assertEmptyResponse()
 
-    def __set_private(self, context):
-        vs = IViewerSecurity(context)
-        vs.setMinimumRole('Authenticated')
 
-    def assertEmptyResponse(self):
-        self.assertEquals("", self.response.getBody(), "response should be empty")
 
 def test_suite():
     suite = unittest.TestSuite()
