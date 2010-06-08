@@ -26,7 +26,10 @@ class VirtualSite(grok.Adapter):
         return root
 
     def get_root_url(self):
-        return absoluteURL(self.get_root(), self.request)
+        root = self.get_root()
+        if root is not None:
+            return absoluteURL(root, self.request)
+        return u''
 
     def get_silva_root(self):
         # XXX Check for nested localsites in Silva
