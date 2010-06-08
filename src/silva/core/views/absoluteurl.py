@@ -21,7 +21,6 @@ class AbsoluteURL(BrowserView):
 
     (original: zope.traversing.browser.absoluteurl)
     """
-
     implements(ISilvaURL)
 
     def __init__(self, context, request):
