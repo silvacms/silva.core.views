@@ -12,6 +12,13 @@ from zope.publisher.interfaces.browser import IBrowserRequest
 from zope.traversing.browser.interfaces import IAbsoluteURL
 from zope.viewlet.interfaces import IViewlet as IBaseViewlet
 
+import zope.deferredimport
+zope.deferredimport.deprecated(
+    'Please import from silva.core.smi instead,'
+    'this import will be removed in Silva 2.4',
+    ISMIView='silva.core.smi.interfaces:ISMIView',
+    ISMITab='silva.core.smi.interfaces:ISMITab',)
+
 
 class ITestRequest(IBrowserRequest):
     """Marker interface to mark a TestRequest.
@@ -68,19 +75,6 @@ class IView(IGrokView):
 class IZMIView(IGrokView):
     """A view in ZMI.
     """
-
-class ISMIView(IGrokView):
-    """A view in SMI.
-    """
-    tab_name = Attribute("Name of the current tab.")
-    active_tab = Attribute(u"Which is the current active tab")
-    vein = Attribute(u"What's the vein to display")
-
-
-class ISMITab(ISMIView):
-    """A tab in SMI.
-    """
-
 
 class IContentProvider(IBaseContentProvider, IGrokCustomizable):
     """A customizable Content Provider.

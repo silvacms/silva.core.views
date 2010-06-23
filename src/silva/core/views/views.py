@@ -10,14 +10,12 @@ from zope.viewlet.interfaces import IViewletManager
 
 from ZPublisher.mapply import mapply
 
-from grokcore.view.meta.views import default_view_name
 import urllib
 
-from silva.core.conf.utils import getSilvaViewFor
 from silva.core.interfaces import ISilvaObject
 from silva.core.views.interfaces import IContentProvider, IViewlet
 from silva.core.views.interfaces import ILayoutFactory
-from silva.core.views.interfaces import IFeedback, IZMIView, ISMIView, ISMITab
+from silva.core.views.interfaces import IFeedback, IZMIView
 from silva.core.views.interfaces import IPreviewLayer
 from silva.core.views.interfaces import IView, IHTTPResponseHeaders
 
@@ -27,6 +25,12 @@ from five.megrok.layout import Page as BasePage
 from megrok.layout.interfaces import IPage, ILayout
 
 from AccessControl import getSecurityManager
+
+import zope.deferredimport
+zope.deferredimport.deprecated(
+    'Please import from silva.core.smi.smi instead,'
+    'this import will be removed in Silva 2.4',
+    SMIView='silva.core.smi.smi:SMIView')
 
 
 # Simple views
@@ -118,50 +122,6 @@ class ZMIView(SilvaGrokView):
     grok.baseclass()
     grok.require('zope2.ViewManagementScreens')
     grok.implements(IZMIView)
-
-
-class SMIView(SilvaGrokView):
-    """A view in SMI.
-    """
-    grok.baseclass()
-    grok.context(ISilvaObject)
-    grok.implements(ISMIView)
-
-    vein = 'contents'
-
-    def _silvaView(self):
-        # Lookup the correct Silva edit view so forms are able to use
-        # silva macros.
-        context = self.request['model']
-        return getSilvaViewFor(self.context, 'edit', context)
-
-    @property
-    def tab_name(self):
-        return grok.name.bind().get(self, default=default_view_name)
-
-    @property
-    def active_tab(self):
-        tab_class = None
-        for base in self.__class__.__bases__:
-            if ISMITab.implementedBy(base):
-                tab_class = base
-        if tab_class:
-            name = grok.name.bind()
-            return name.get(tab_class, default=default_view_name)
-        return 'tab_edit'
-
-    def __call__(self, **kwargs):
-        return super(SMIView, self).__call__()
-
-    def namespace(self):
-        # This add to the template namespace global variable used in
-        # Zope 2 and Silva templates.  Here should be bind at the
-        # correct place in the Silva view registry so you should be
-        # able to use silva macro in your templates.
-        view = self._silvaView()
-        return {'here': view,
-                'user': getSecurityManager().getUser(),
-                'container': self.request['model'],}
 
 
 class Layout(BaseLayout):
