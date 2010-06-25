@@ -12,7 +12,6 @@ from Products.Five import BrowserView
 from Acquisition import aq_parent, aq_inner
 
 from silva.core.interfaces import IRoot, IContent
-
 from silva.core.views.interfaces import IPreviewLayer, ISilvaURL
 
 
@@ -85,8 +84,8 @@ class VersionAbsoluteURL(AbsoluteURL):
     """
 
     def __init__(self, context, request):
-        # Set context to the object in fact
-        self.context = context.object()
+        # Set versioned content as context
+        self.context = context.get_content()
         self.request = request
         self._preview_ns = '++preview++' + context.getId()
 
