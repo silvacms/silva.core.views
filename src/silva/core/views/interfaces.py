@@ -108,6 +108,13 @@ class ICustomizedTemplate(ITemplateCustomizable):
 # URL management / with preview
 
 class ISilvaURL(IAbsoluteURL):
+    """Extends the absolute URL mechanism to support preview and
+    public URLs.
+    """
+
+    def public():
+        """Return URL for public.
+        """
 
     def preview():
         """Return URL for preview.

@@ -3,11 +3,18 @@
 # See also LICENSE.txt
 # $Id$
 
+from five import grok
+from five.megrok.layout import Layout as BaseLayout
+from five.megrok.layout import Page as BasePage
+from megrok.layout.interfaces import IPage, ILayout
 from zope import component, interface
 from zope.cachedescriptors.property import CachedProperty
 from zope.i18n import translate
 from zope.viewlet.interfaces import IViewletManager
+import zope.deferredimport
 
+from AccessControl import getSecurityManager
+from Acquisition import aq_base
 from ZPublisher.mapply import mapply
 
 import urllib
@@ -19,14 +26,6 @@ from silva.core.views.interfaces import IFeedback, IZMIView
 from silva.core.views.interfaces import IPreviewLayer
 from silva.core.views.interfaces import IView, IHTTPResponseHeaders
 
-from five import grok
-from five.megrok.layout import Layout as BaseLayout
-from five.megrok.layout import Page as BasePage
-from megrok.layout.interfaces import IPage, ILayout
-
-from AccessControl import getSecurityManager
-
-import zope.deferredimport
 zope.deferredimport.deprecated(
     'Please import from silva.core.smi.smi instead,'
     'this import will be removed in Silva 2.4',
@@ -45,12 +44,17 @@ class SilvaErrorSupplement(object):
         self.klass = klass
 
     def getInfo(self, as_html=0):
-        object_path = '/'.join(self.context.getPhysicalPath())
+        object_path = u'n/a'
+        if hasattr(aq_base(self.context), 'getPhysicalPath'):
+            object_path = '/'.join(self.context.getPhysicalPath())
         info = list()
-        info.append((u'Class', '%s.%s' % (
+        info.append(
+            (u'Class', '%s.%s' % (
                     self.klass.__module__, self.klass.__class__.__name__)))
-        info.append((u'Object path', object_path,))
-        info.append((u'Object type', getattr(self.context, 'meta_type', None,)))
+        info.append(
+            (u'Object path', object_path,))
+        info.append(
+            (u'Object type', getattr(self.context, 'meta_type', u'n/a',)))
         if not as_html:
             return '   - ' + '\n   - '.join(map(lambda x: '%s: %s' % x, info))
 
