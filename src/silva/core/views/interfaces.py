@@ -27,7 +27,12 @@ class ITestRequest(IBrowserRequest):
 
 # Preview layer
 
-class IPreviewLayer(IBrowserRequest):
+class INonCachedLayer(IBrowserRequest):
+    """Layer that prevent its content to be cached by the HTTP protocol.
+    """
+
+
+class IPreviewLayer(INonCachedLayer):
     """This layer enable the fact to display preview version instead
     of public version.
     """

@@ -6,10 +6,12 @@ from five import grok
 from zope.publisher.interfaces.browser import IBrowserRequest
 from silva.core.interfaces import ISilvaObject
 from silva.core.interfaces.adapters import IViewerSecurity
-from silva.core.views.interfaces import IHTTPResponseHeaders, IPreviewLayer
+from silva.core.views.interfaces import IHTTPResponseHeaders, INonCachedLayer
 
 
 class ResponseHeaderHandler(grok.MultiAdapter):
+    """Default class to implement HTTP header settings.
+    """
     grok.baseclass()
 
     def __init__(self, request, context):
@@ -46,6 +48,8 @@ class ResponseHeaderHandler(grok.MultiAdapter):
 
 
 class ErrorHeaders(ResponseHeaderHandler):
+    """Errors are not cached.
+    """
     grok.adapts(IBrowserRequest, Exception)
     grok.implements(IHTTPResponseHeaders)
     grok.provides(IHTTPResponseHeaders)
@@ -55,6 +59,8 @@ class ErrorHeaders(ResponseHeaderHandler):
 
 
 class HTTPResponseHeaders(ResponseHeaderHandler):
+    """Regular Silva content headers.
+    """
     grok.adapts(IBrowserRequest, ISilvaObject)
     grok.implements(IHTTPResponseHeaders)
     grok.provides(IHTTPResponseHeaders)
@@ -71,7 +77,7 @@ class HTTPResponseHeaders(ResponseHeaderHandler):
                 'max-age=%d, must-revalidate' % self.max_age)
 
     def __is_preview(self):
-        return IPreviewLayer.providedBy(self.request)
+        return INonCachedLayer.providedBy(self.request)
 
     def __is_private(self):
         vs = IViewerSecurity(self.context)

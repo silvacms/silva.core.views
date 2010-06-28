@@ -2,17 +2,17 @@
 # See also LICENSE.txt
 # $Id$
 
-from zope.interface import alsoProvides, implements
+from five import grok
 from zope.component import getMultiAdapter
+from zope.interface import alsoProvides
 from zope.publisher.interfaces.browser import IBrowserRequest
 from zope.traversing.interfaces import ITraversable
-from silva.core.views.interfaces import IHTTPResponseHeaders
-from five import grok
 
 from Acquisition.interfaces import IAcquirer
 from ZPublisher.BaseRequest import DefaultPublishTraverse
-from silva.core.interfaces import IPublication
 
+from silva.core.interfaces import IPublication
+from silva.core.views.interfaces import IHTTPResponseHeaders
 from silva.core.views.interfaces import IPreviewLayer
 
 
@@ -26,7 +26,7 @@ class UseParentByAcquisition(object):
     Returning an instance of this object will prevent that behavior
     and permit you to stay on the same context object.
     """
-    implements(IAcquirer)
+    grok.implements(IAcquirer)
 
     def __of__(self, obj):
         return obj
@@ -51,6 +51,7 @@ class PreviewTraversable(grok.MultiAdapter):
         if name:
             self.request.other['SILVA_PREVIEW_NAME'] = name
         return UseParentByAcquisition()
+
 
 
 class SilvaPublishTraverse(DefaultPublishTraverse):
