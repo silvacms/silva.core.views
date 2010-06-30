@@ -112,10 +112,6 @@ class ISilvaURL(IAbsoluteURL):
     public URLs.
     """
 
-    def public():
-        """Return URL for public.
-        """
-
     def preview():
         """Return URL for preview.
         """
