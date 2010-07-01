@@ -4,24 +4,19 @@
 # $Id$
 
 from five import grok
-from five.megrok.layout import Layout as BaseLayout
-from five.megrok.layout import Page as BasePage
-from megrok.layout.interfaces import IPage, ILayout
+from infrae.layout import Layout as BaseLayout
+from infrae.layout import Page as BasePage
+from infrae.layout.interfaces import IPage
 from zope import component, interface
 from zope.cachedescriptors.property import CachedProperty
 from zope.i18n import translate
 from zope.viewlet.interfaces import IViewletManager
 import zope.deferredimport
 
-from AccessControl import getSecurityManager
-from Acquisition import aq_base
-from ZPublisher.mapply import mapply
-
 import urllib
 
 from silva.core.interfaces import ISilvaObject
 from silva.core.views.interfaces import IContentProvider, IViewlet
-from silva.core.views.interfaces import ILayoutFactory
 from silva.core.views.interfaces import IFeedback, IZMIView
 from silva.core.views.interfaces import IPreviewLayer
 from silva.core.views.interfaces import IView, IHTTPResponseHeaders
@@ -34,35 +29,6 @@ zope.deferredimport.deprecated(
 
 # Simple views
 
-class SilvaErrorSupplement(object):
-    """Add more information about an error on a view in a traceback.
-    """
-
-    def __init__(self, klass, full_information=False):
-        self.context = klass.context
-        self.request = klass.request
-        self.klass = klass
-
-    def getInfo(self, as_html=0):
-        object_path = u'n/a'
-        if hasattr(aq_base(self.context), 'getPhysicalPath'):
-            object_path = '/'.join(self.context.getPhysicalPath())
-        info = list()
-        info.append(
-            (u'Class', '%s.%s' % (
-                    self.klass.__module__, self.klass.__class__.__name__)))
-        info.append(
-            (u'Object path', object_path,))
-        info.append(
-            (u'Object type', getattr(self.context, 'meta_type', u'n/a',)))
-        if not as_html:
-            return '   - ' + '\n   - '.join(map(lambda x: '%s: %s' % x, info))
-
-        from cgi import escape
-        return u'<p>Extra information:<br /><li>%s</li></p>' % ''.join(map(
-            lambda x: u'<li><b>%s</b>: %s</li>' % (
-                escape(str(x[0])), escape(str(x[1]))),
-            info))
 
 
 class SilvaGrokView(grok.View):
@@ -99,7 +65,6 @@ class SilvaGrokView(grok.View):
     def __call__(self):
         """Render the view.
         """
-        __traceback_supplement__ = (SilvaErrorSupplement, self)
         self.setHTTPHeaders()
         return super(SilvaGrokView, self).__call__()
 
@@ -134,27 +99,6 @@ class Layout(BaseLayout):
     grok.baseclass()
     grok.context(ISilvaObject)
 
-    def __call__(self, view):
-        """Render the layout.
-        """
-        __traceback_supplement__ = (SilvaErrorSupplement, self)
-        return super(Layout, self).__call__(view)
-
-
-class LayoutFactory(grok.MultiAdapter):
-    grok.adapts(interface.Interface, interface.Interface)
-    grok.implements(ILayoutFactory)
-    grok.provides(ILayoutFactory)
-
-    def __init__(self, request, context):
-        self.request = request
-        self.context = context
-
-    def __call__(self, view):
-        """ Default behavior of megrok.layout Page
-        """
-        return component.getMultiAdapter(
-            (self.request, self.context), ILayout)
 
 
 class Page(BasePage):
@@ -164,21 +108,6 @@ class Page(BasePage):
     grok.context(ISilvaObject)
     grok.require('zope2.View')
 
-    def __call__(self):
-        """Render the page.
-        """
-        __traceback_supplement__ = (SilvaErrorSupplement, self)
-
-        mapply(self.update, (), self.request)
-        if self.request.response.getStatus() in (302, 303):
-            # A redirect was triggered somewhere in update().  Don't
-            # continue rendering the template or doing anything else.
-            return
-
-        layout_factory = component.getMultiAdapter(
-            (self.request, self.context,), ILayoutFactory)
-        self.layout = layout_factory(self)
-        return self.layout(self)
 
 
 class View(SilvaGrokView):

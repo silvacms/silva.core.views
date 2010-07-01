@@ -171,6 +171,3 @@ class IHTTPResponseHeaders(Interface):
         """
 
 
-class ILayoutFactory(Interface):
-    """ A factory that lookup the layout and return it
-    """
