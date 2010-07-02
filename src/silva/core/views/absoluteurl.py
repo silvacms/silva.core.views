@@ -90,6 +90,17 @@ class VersionAbsoluteURL(AbsoluteURL):
         self._preview_ns = '++preview++' + context.getId()
 
 
+
+class ErrorAbsoluteURL(AbsoluteURL):
+    """AbsoluteURL for a version
+    """
+
+    def __init__(self, context, request):
+        # Set first Silva object as context
+        self.context = context.get_silva_object()
+        self.request = request
+
+
 class TestAbsoluteURL(BrowserView):
     """An absolute URL provider for TestRequest. This is mainly to get
     test working.

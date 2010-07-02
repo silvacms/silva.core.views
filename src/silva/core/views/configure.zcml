@@ -58,6 +58,22 @@
      allowed_interface=".interfaces.ISilvaURL"
      />
 
+  <view
+     for="Exception"
+     factory=".absoluteurl.ErrorAbsoluteURL"
+     type="zope.publisher.interfaces.http.IHTTPRequest"
+     permission="zope.Public"
+     provides=".interfaces.ISilvaURL"
+     />
+
+  <browser:page
+     for="Exception"
+     name="absolute_url"
+     class=".absoluteurl.ErrorAbsoluteURL"
+     permission="zope.Public"
+     allowed_interface=".interfaces.ISilvaURL"
+     />
+
   <!-- AbsoluteURL views for tests -->
   <class class="zope.publisher.browser.TestRequest">
     <implements interface="silva.core.views.interfaces.ITestRequest" />
