@@ -81,6 +81,5 @@ class SilvaHEADRequest(object):
     def HEAD(self, *args, **kw):
         """Return empty response body
         """
-        self.request.response.setHeader('Content-Length', '0')
-        return ""
+        return u''
 
