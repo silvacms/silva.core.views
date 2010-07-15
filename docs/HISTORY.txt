@@ -1,10 +1,16 @@
 Changelog
 =========
 
-2.2 (unreleased)
-----------------
+2.3b1 (unreleased)
+------------------
 
-* ...
+* Move out SMI views
+
+* Move out forms
+
+* Improved error reporting
+
+* Lookup a ILayoutFactory adapter to customize skin selection
 
 2.2b1 (2010-01-22)
 ------------------
