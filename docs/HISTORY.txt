@@ -1,16 +1,20 @@
 Changelog
 =========
 
-2.3b1 (unreleased)
+2.3b1 (2010/07/16)
 ------------------
 
-* Move out SMI views
+* Form code move to ``silva.core.forms``.
 
-* Move out forms
+* Layout system is now based on ``infrae.layout``.
 
-* Improved error reporting
+* HTTP headers have been improved to be customized, HEAD requests should set
+  the Content-Length of the content if possible.
 
-* Lookup a ILayoutFactory adapter to customize skin selection
+* absolute_url is now available on versions and test requets.
+
+* Update to match publisher changes in Zope 2.12.
+
 
 2.2b1 (2010-01-22)
 ------------------
