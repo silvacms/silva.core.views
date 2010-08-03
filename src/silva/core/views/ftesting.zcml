@@ -1,0 +1,29 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:grok="http://namespaces.zope.org/grok">
+
+  <include package="silva.core.views" />
+
+  <!-- AbsoluteURL views for TestRequest -->
+  <class class="zope.publisher.browser.TestRequest">
+    <implements interface="silva.core.views.interfaces.ITestRequest" />
+    <implements interface="zope.annotation.interfaces.IAttributeAnnotatable" />
+  </class>
+
+  <view
+     for="zope.interface.Interface"
+     factory=".absoluteurl.TestAbsoluteURL"
+     type="silva.core.views.interfaces.ITestRequest"
+     permission="zope.Public"
+     provides=".interfaces.ISilvaURL"
+     />
+
+  <view
+     for="silva.core.interfaces.ISilvaObject"
+     factory=".absoluteurl.TestAbsoluteURL"
+     type="silva.core.views.interfaces.ITestRequest"
+     permission="zope.Public"
+     provides=".interfaces.ISilvaURL"
+     />
+
+</configure>

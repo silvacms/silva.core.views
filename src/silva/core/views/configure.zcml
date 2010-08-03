@@ -74,27 +74,6 @@
      allowed_interface=".interfaces.ISilvaURL"
      />
 
-  <!-- AbsoluteURL views for tests -->
-  <class class="zope.publisher.browser.TestRequest">
-    <implements interface="silva.core.views.interfaces.ITestRequest" />
-  </class>
-
-  <view
-     for="zope.interface.Interface"
-     factory=".absoluteurl.TestAbsoluteURL"
-     type="silva.core.views.interfaces.ITestRequest"
-     permission="zope.Public"
-     provides=".interfaces.ISilvaURL"
-     />
-  <!-- A second time because adaptation is left to right, like Malthe says -->
-  <view
-     for="silva.core.interfaces.ISilvaObject"
-     factory=".absoluteurl.TestAbsoluteURL"
-     type="silva.core.views.interfaces.ITestRequest"
-     permission="zope.Public"
-     provides=".interfaces.ISilvaURL"
-     />
-
   <!-- Default traverser for Silva views -->
   <adapter
     for="silva.core.interfaces.ISilvaObject
