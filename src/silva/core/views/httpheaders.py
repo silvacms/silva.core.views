@@ -80,7 +80,4 @@ class HTTPResponseHeaders(ResponseHeaderHandler):
         return INonCachedLayer.providedBy(self.request)
 
     def __is_private(self):
-        vs = IViewerSecurity(self.context)
-        return vs.getMinimumRole() != 'Anonymous'
-
-
+        return IViewerSecurity(self.context).get_role() is not None
