@@ -40,8 +40,8 @@
 
  We now create a protected folder:
 
-    >>> from silva.core.interfaces.adapters import IViewerSecurity
-    >>> IViewerSecurity(root.myfolder).setMinimumRole('Authenticated')
+    >>> from silva.core.interfaces.adapters import IAccessSecurity
+    >>> IAccessSecurity(root.myfolder).minimum_role = 'Authenticated'
 
  If the view is private you should not have cache headers:
 
@@ -74,7 +74,3 @@ class MyFolderView(silvaviews.View):
 
     def render(self):
         return "This is a view!"
-
-
-
-

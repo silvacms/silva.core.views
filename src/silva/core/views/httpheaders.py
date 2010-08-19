@@ -5,7 +5,7 @@
 from five import grok
 from zope.publisher.interfaces.browser import IBrowserRequest
 from silva.core.interfaces import ISilvaObject
-from silva.core.interfaces.adapters import IViewerSecurity
+from silva.core.interfaces.adapters import IAccessSecurity
 from silva.core.views.interfaces import IHTTPResponseHeaders, INonCachedLayer
 
 
@@ -80,4 +80,4 @@ class HTTPResponseHeaders(ResponseHeaderHandler):
         return INonCachedLayer.providedBy(self.request)
 
     def __is_private(self):
-        return IViewerSecurity(self.context).get_role() is not None
+        return IAccessSecurity(self.context).minimum_role is not None

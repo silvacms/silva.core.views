@@ -22,8 +22,8 @@ from silva.core.views.interfaces import IPreviewLayer
 from silva.core.views.interfaces import IView, IHTTPResponseHeaders
 
 zope.deferredimport.deprecated(
-    'Please import from silva.core.smi.smi instead,'
-    'this import will be removed in Silva 2.4',
+    'SMIView moved to silva.core.smi. '
+    'Consider using a SMIPage instead. It will be removed in Silva 2.4',
     SMIView='silva.core.smi.smi:SMIView')
 
 

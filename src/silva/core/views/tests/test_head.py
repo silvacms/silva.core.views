@@ -4,7 +4,7 @@
 # $Id$
 
 from Products.Silva.testing import FunctionalLayer, http
-from silva.core.interfaces.adapters import IViewerSecurity
+from silva.core.interfaces.adapters import IAccessSecurity
 
 import unittest
 
@@ -44,7 +44,7 @@ class HEADTestCase(unittest.TestCase):
                     (key, value, reply_value))
 
     def set_private(self, context):
-        IViewerSecurity(context).setMinimumRole('Authenticated')
+        IAccessSecurity(context).minimum_role = 'Authenticated'
 
     def assertEmptyResponse(self):
         self.assertEquals(
