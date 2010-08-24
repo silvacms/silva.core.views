@@ -3,6 +3,8 @@
 # See also LICENSE.txt
 # $Id$
 
+from Acquisition import aq_base
+
 from five import grok
 from infrae.layout import Layout as BaseLayout
 from infrae.layout import Page as BasePage
