@@ -9,7 +9,7 @@ from five import grok
 from infrae.layout import Layout as BaseLayout
 from infrae.layout import Page as BasePage
 from infrae.layout.interfaces import IPage
-from zope import component, interface
+from zope import component
 from zope.cachedescriptors.property import CachedProperty
 from zope.viewlet.interfaces import IViewletManager
 import zope.deferredimport
@@ -24,6 +24,10 @@ zope.deferredimport.deprecated(
     'SMIView moved to silva.core.smi. '
     'Consider using a SMIPage instead. It will be removed in Silva 2.4',
     SMIView='silva.core.smi.smi:SMIView')
+zope.deferredimport.deprecated(
+    'SMIPortletManager moved to silva.core.smi.smi. '
+    'Please update your import. This one will be removed in Silva 2.4',
+    SMIPortletManager='silva.core.smi.smi:SMIPortletManager')
 
 
 # Simple views
@@ -172,14 +176,6 @@ class Viewlet(ViewletLayoutSupport, grok.Viewlet):
     grok.implements(IViewlet)
     grok.require('zope2.View')
 
-
-class SMIPortletManager(ViewletManager):
-    """Third SMI column manager.
-    """
-    grok.view(interface.Interface)
-
-    def enabled(self):
-        return len(self.viewlets) != 0
 
 __all__ = [
     'View', 'ZMIView', 'Layout', 'Page',
