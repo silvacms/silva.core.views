@@ -39,14 +39,6 @@ class IPreviewLayer(INonCachedLayer):
 
 # View
 
-class IFeedback(Interface):
-    """Feedback information.
-    """
-
-    status = Attribute(u"Feedback message")
-    status_type = Attribute(u"Feedback type, error or feedback")
-
-
 class IGrokCustomizable(Interface):
     """A grok template which can be customized with a TTW template.
 

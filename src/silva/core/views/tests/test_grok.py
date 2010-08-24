@@ -29,4 +29,3 @@ def test_suite():
     suite.addTest(suite_from_package(
             'silva.core.views.tests.grok', create_test))
     return suite
-

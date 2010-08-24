@@ -1,10 +1,10 @@
-# Copyright (c) 2008-2010 Infrae. All rights reserved.
+# -*- coding: utf-8 -*-
+# Copyright (c) 2010 Infrae. All rights reserved.
 # See also LICENSE.txt
 # $Id$
 """
-
  We grok this test file:
-    >>> grok('silva.core.views.tests.grok.view_cache_headers')
+    >>> grok('silva.core.views.tests.grok.page_cache_headers')
 
  Now we add a folder:
 
@@ -18,11 +18,11 @@
  headers:
 
     >>> browser = Browser()
-    >>> browser.open('http://localhost/root/myfolder/mytestview')
+    >>> browser.open('http://localhost/root/myfolder/mytestpage')
     >>> browser.status
     '200 OK'
     >>> browser.contents
-    'This is a view!'
+    'Layout: this is a content page!, end of it.'
     >>> browser.headers.has_key('cache-control')
     True
     >>> browser.headers['Cache-Control']
@@ -30,7 +30,7 @@
 
  We can do HEAD requests:
 
-    >>> reply = http('HEAD /root/myfolder/mytestview HTTP/1.1', parsed=True)
+    >>> reply = http('HEAD /root/myfolder/mytestpage HTTP/1.1', parsed=True)
     >>> reply.getHeaders()
     {'Content-Length': '0',
      'Content-Type': 'text/html;charset=utf-8',
@@ -46,11 +46,11 @@
  If the view is private you should not have cache headers:
 
     >>> browser.addHeader("Authorization", 'Basic manager:manager')
-    >>> browser.open('http://localhost/root/myfolder/mytestview')
+    >>> browser.open('http://localhost/root/myfolder/mytestpage')
     >>> browser.status
     '200 OK'
     >>> browser.contents
-    'This is a view!'
+    'Layout: this is a content page!, end of it.'
     >>> browser.headers.has_key('cache-control')
     True
     >>> browser.headers['Cache-Control']
@@ -64,12 +64,25 @@
 
 from Products.Silva.Folder import Folder
 from silva.core.views import views as silvaviews
+from infrae.layout import ILayout, layout
 from five import grok
 
 
-class MyFolderView(silvaviews.View):
-    grok.name('mytestview')
-    grok.context(Folder)
+class IMySimpleLayout(ILayout):
+    pass
+
+
+class MySimpleLayout(silvaviews.Layout):
+    layout(IMySimpleLayout)
 
     def render(self):
-        return "This is a view!"
+        return "".join(("Layout: ", self.view.content(), ", end of it."))
+
+
+class MyFolderPage(silvaviews.Page):
+    grok.name('mytestpage')
+    grok.context(Folder)
+    layout(IMySimpleLayout)
+
+    def render(self):
+        return "this is a content page!"

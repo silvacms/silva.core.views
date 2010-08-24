@@ -11,15 +11,12 @@ from infrae.layout import Page as BasePage
 from infrae.layout.interfaces import IPage
 from zope import component, interface
 from zope.cachedescriptors.property import CachedProperty
-from zope.i18n import translate
 from zope.viewlet.interfaces import IViewletManager
 import zope.deferredimport
 
-import urllib
-
 from silva.core.interfaces import ISilvaObject
 from silva.core.views.interfaces import IContentProvider, IViewlet
-from silva.core.views.interfaces import IFeedback, IZMIView
+from silva.core.views.interfaces import IZMIView
 from silva.core.views.interfaces import IPreviewLayer
 from silva.core.views.interfaces import IView, IHTTPResponseHeaders
 
@@ -32,11 +29,12 @@ zope.deferredimport.deprecated(
 # Simple views
 
 
+class HTTPHeaderView(object):
+    """Support to set HTTP headers and support HEAD requests on views
+    objects.
 
-class SilvaGrokView(grok.View):
-    """Grok View on Silva objects.
+    This is not aimed to be use directly.
     """
-    grok.baseclass()
 
     def getPhysicalPath(self):
         return self.context.getPhysicalPath() + ('/@@' + self.__name__,)
@@ -44,13 +42,13 @@ class SilvaGrokView(grok.View):
     def publishTraverse(self, request, name):
         if request.method == name and hasattr(self, name):
             return getattr(self, name)
-        return super(SilvaGrokView, self).publishTraverse(request, name)
+        return super(HTTPHeaderView, self).publishTraverse(request, name)
 
     def browserDefault(self, request):
         if request.method in ('HEAD',):
             if hasattr(self, request.method):
                 return self, (request.method,)
-        return super(SilvaGrokView, self).browserDefault(request)
+        return super(HTTPHeaderView, self).browserDefault(request)
 
     def setHTTPHeaders(self):
         headers = component.queryMultiAdapter(
@@ -68,26 +66,10 @@ class SilvaGrokView(grok.View):
         """Render the view.
         """
         self.setHTTPHeaders()
-        return super(SilvaGrokView, self).__call__()
-
-    def redirect(self, url):
-        # Override redirect to send status information if there is.
-        if IFeedback.providedBy(self):
-            message = self.status
-            if message:
-                message = translate(message)
-                if isinstance(message, unicode):
-                    # XXX This won't be decoded correctly at the other end.
-                    message = message.encode('utf8')
-                to_append = urllib.urlencode(
-                    {'message': message, 'message_type': self.status_type,})
-                join_char = '?' in url and '&' or '?'
-                super(SilvaGrokView, self).redirect(url + join_char + to_append)
-                return
-        super(SilvaGrokView, self).redirect(url)
+        return super(HTTPHeaderView, self).__call__()
 
 
-class ZMIView(SilvaGrokView):
+class ZMIView(HTTPHeaderView, grok.View):
     """View in ZMI.
     """
     grok.baseclass()
@@ -102,8 +84,7 @@ class Layout(BaseLayout):
     grok.context(ISilvaObject)
 
 
-
-class Page(BasePage):
+class Page(HTTPHeaderView, BasePage):
     """A page class using a layout to render itself.
     """
     grok.baseclass()
@@ -111,8 +92,7 @@ class Page(BasePage):
     grok.require('zope2.View')
 
 
-
-class View(SilvaGrokView):
+class View(HTTPHeaderView, grok.View):
     """View on Silva object, support view and preview
     """
     grok.baseclass()
@@ -200,3 +180,7 @@ class SMIPortletManager(ViewletManager):
 
     def enabled(self):
         return len(self.viewlets) != 0
+
+__all__ = [
+    'View', 'ZMIView', 'Layout', 'Page',
+    'ContentProvider', 'ViewletManager', 'Viewlet']
