@@ -41,7 +41,7 @@ class HTTPHeaderView(object):
     """
 
     def getPhysicalPath(self):
-        return self.context.getPhysicalPath() + ('/@@' + self.__name__,)
+        return self.context.getPhysicalPath() + (self.__name__,)
 
     def publishTraverse(self, request, name):
         if request.method == name and hasattr(self, name):
