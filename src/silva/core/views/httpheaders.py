@@ -5,7 +5,7 @@
 from five import grok
 from zope.publisher.interfaces.browser import IBrowserRequest
 from silva.core.interfaces import ISilvaObject
-from silva.core.interfaces.adapters import IAccessSecurity
+from silva.core.interfaces.auth import IAccessSecurity
 from silva.core.views.interfaces import IHTTPResponseHeaders, INonCachedLayer
 
 
