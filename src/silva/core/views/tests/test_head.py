@@ -4,7 +4,7 @@
 # $Id$
 
 from Products.Silva.testing import FunctionalLayer, http
-from silva.core.interfaces.adapters import IAccessSecurity
+from silva.core.interfaces.auth import IAccessSecurity
 
 import unittest
 
