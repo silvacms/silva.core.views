@@ -1,10 +1,14 @@
 Changelog
 =========
 
-2.3 (unreleased)
+2.3 (2010-01-07)
 ----------------
 
-* ...
+* Update imports due to API changes.
+
+* Update test setup, use new test infrastructure.
+
+* Properly set HTTP headers on Pages as well.
 
 2.3b1 (2010/07/16)
 ------------------

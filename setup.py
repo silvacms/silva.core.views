@@ -6,7 +6,7 @@
 from setuptools import setup, find_packages
 import os
 
-version = '2.3dev'
+version = '2.3'
 
 tests_require = [
     'Products.Silva [test]',
@@ -45,7 +45,6 @@ setup(name='silva.core.views',
         'zope.container',
         'zope.contentprovider',
         'zope.deferredimport',
-        'zope.i18n',
         'zope.interface',
         'zope.publisher',
         'zope.site',
