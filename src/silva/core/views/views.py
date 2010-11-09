@@ -111,8 +111,6 @@ class View(HTTPHeaderView, grok.View):
 
     @CachedProperty
     def content(self):
-        if 'model' in self.request:
-            return self.request['model']
         preview_name = self.request.other.get('SILVA_PREVIEW_NAME', None)
         if (preview_name is not None and
             hasattr(aq_base(self.context), preview_name)):
