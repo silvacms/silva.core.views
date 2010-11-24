@@ -111,19 +111,20 @@ class ISilvaURL(IAbsoluteURL):
 # Adapters
 
 class IVirtualSite(Interface):
-    """This adapts the request and let you access the root object of
-    the current site. If Virtual Host Monster, the root object for
-    your might not be your Silva root.
+    """Adapter on a Zope request to retrieve the root object of the
+    current site. If a Virtual Host Monster is used, the root object
+    for your site might not be your Silva root, but a publication or a
+    folder.
     """
 
     def get_root():
-        """Return the root of the current site, which will be either
-        the virtual root or the Silva if Virtual Host Monster
-        rewriting is used for the request, and where.
+        """Return the root object of the current site, which can be
+        either the virtual root object or the Silva root depending if
+        Virtual Host Monster rewriting is used for the request or not.
         """
 
     def get_root_url():
-        """Return the URL of the root of the current site.
+        """Return the URL of the root object of the current site.
         """
 
     def get_silva_root():
@@ -131,13 +132,14 @@ class IVirtualSite(Interface):
         """
 
     def get_virtual_root():
-        """Return the virtual root defined by the Virtual Host Monster
-        or None.
+        """Return the virtual root object defined by the Virtual Host
+        Monster or None if the Virtual Host Monster was not used.
         """
 
     def get_virtual_path():
-        """Return the path to the virtual defined by the Virtual Host
-        Monster or None.
+        """Return the path (as a tuple of identifier) to the virtual
+        defined by the Virtual Host Monster or None if the Virtual
+        Host Monster was not used.
         """
 
 
