@@ -1,6 +1,13 @@
 Changelog
 =========
 
+2.3.X - Bethel Changes
+----------------------
+
+* adjusted absoluteurl/@@breadcrumbs so that it returns the 'id' and 'obj'
+  for each breadcrumb.  This data is used in Bethel's smi pathbar/breadcrumb.
+
+
 2.3.2 (unreleased)
 ------------------
 

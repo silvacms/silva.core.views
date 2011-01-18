@@ -68,13 +68,13 @@ class AbsoluteURL(BrowserView):
             IRoot.providedBy(self.context) or
             isVirtualHostRoot() or
             not ITraversable.providedBy(container)):
-            return ({'name': name, 'url': self.__str__()},)
+            return ({'name': name, 'url': self.__str__(), 'id':context.id, 'obj': context},)
 
         base = tuple(zope.component.getMultiAdapter(
                      (container, request), name='absolute_url').breadcrumbs())
 
         if not (IContent.providedBy(context) and context.is_default()):
-            base += ({'name': name, 'url': self.__str__()},)
+            base += ({'name': name, 'url': self.__str__(), 'id':context.id, 'obj': context},)
 
         return base
 
