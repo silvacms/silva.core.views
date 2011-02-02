@@ -99,6 +99,7 @@ class ErrorAbsoluteURL(AbsoluteURL):
         # Set first Silva object as context
         self.context = context.get_silva_object()
         self.request = request
+        self._preview_ns = '++preview++'
 
 
 class TestAbsoluteURL(BrowserView):
