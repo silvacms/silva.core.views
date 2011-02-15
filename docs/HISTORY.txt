@@ -6,6 +6,10 @@ Changelog
 
 * adjusted absoluteurl/@@breadcrumbs so that it returns the 'id' and 'obj'
   for each breadcrumb.  This data is used in Bethel's smi pathbar/breadcrumb.
+  
+* adjust the HTTPHeaderView to __call__ the adapter rather than call 
+  setupHeaders directly (enabling overriding adapters to put overriding code
+  in __call__).
 
 
 2.3.2 (unreleased)

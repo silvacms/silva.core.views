@@ -58,7 +58,9 @@ class HTTPHeaderView(object):
         headers = component.queryMultiAdapter(
             (self.request, self.context), IHTTPResponseHeaders)
         if headers is not None:
-            headers.set_headers()
+            #use __call__ instead of setupHeaders directly. to enable
+            # adapters in lower skins/layers to override in the __call__ method
+            headers.__call__()
 
     def HEAD(self):
         """Reply to HEAD requests.
