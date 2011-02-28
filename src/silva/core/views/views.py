@@ -17,7 +17,8 @@ import zope.deferredimport
 from zope.publisher.publish import mapply
 
 from silva.core.interfaces import (ISilvaObject, IContainer, IContentLayout,
-                                   IVersionedContentLayout)
+                                   IVersionedContentLayout, 
+                                   IDefaultContentTemplate)
 from silva.core.views.interfaces import IContentProvider, IViewlet
 from silva.core.views.interfaces import IZMIView
 from silva.core.views.interfaces import IPreviewLayer
@@ -119,10 +120,9 @@ class Page(HTTPHeaderView, BasePage):
             # be rendered within a content layout)
             # render the content, inject into default content renderer view
             try:
-                
                 dcl = component.getMultiAdapter((obj,
                                                  self.request),
-                                                name="defaultcontenttemplate")
+                                                interface=IDefaultContentTemplate)
             except ComponentLookupError:
                 return content
             #since grok.View does not support passing in parameters on call,
