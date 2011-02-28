@@ -10,11 +10,14 @@ from infrae.layout import Layout as BaseLayout
 from infrae.layout import Page as BasePage
 from infrae.layout.interfaces import IPage
 from zope import component
+from zope.component.interfaces import ComponentLookupError
 from zope.cachedescriptors.property import CachedProperty
 from zope.viewlet.interfaces import IViewletManager
 import zope.deferredimport
+from zope.publisher.publish import mapply
 
-from silva.core.interfaces import ISilvaObject
+from silva.core.interfaces import (ISilvaObject, IContainer, IContentLayout,
+                                   IVersionedContentLayout)
 from silva.core.views.interfaces import IContentProvider, IViewlet
 from silva.core.views.interfaces import IZMIView
 from silva.core.views.interfaces import IPreviewLayer
@@ -96,7 +99,37 @@ class Page(HTTPHeaderView, BasePage):
     grok.baseclass()
     grok.context(ISilvaObject)
     grok.require('zope2.View')
-
+    
+    def content(self):
+        """override BasePage's method to provide content layout support"""
+        template = getattr(self, 'template', None)
+        if template is not None:
+            return self._render_template()
+        
+        content = mapply(self.render, (), self.request)
+        obj = self.context
+        if IContainer.providedBy(obj):
+            #if a container, need to get the default document, since containers
+            # don't implement contentlayout
+            if obj.get_default():
+                obj = obj.get_default()
+        if not (IContentLayout.providedBy(obj) or \
+                IVersionedContentLayout.providedBy(obj)):
+            #does not provide content layout (but may still need to 
+            # be rendered within a content layout)
+            # render the content, inject into default content renderer view
+            try:
+                
+                dcl = component.getMultiAdapter((obj,
+                                                 self.request),
+                                                name="defaultcontenttemplate")
+            except ComponentLookupError:
+                return content
+            #since grok.View does not support passing in parameters on call,
+            # set the content here
+            dcl.set_content(content)
+            return dcl()
+        return content
 
 class View(HTTPHeaderView, grok.View):
     """View on Silva object, support view and preview

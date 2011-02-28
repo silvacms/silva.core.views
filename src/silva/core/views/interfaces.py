@@ -31,10 +31,16 @@ class INonCachedLayer(IBrowserRequest):
     """Layer that prevent its content to be cached by the HTTP protocol.
     """
 
-
 class IPreviewLayer(INonCachedLayer):
     """This layer enable the fact to display preview version instead
     of public version.
+    """
+
+# used by the content layout editor (silva.core.contentlayout)
+class ILayoutEditorLayer(IPreviewLayer):
+    """This layer, accessible through ++layouteditor++ will cause
+       a ContentLayout object to be rendered with the LayoutEditor
+       interface (as opposed to preview or view)
     """
 
 # View

@@ -11,6 +11,9 @@ Changelog
   setupHeaders directly (enabling overriding adapters to put overriding code
   in __call__).
 
+* adjust views.Page.content to wrap non-IContentLayout content around
+  a default content template
+
 
 2.3.2 (unreleased)
 ------------------
