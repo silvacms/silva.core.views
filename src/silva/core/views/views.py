@@ -129,6 +129,7 @@ class Page(HTTPHeaderView, BasePage):
             # set the content here
             dcl.rendered_content = content
             dcl.page = self
+            dcl.layout = self.layout
             return dcl()
         return content
 

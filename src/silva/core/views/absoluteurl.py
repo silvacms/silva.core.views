@@ -12,7 +12,7 @@ from Products.Five import BrowserView
 from Acquisition import aq_parent, aq_inner
 
 from silva.core.interfaces import IRoot, IContent
-from silva.core.views.interfaces import IPreviewLayer, ISilvaURL
+from silva.core.views.interfaces import IPreviewLayer, ISilvaURL, IVirtualSite
 
 
 class AbsoluteURL(BrowserView):
@@ -54,15 +54,14 @@ class AbsoluteURL(BrowserView):
         context = aq_inner(self.context)
         container = aq_parent(context)
         request = self.request
+        virtual_root = IVirtualSite(self.request).get_root()
 
         name = context.get_short_title()
         if len(name) > 50:
             name = name[47:] + '...'
 
         def isVirtualHostRoot():
-            path = self.context.getPhysicalPath()
-            virtualPath = self.request.physicalPathToVirtualPath(path)
-            return not virtualPath
+            return self.context == virtual_root
 
         if (container is None or
             IRoot.providedBy(self.context) or
