@@ -128,8 +128,6 @@ class Page(HTTPHeaderView, BasePage):
             #since grok.View does not support passing in parameters on call,
             # set the content here
             dcl.rendered_content = content
-            dcl.page = self
-            dcl.layout = self.layout
             return dcl()
         return content
 
