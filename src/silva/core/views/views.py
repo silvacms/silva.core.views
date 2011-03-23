@@ -23,6 +23,7 @@ from silva.core.views.interfaces import IContentProvider, IViewlet
 from silva.core.views.interfaces import IZMIView
 from silva.core.views.interfaces import IPreviewLayer
 from silva.core.views.interfaces import IView, IHTTPResponseHeaders
+from silva.core.smi.interfaces import ISMILayer
 
 zope.deferredimport.deprecated(
     'SMIView moved to silva.core.smi. '
@@ -93,22 +94,18 @@ class Layout(BaseLayout):
     grok.baseclass()
     grok.context(ISilvaObject)
 
-
-class Page(HTTPHeaderView, BasePage):
-    """A page class using a layout to render itself.
-    """
-    grok.baseclass()
-    grok.context(ISilvaObject)
-    grok.require('zope2.View')
+class ContentTemplateMixin(object):
+    """Mixin class to assist pages and views in wrapping the rendered
+       content around a content layout template if necessary"""
     
-    def content(self):
-        """override BasePage's method to provide content layout support"""
-        template = getattr(self, 'template', None)
-        if template is not None:
-            return self._render_template()
-        
-        content = mapply(self.render, (), self.request)
+    def wrap_if_necessary(self, rendered_content):
+        """Wrap the rendered content around a default content template if
+           necessary"""
         obj = self.context
+        #do not wrap rendered content if in edit mode (i.e. ISMILayer)
+        # this can happen when the content/screen is a zeam SMIForm
+        if ISMILayer.providedBy(self.request):
+            return rendered_content
         if IContainer.providedBy(obj):
             #if a container, need to get the default document, since containers
             # don't implement contentlayout
@@ -124,13 +121,28 @@ class Page(HTTPHeaderView, BasePage):
                                                  self.request),
                                                 interface=IDefaultContentTemplate)
             except ComponentLookupError:
-                return content
-            #since grok.View does not support passing in parameters on call,
-            # set the content here
-            dcl.rendered_content = content
+                return rendered_content
+            dcl.rendered_content = rendered_content
             return dcl()
-        return content
-
+        return rendered_content
+        
+    
+class Page(HTTPHeaderView, BasePage, ContentTemplateMixin):
+    """A page class using a layout to render itself.
+    """
+    grok.baseclass()
+    grok.context(ISilvaObject)
+    grok.require('zope2.View')
+    
+    def content(self):
+        """override BasePage's method to provide content layout support"""
+        template = getattr(self, 'template', None)
+        if template is not None:
+            return self._render_template()
+        
+        content = mapply(self.render, (), self.request)
+        return self.wrap_if_necessary(content)
+    
 class View(HTTPHeaderView, grok.View):
     """View on Silva object, support view and preview
     """

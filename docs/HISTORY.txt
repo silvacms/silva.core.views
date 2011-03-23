@@ -13,6 +13,9 @@ Changelog
 
 * adjust views.Page.content to wrap non-IContentLayout content around
   a default content template
+  
+* add a ContentTemplateMixin, which factors out wrapping the rendered content
+  in a content layout template
 
 
 2.3.2 (unreleased)
