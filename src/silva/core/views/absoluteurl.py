@@ -3,16 +3,25 @@
 # $Id$
 
 # Zope 3
-import zope.component
+from zope.component import getMultiAdapter
 from zope.interface import implements
 
 # Zope 2
 from OFS.interfaces import ITraversable
 from Products.Five import BrowserView
-from Acquisition import aq_parent, aq_inner
+from Acquisition import aq_parent
 
 from silva.core.interfaces import IRoot, IContent
 from silva.core.views.interfaces import IPreviewLayer, ISilvaURL
+
+
+def minimize(string):
+    """Minize a string to 50 characters.
+    """
+    string = string.strip()
+    if len(string) > 50:
+        return string[:47].strip() + '...'
+    return string
 
 
 class AbsoluteURL(BrowserView):
@@ -26,6 +35,13 @@ class AbsoluteURL(BrowserView):
         self.context = context
         self.request = request
         self._preview_ns = '++preview++'
+
+        def title():
+            if IPreviewLayer.providedBy(self.request):
+                return context.get_previewable().get_short_title()
+            return context.get_short_title()
+
+        self.title = title
 
     def url(self, preview=False):
         path = list(self.context.getPhysicalPath())
@@ -51,13 +67,8 @@ class AbsoluteURL(BrowserView):
     __call__ = __repr__ = __unicode__ = __str__
 
     def breadcrumbs(self):
-        context = aq_inner(self.context)
-        container = aq_parent(context)
-        request = self.request
-
-        name = context.get_short_title().strip()
-        if len(name) > 50:
-            name = name[:47].strip() + '...'
+        container = aq_parent(self.context)
+        name = minimize(self.title())
 
         def isVirtualHostRoot():
             path = self.context.getPhysicalPath()
@@ -70,10 +81,10 @@ class AbsoluteURL(BrowserView):
             not ITraversable.providedBy(container)):
             return ({'name': name, 'url': self.__str__()},)
 
-        base = tuple(zope.component.getMultiAdapter(
-                     (container, request), name='absolute_url').breadcrumbs())
+        base = tuple(getMultiAdapter(
+                (container, self.request), name='absolute_url').breadcrumbs())
 
-        if not (IContent.providedBy(context) and context.is_default()):
+        if not (IContent.providedBy(self.context) and self.context.is_default()):
             base += ({'name': name, 'url': self.__str__()},)
 
         return base
@@ -88,7 +99,7 @@ class VersionAbsoluteURL(AbsoluteURL):
         self.context = context.get_content()
         self.request = request
         self._preview_ns = '++preview++' + context.getId()
-
+        self.title = lambda: context.get_short_title()
 
 
 class ErrorAbsoluteURL(AbsoluteURL):
