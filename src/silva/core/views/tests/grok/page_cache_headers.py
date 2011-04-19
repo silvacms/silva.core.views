@@ -17,25 +17,25 @@
  When requesting the view the response should include cache control
  headers:
 
-    >>> browser = Browser()
+    >>> browser = getBrowser()
     >>> browser.open('http://localhost/root/myfolder/mytestpage')
-    >>> browser.status
-    '200 OK'
+    200
+    >>> browser.headers
+    {'content-length': '43',
+     'content-type': 'text/html;charset=utf-8',
+     'cache-control': 'max-age=86400, must-revalidate'}
     >>> browser.contents
     'Layout: this is a content page!, end of it.'
-    >>> browser.headers.has_key('cache-control')
-    True
-    >>> browser.headers['Cache-Control']
-    'max-age=86400, must-revalidate'
 
  We can do HEAD requests:
 
-    >>> reply = http('HEAD /root/myfolder/mytestpage HTTP/1.1', parsed=True)
-    >>> reply.getHeaders()
-    {'Content-Length': '0',
-     'Content-Type': 'text/html;charset=utf-8',
-     'Cache-Control': 'max-age=86400, must-revalidate'}
-    >>> reply.getBody()
+    >>> browser.open('/root/myfolder/mytestpage', method='HEAD')
+    204
+    >>> browser.headers
+    {'content-length': '0',
+     'content-type': 'text/html;charset=utf-8',
+     'cache-control': 'max-age=86400, must-revalidate'}
+    >>> browser.contents
     ''
 
  We now create a protected folder:
@@ -45,20 +45,17 @@
 
  If the view is private you should not have cache headers:
 
-    >>> browser.addHeader("Authorization", 'Basic manager:manager')
+    >>> browser.login('manager')
     >>> browser.open('http://localhost/root/myfolder/mytestpage')
-    >>> browser.status
-    '200 OK'
+    200
+    >>> browser.headers
+    {'content-length': '43',
+     'expires': 'Mon, 26 Jul 1997 05:00:00 GMT',
+     'content-type': 'text/html;charset=utf-8',
+     'pragma': 'no-cache',
+     'cache-control': 'no-cache, must-revalidate, post-check=0, pre-check=0'}
     >>> browser.contents
     'Layout: this is a content page!, end of it.'
-    >>> browser.headers.has_key('cache-control')
-    True
-    >>> browser.headers['Cache-Control']
-    'no-cache, must-revalidate, post-check=0, pre-check=0'
-    >>> browser.headers.has_key('pragma')
-    True
-    >>> browser.headers['Pragma']
-    'no-cache'
 
 """
 

@@ -6,12 +6,10 @@
 import unittest
 import doctest
 
-from Products.Silva.testing import (
-    FunctionalLayer, suite_from_package, http, Browser)
+from Products.Silva.testing import FunctionalLayer, suite_from_package
 
-globs = {'http': http,
-         'grok': FunctionalLayer.grok,
-         'Browser': Browser,
+globs = {'grok': FunctionalLayer.grok,
+         'getBrowser': FunctionalLayer.get_browser,
          'getRootFolder': FunctionalLayer.get_application}
 
 

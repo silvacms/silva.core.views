@@ -3,7 +3,7 @@
 # See also LICENSE.txt
 # $Id$
 
-from Products.Silva.testing import FunctionalLayer, http
+from Products.Silva.testing import FunctionalLayer
 from silva.core.interfaces.auth import IAccessSecurity
 
 import unittest
@@ -30,56 +30,51 @@ class HEADTestCase(unittest.TestCase):
         self.root = self.layer.get_application()
 
     def check_headers(self, method, path, headers, expected_headers):
-        # XXX use infrae.testbrowser
-        request = '%s %s HTTP/1.1' % (method, path)
-        for header in headers.items():
-            request += '\r\n%s: %s' % header
-        self.response = http(request, parsed=True)
-        self.failUnless(self.response.getStatus(), 200)
-        response_headers = self.response.getHeaders()
-        for key, value in expected_headers.items():
-            reply_value = response_headers.get(key, None)
-            self.assertEquals(
-                reply_value, value,
-                'Invalid header for "%s", expected: "%s", was: "%s"' %
-                    (key, value, reply_value))
+        with self.layer.get_browser() as browser:
+            # Set request header
+            for name, value in headers.items():
+                browser.set_request_header(name, value)
+
+            self.assertEqual(browser.open(path, method=method), 204)
+            self.assertEqual(browser.contents, '')
+
+            # Check result headers
+            for name, value in expected_headers.items():
+                reply_value = browser.headers.get(name)
+                self.assertEquals(
+                    reply_value, value,
+                    'Invalid header for "%s", expected: "%s", was: "%s"' %
+                        (name, value, reply_value))
 
     def set_private(self, context):
         IAccessSecurity(context).minimum_role = 'Authenticated'
 
-    def assertEmptyResponse(self):
-        self.assertEquals(
-            "", self.response.getBody(), "response should be empty")
-
 
 class SilvaHEADTestCase(HEADTestCase):
+    """Test HEAD request on default Silva content.
+    """
 
     def test_root(self):
         self.check_headers('HEAD', '/root', {}, PUBLIC_HEADERS_EXPECTED)
-        self.assertEmptyResponse()
 
     def test_root_auth(self):
         self.check_headers('HEAD', '/root', AUTH, PUBLIC_HEADERS_EXPECTED)
-        self.assertEmptyResponse()
 
     def test_root_auth_private(self):
         self.set_private(self.root)
         self.check_headers('HEAD', '/root', AUTH, PRIVATE_HEADERS_EXPECTED)
-        self.assertEmptyResponse()
 
     def test_publication(self):
         factory = self.root.manage_addProduct['Silva']
         factory.manage_addPublication('publication', 'Publication')
         self.check_headers(
             'HEAD', '/root/publication', {}, PUBLIC_HEADERS_EXPECTED)
-        self.assertEmptyResponse()
 
     def test_publication_auth(self):
         factory = self.root.manage_addProduct['Silva']
         factory.manage_addPublication('publication', 'Publication')
         self.check_headers(
             'HEAD', '/root/publication', AUTH, PUBLIC_HEADERS_EXPECTED)
-        self.assertEmptyResponse()
 
     def test_publication_auth_private(self):
         factory = self.root.manage_addProduct['Silva']
@@ -87,7 +82,6 @@ class SilvaHEADTestCase(HEADTestCase):
         self.set_private(self.root.publication)
         self.check_headers(
             'HEAD', '/root/publication', AUTH, PRIVATE_HEADERS_EXPECTED)
-        self.assertEmptyResponse()
 
 
 def test_suite():
