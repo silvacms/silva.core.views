@@ -2,6 +2,9 @@
 # See also LICENSE.txt
 # $Id$
 
+#python
+import re
+
 # Zope 3
 import zope.component
 from zope.interface import implements
@@ -11,7 +14,7 @@ from OFS.interfaces import ITraversable
 from Products.Five import BrowserView
 from Acquisition import aq_parent, aq_inner
 
-from silva.core.interfaces import IRoot, IContent
+from silva.core.interfaces import IRoot, IContent, IContainer
 from silva.core.views.interfaces import IPreviewLayer, ISilvaURL, IVirtualSite
 
 
@@ -40,7 +43,12 @@ class AbsoluteURL(BrowserView):
                 'VirtualRootPhysicalPath', ('',))
             preview_pos = max(len(root_path), len(virtual_path))
             path.insert(preview_pos, self._preview_ns)
-        return self.request.physicalPathToURL(path)
+        url = self.request.physicalPathToURL(path)
+        if IContainer.providedBy(self.context) and \
+           not url.endswith('/'):
+            return url + '/'
+        elif self.context.is_default() and url.endswith('/index'):
+            return re.sub('/index$', '/', url)
 
     def preview(self):
         return self.url(preview=True)

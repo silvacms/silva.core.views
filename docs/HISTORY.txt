@@ -16,6 +16,12 @@ Changelog
   
 * add a ContentTemplateMixin, which factors out wrapping the rendered content
   in a content layout template
+  
+* adjust absoluteurl.url() to strip trailing 'index' section from urls
+  for index documents (url canonicalization)
+  
+* adjust absoluteurl.url() to append trailing '/' to IContainers
+  (url canonicalization)
 
 
 2.3.2 (unreleased)
