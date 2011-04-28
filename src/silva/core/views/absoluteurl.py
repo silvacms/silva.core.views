@@ -49,6 +49,7 @@ class AbsoluteURL(BrowserView):
             return url + '/'
         elif self.context.is_default() and url.endswith('/index'):
             return re.sub('/index$', '/', url)
+        return url
 
     def preview(self):
         return self.url(preview=True)
