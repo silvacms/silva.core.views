@@ -44,11 +44,6 @@ class AbsoluteURL(BrowserView):
             preview_pos = max(len(root_path), len(virtual_path))
             path.insert(preview_pos, self._preview_ns)
         url = self.request.physicalPathToURL(path)
-        if IContainer.providedBy(self.context) and \
-           not url.endswith('/'):
-            return url + '/'
-        elif self.context.is_default() and url.endswith('/index'):
-            return re.sub('/index$', '/', url)
         return url
 
     def preview(self):
