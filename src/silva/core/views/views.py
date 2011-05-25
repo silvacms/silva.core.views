@@ -106,7 +106,13 @@ class ContentTemplateMixin(object):
         # this can happen when the content/screen is a zeam SMIForm
         if ISMILayer.providedBy(self.request):
             return rendered_content
-        if IContainer.providedBy(obj):
+        #if this is the default view (i.e. index.html) of a container,
+        # get the default document.  Default views will likely NOT be
+        # overridden (why not just use a silvaviews.View then?) but there
+        # are grok Views registered on interfaces attached to containers
+        # which DO change the default template.
+        # there SHOULD NOT be extra views registered on ContentLayout objects.
+        if self.__name__ == 'index.html' and IContainer.providedBy(obj):
             #if a container, need to get the default document, since containers
             # don't implement contentlayout
             if obj.get_default():
