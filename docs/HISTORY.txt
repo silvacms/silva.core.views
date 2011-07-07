@@ -1,8 +1,8 @@
 Changelog
 =========
 
-2.3.X - Bethel Changes
-----------------------
+2.3.1-bethel.1 (2011-07-07)
+---------------------------
 
 * adjusted absoluteurl/@@breadcrumbs so that it returns the 'id' and 'obj'
   for each breadcrumb.  This data is used in Bethel's smi pathbar/breadcrumb.
@@ -22,12 +22,6 @@ Changelog
   
 * adjust absoluteurl.url() to append trailing '/' to IContainers
   (url canonicalization)
-
-
-2.3.2 (unreleased)
-------------------
-
-* ...
 
 2.3.1 (2010/12/20)
 ------------------
