@@ -61,7 +61,7 @@
 
 from Products.Silva.Folder import Folder
 from silva.core.views import views as silvaviews
-from infrae.layout import ILayout, layout
+from grokcore.layout import ILayout, layout
 from five import grok
 
 

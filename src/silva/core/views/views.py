@@ -6,9 +6,9 @@
 from Acquisition import aq_base
 
 from five import grok
-from infrae.layout import Layout as BaseLayout
-from infrae.layout import Page as BasePage
-from infrae.layout.interfaces import IPage
+from grokcore.layout import Layout as BaseLayout
+from grokcore.layout import Page as BasePage
+from grokcore.layout.interfaces import IPage
 from zope import component
 from zope.cachedescriptors.property import CachedProperty
 from zope.viewlet.interfaces import IViewletManager

@@ -8,7 +8,7 @@
 
   <include package="five.grok" />
   <include package="silva.core.conf" />
-  <include package="infrae.layout" />
+  <include package="grokcore.layout" />
 
   <!-- Default page style -->
   <browser:page
