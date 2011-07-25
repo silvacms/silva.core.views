@@ -6,18 +6,28 @@
 from Acquisition import aq_base
 
 from five import grok
-from grokcore.layout import Layout as BaseLayout
-from grokcore.layout import Page as BasePage
-from grokcore.layout.interfaces import IPage
+from infrae.layout import Layout as BaseLayout
+from infrae.layout import Page as BasePage
+from infrae.layout.interfaces import IPage
 from zope import component
 from zope.cachedescriptors.property import CachedProperty
 from zope.viewlet.interfaces import IViewletManager
+import zope.deferredimport
 
 from silva.core.interfaces import ISilvaObject
 from silva.core.views.interfaces import IContentProvider, IViewlet
 from silva.core.views.interfaces import IZMIView
 from silva.core.views.interfaces import IPreviewLayer
 from silva.core.views.interfaces import IView, IHTTPResponseHeaders
+
+zope.deferredimport.deprecated(
+    'SMIView moved to silva.core.smi. '
+    'Consider using a SMIPage instead. It will be removed in Silva 2.4',
+    SMIView='silva.core.smi.smi:SMIView')
+zope.deferredimport.deprecated(
+    'SMIPortletManager moved to silva.core.smi.smi. '
+    'Please update your import. This one will be removed in Silva 2.4',
+    SMIPortletManager='silva.core.smi.smi:SMIPortletManager')
 
 
 # Simple views
