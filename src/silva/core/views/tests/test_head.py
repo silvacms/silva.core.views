@@ -39,10 +39,10 @@ class HEADTestCase(unittest.TestCase):
         response_headers = self.response.getHeaders()
         for key, value in expected_headers.items():
             reply_value = response_headers.get(key, None)
-                self.assertEquals(
-                    reply_value, value,
-                    'Invalid header for "%s", expected: "%s", was: "%s"' %
-                    (key, value, reply_value))
+            self.assertEquals(
+                reply_value, value,
+                'Invalid header for "%s", expected: "%s", was: "%s"' %
+                (key, value, reply_value))
 
     def set_private(self, context):
         IAccessSecurity(context).minimum_role = 'Authenticated'
