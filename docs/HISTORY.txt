@@ -1,10 +1,12 @@
 Changelog
 =========
 
-2.3.2 (unreleased)
+2.3.2 (2011/07/27)
 ------------------
 
-* ...
+* Fix a bug while truncating a title in the breadcrumb.
+
+* Fix URL computation on error pages.
 
 2.3.1 (2010/12/20)
 ------------------
