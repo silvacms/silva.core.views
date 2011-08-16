@@ -3,7 +3,8 @@
 # See also LICENSE.txt
 # $Id$
 
-from Acquisition import aq_base
+from AccessControl.security import checkPermission
+from AccessControl import Unauthorized
 
 from five import grok
 from grokcore.layout import Layout as BaseLayout
@@ -86,6 +87,8 @@ class Page(HTTPHeaderView, BasePage):
     grok.require('zope2.View')
 
 
+_marker = object()
+
 class View(HTTPHeaderView, grok.View):
     """View on Silva object, support view and preview
     """
@@ -95,22 +98,33 @@ class View(HTTPHeaderView, grok.View):
     grok.name(u'content.html')
     grok.require('zope2.View')
 
+    __content = _marker
+
     @CachedProperty
     def is_preview(self):
         return IPreviewLayer.providedBy(self.request)
 
-    @CachedProperty
-    def content(self):
-        preview_name = self.request.other.get('SILVA_PREVIEW_NAME', None)
-        if (preview_name is not None and
-            hasattr(aq_base(self.context), preview_name)):
-            return getattr(self.context, preview_name)
-        version = None
-        if self.is_preview:
-            version = self.context.get_previewable()
-        if version is None:
-            version = self.context.get_viewable()
-        return version
+    @apply
+    def content():
+
+        def getter(self):
+            if self.__content is not _marker:
+                return self.__content
+            content = None
+            if self.is_preview:
+                content = self.context.get_previewable()
+                if not checkPermission('silva.ReadSilvaContent', self.context):
+                    raise Unauthorized(
+                        "You need to be authenticated to access this version")
+            if content is None:
+                content = self.context.get_viewable()
+            self.__content = content
+            return content
+
+        def setter(self, content):
+            self.__content = content
+
+        return property(getter, setter)
 
     def namespace(self):
         return {'content': self.content}
