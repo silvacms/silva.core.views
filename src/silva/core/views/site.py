@@ -32,8 +32,8 @@ class VirtualSite(grok.Adapter):
         return u''
 
     def get_silva_root(self):
-        # XXX Check for nested localsites in Silva
-        return getSite()
+        # We call get_root to by pass any local site
+        return getSite().get_root()
 
     def get_virtual_root(self):
         root_path = self.get_virtual_path()
@@ -45,7 +45,7 @@ class VirtualSite(grok.Adapter):
     def get_virtual_path(self):
         try:
             root_path = self.request['VirtualRootPhysicalPath']
-        except (AttributeError, KeyError), err:
+        except (AttributeError, KeyError):
             root_path =  None
 
         return root_path
