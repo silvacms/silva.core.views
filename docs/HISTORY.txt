@@ -1,6 +1,19 @@
 Changelog
 =========
 
+2.3.2-bethel.1 (unreleased)
+------------------------------
+
+* merge changeset: 0de42b7de878, bringing code up to version 2.3.2 with
+  an additional fix for breadcrumbs in localsites
+
+2.3.2 (2011/07/27)
+------------------
+
+* Fix a bug while truncating a title in the breadcrumb.
+
+* Fix URL computation on error pages.
+
 2.3.1-bethel.1 (2011-07-07)
 ---------------------------
 

@@ -30,6 +30,7 @@ class HEADTestCase(unittest.TestCase):
         self.root = self.layer.get_application()
 
     def check_headers(self, method, path, headers, expected_headers):
+        # XXX use infrae.testbrowser
         request = '%s %s HTTP/1.1' % (method, path)
         for header in headers.items():
             request += '\r\n%s: %s' % header
@@ -41,7 +42,7 @@ class HEADTestCase(unittest.TestCase):
             self.assertEquals(
                 reply_value, value,
                 'Invalid header for "%s", expected: "%s", was: "%s"' %
-                    (key, value, reply_value))
+                (key, value, reply_value))
 
     def set_private(self, context):
         IAccessSecurity(context).minimum_role = 'Authenticated'
@@ -49,6 +50,9 @@ class HEADTestCase(unittest.TestCase):
     def assertEmptyResponse(self):
         self.assertEquals(
             "", self.response.getBody(), "response should be empty")
+
+
+class SilvaHEADTestCase(HEADTestCase):
 
     def test_root(self):
         self.check_headers('HEAD', '/root', {}, PUBLIC_HEADERS_EXPECTED)
@@ -85,33 +89,8 @@ class HEADTestCase(unittest.TestCase):
             'HEAD', '/root/publication', AUTH, PRIVATE_HEADERS_EXPECTED)
         self.assertEmptyResponse()
 
-    def test_document(self):
-        factory = self.root.manage_addProduct['SilvaDocument']
-        factory.manage_addDocument('document', 'Document')
-        self.check_headers(
-            'HEAD', '/root/document', {}, PUBLIC_HEADERS_EXPECTED)
-        self.assertEmptyResponse()
-
-    def test_document_auth(self):
-        factory = self.root.manage_addProduct['SilvaDocument']
-        factory.manage_addDocument('document', 'Document')
-        self.check_headers(
-            'HEAD', '/root/document', AUTH, PUBLIC_HEADERS_EXPECTED)
-        self.assertEquals(
-            "", self.response.getBody(), "response should be empty")
-        self.assertEmptyResponse()
-
-    def test_document_auth_private(self):
-        factory = self.root.manage_addProduct['SilvaDocument']
-        factory.manage_addDocument('document', 'Document')
-        self.set_private(self.root.document)
-        self.check_headers(
-            'HEAD', '/root/document', AUTH, PRIVATE_HEADERS_EXPECTED)
-        self.assertEmptyResponse()
-
-
 
 def test_suite():
     suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(HEADTestCase))
+    suite.addTest(unittest.makeSuite(SilvaHEADTestCase))
     return suite
