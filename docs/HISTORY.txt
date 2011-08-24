@@ -4,7 +4,7 @@ Changelog
 2.3.3 (unreleased)
 ------------------
 
-* ...
+* fix site/get_silva_root, so None is returned if no Site is present
 
 2.3.2 (2011/07/27)
 ------------------
