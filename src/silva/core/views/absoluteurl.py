@@ -82,13 +82,13 @@ class AbsoluteURL(BrowserView):
             IRoot.providedBy(self.context) or
             isVirtualHostRoot() or
             not ITraversable.providedBy(container)):
-            return ({'name': name, 'url': self.__str__(), 'id':context.id, 'obj': context},)
+            return ({'name': name, 'url': self.__str__(), 'id':self.context.id, 'obj': self.context},)
 
         base = tuple(getMultiAdapter(
                 (container, self.request), name='absolute_url').breadcrumbs())
 
         if not (IContent.providedBy(self.context) and self.context.is_default()):
-            base += ({'name': name, 'url': self.__str__(), 'id':context.id, 'obj': context},)
+            base += ({'name': name, 'url': self.__str__(), 'id':self.context.id, 'obj': self.context},)
 
         return base
 
