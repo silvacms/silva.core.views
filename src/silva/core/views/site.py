@@ -33,7 +33,10 @@ class VirtualSite(grok.Adapter):
 
     def get_silva_root(self):
         # Return Silva root, using getSite and acquisition
-        return getSite().get_root()
+        site = getSite()
+        if site:
+            return site.get_root()
+        return site
 
     def get_virtual_root(self):
         root_path = self.get_virtual_path()

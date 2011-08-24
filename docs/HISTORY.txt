@@ -7,6 +7,9 @@ Changelog
 * merge changeset: 0de42b7de878, bringing code up to version 2.3.2 with
   an additional fix for breadcrumbs in localsites
 
+* fix get_root in site.py -- the zope app root default view was broken 
+  (in this code) if there are no silva roots
+
 2.3.2 (2011/07/27)
 ------------------
 
