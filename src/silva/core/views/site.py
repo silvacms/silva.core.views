@@ -33,7 +33,10 @@ class VirtualSite(grok.Adapter):
 
     def get_silva_root(self):
         # We call get_root to by pass any local site
-        return getSite().get_root()
+        site = getSite()
+        if site is not None:
+            return site.get_root()
+        return None
 
     def get_virtual_root(self):
         root_path = self.get_virtual_path()
