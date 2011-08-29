@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.3.2-bethel.1 (unreleased)
+2.3.2-bethel.1 (2011-08-29)
 ------------------------------
 
 * merge changeset: 0de42b7de878, bringing code up to version 2.3.2 with
