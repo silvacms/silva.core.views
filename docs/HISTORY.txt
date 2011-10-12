@@ -1,6 +1,11 @@
 Changelog
 =========
 
+2.3.2-bethel.2 (unreleased)
+---------------------------
+
+* added 'other' to the test AbsoluteURLRequest
+
 2.3.2-bethel.1 (2011-08-29)
 ------------------------------
 

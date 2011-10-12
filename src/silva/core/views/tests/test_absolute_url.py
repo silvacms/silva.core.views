@@ -14,6 +14,7 @@ class AbsTestRequest(TestRequest):
         #set a default script
         self._script = []
         super(AbsTestRequest, self).__init__(**kw)
+        self.other = {}
     
     def physicalPathToVirtualPath(self, path):
         """ Remove the path to the VirtualRoot from a physical path """
