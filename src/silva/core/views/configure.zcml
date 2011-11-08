@@ -18,13 +18,6 @@
      permission="zope.Public"
      />
 
-  <browser:page
-     for="silva.core.interfaces.ISilvaObject"
-     template="templates/smi_template.pt"
-     name="five_template"
-     permission="zope.Public"
-     />
-
   <!-- AbsoluteURL views -->
   <view
      for="silva.core.interfaces.ISilvaObject"
