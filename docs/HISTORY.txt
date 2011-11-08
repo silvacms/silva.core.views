@@ -1,10 +1,17 @@
 Changelog
 =========
 
-2.3.2 (unreleased)
+3.0b1 (2011/11/08)
 ------------------
 
-* ...
+* Fix various bugs on ``IVirtualSite``
+
+* Now base the layout on the generic ``grokcore.layout`` package
+  instead of ``infrae.layout``.
+
+* Review support for preview on a ``View``.
+
+* Fix various bugs in breadcrumb and preview URL.
 
 2.3.1 (2010/12/20)
 ------------------
