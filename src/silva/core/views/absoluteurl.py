@@ -7,7 +7,6 @@ from zope.component import getMultiAdapter
 from zope.interface import implements
 
 # Zope 2
-from OFS.interfaces import ITraversable
 from Products.Five import BrowserView
 from Acquisition import aq_parent
 
@@ -36,15 +35,12 @@ class AbsoluteURL(BrowserView):
         self.request = request
         self._preview_ns = '++preview++'
 
-        def title():
-            if IPreviewLayer.providedBy(self.request):
-                return context.get_previewable().get_short_title()
-            return context.get_short_title()
+    def title(self, preview=False):
+        if preview:
+            return self.context.get_previewable().get_short_title()
+        return self.context.get_short_title()
 
-        self.title = title
-
-    def url(self, preview=False):
-        path = list(self.context.getPhysicalPath())
+    def path2url(self, path, preview=False):
         # Insert back the preview namespace. Maybe there is a better
         # way to do it, but have to do it by hand here since
         # ZPublisher.Request doesn't implements its interfaces
@@ -55,8 +51,14 @@ class AbsoluteURL(BrowserView):
             virtual_path = self.request.other.get(
                 'VirtualRootPhysicalPath', ('',))
             preview_pos = max(len(root_path), len(virtual_path))
+            path = list(path)
             path.insert(preview_pos, self._preview_ns)
         return self.request.physicalPathToURL(path)
+
+    def url(self, preview=False):
+        return self.path2url(
+            self.context.getPhysicalPath(),
+            preview=preview)
 
     def preview(self):
         return self.url(preview=True)
@@ -66,25 +68,25 @@ class AbsoluteURL(BrowserView):
 
     __call__ = __repr__ = __unicode__ = __str__
 
+    def is_virtual_root(self, content):
+        path = content.getPhysicalPath()
+        virtual_path = self.request.physicalPathToVirtualPath(path)
+        return not virtual_path
+
     def breadcrumbs(self):
         container = aq_parent(self.context)
-        name = minimize(self.title())
-
-        def isVirtualHostRoot():
-            path = self.context.getPhysicalPath()
-            virtualPath = self.request.physicalPathToVirtualPath(path)
-            return not virtualPath
+        preview = IPreviewLayer.providedBy(self.request)
+        name = minimize(self.title(preview=preview))
 
         if (container is None or
             IRoot.providedBy(self.context) or
-            isVirtualHostRoot() or
-            not ITraversable.providedBy(container)):
+            self.is_virtual_root(self.context)):
             return ({'name': name, 'url': self.__str__()},)
 
         base = tuple(getMultiAdapter(
-                (container, self.request), name='absolute_url').breadcrumbs())
+            (container, self.request), name='absolute_url').breadcrumbs())
 
-        if not (IContent.providedBy(self.context) and self.context.is_default()):
+        if IContent.providedBy(self.context) and not self.context.is_default():
             base += ({'name': name, 'url': self.__str__()},)
 
         return base
@@ -94,12 +96,8 @@ class VersionAbsoluteURL(AbsoluteURL):
     """AbsoluteURL for a version
     """
 
-    def __init__(self, context, request):
-        # Set versioned content as context
-        self.context = context.get_content()
-        self.request = request
-        self._preview_ns = '++preview++' + context.getId()
-        self.title = lambda: context.get_short_title()
+    def title(self, preview=False):
+        return self.context.get_short_title()
 
 
 class ErrorAbsoluteURL(AbsoluteURL):

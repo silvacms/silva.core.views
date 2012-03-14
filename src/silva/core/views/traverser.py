@@ -48,8 +48,6 @@ class PreviewTraversable(grok.MultiAdapter):
     def traverse(self, name, remaining):
         if not IPreviewLayer.providedBy(self.request):
             alsoProvides(self.request, IPreviewLayer)
-        if name:
-            self.request.other['SILVA_PREVIEW_NAME'] = name
         return UseParentByAcquisition()
 
 
