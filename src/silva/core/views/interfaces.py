@@ -11,6 +11,8 @@ from zope.interface import Interface, Attribute
 from zope.publisher.interfaces.browser import IBrowserRequest
 from zope.traversing.browser.interfaces import IAbsoluteURL
 from zope.viewlet.interfaces import IViewlet as IBaseViewlet
+from silva.core.conf.martiansupport.directives import only_for
+from silva.core.interfaces.content import ICustomizable, IPublishable
 
 import zope.deferredimport
 zope.deferredimport.deprecated(
@@ -93,9 +95,30 @@ class ITemplateCustomizable(IGrokCustomizable):
 
 # TTW Templates
 
+
 class ICustomizedTemplate(ITemplateCustomizable):
     """A through the web template.
     """
+
+# Customization tag
+
+
+class ICustomizableTag(ICustomizable):
+    """This is a tag that you can set on object to customize them.
+    """
+
+
+class IDisableBreadcrumbTag(ICustomizableTag):
+    """Hide content from breadcrumbs
+    """
+    only_for(IPublishable)
+
+
+class IDisableNavigationTag(ICustomizableTag):
+    """Hide content from navigation
+    """
+    only_for(IPublishable)
+
 
 # URL management / with preview
 

@@ -12,6 +12,7 @@ from Acquisition import aq_parent
 
 from silva.core.interfaces import IRoot, IContent
 from silva.core.views.interfaces import IPreviewLayer, ISilvaURL
+from silva.core.views.interfaces import IDisableBreadcrumbTag
 
 
 def minimize(string):
@@ -86,7 +87,9 @@ class AbsoluteURL(BrowserView):
         base = tuple(getMultiAdapter(
             (container, self.request), name='absolute_url').breadcrumbs())
 
-        if IContent.providedBy(self.context) and not self.context.is_default():
+        if (not IDisableBreadcrumbTag.providedBy(self.context) and
+            IContent.providedBy(self.context) and
+            not self.context.is_default()):
             base += ({'name': name, 'url': self.__str__()},)
 
         return base
