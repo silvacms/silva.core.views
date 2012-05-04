@@ -146,12 +146,24 @@ class IVirtualSite(Interface):
         Virtual Host Monster rewriting is used for the request or not.
         """
 
+    def get_root_path():
+        """Return the path to the root object from the public side
+        (meaning the path between the start of the url and either to
+        the Silva root or virtual root).
+
+        This is usefull to set cookies to the root of the site.
+        """
+
     def get_root_url():
         """Return the URL of the root object of the current site.
         """
 
     def get_silva_root():
         """Return the Silva root.
+        """
+
+    def get_silva_path():
+        """Return the path to the Silva root in zope.
         """
 
     def get_virtual_root():

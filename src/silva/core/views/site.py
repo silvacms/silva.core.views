@@ -25,6 +25,9 @@ class VirtualSite(grok.Adapter):
             return self.get_silva_root()
         return root
 
+    def get_root_path(self):
+        return self.get_root().absolute_url_path()
+
     def get_root_url(self):
         root = self.get_root()
         if root is not None:
@@ -37,6 +40,9 @@ class VirtualSite(grok.Adapter):
         if site is not None:
             return site.get_root()
         return None
+
+    def get_silva_path(self):
+        return '/'.join(self.get_silva_root().getPhysicalPath())
 
     def get_virtual_root(self):
         root_path = self.get_virtual_path()

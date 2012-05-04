@@ -69,8 +69,7 @@ class AbsoluteURL(BrowserView):
 
     __call__ = __repr__ = __unicode__ = __str__
 
-    def is_virtual_root(self, content):
-        path = content.getPhysicalPath()
+    def is_virtual_root(self, path):
         virtual_path = self.request.physicalPathToVirtualPath(path)
         return not virtual_path
 
@@ -81,7 +80,7 @@ class AbsoluteURL(BrowserView):
 
         if (container is None or
             IRoot.providedBy(self.context) or
-            self.is_virtual_root(self.context)):
+            self.is_virtual_root(self.context.getPhysicalPath())):
             return ({'name': name, 'url': self.__str__()},)
 
         base = tuple(getMultiAdapter(
