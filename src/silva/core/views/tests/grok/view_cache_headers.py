@@ -25,7 +25,7 @@
      'content-type': 'text/html;charset=utf-8',
      'cache-control': 'max-age=86400, must-revalidate'}
     >>> browser.contents
-    'This is a view!'
+    u'This is a view!'
 
  We can do HEAD requests:
 
@@ -36,7 +36,7 @@
      'content-type': 'text/html;charset=utf-8',
      'cache-control': 'max-age=86400, must-revalidate'}
     >>> browser.contents
-    ''
+    u''
 
  We now create a protected folder:
 
@@ -55,7 +55,7 @@
      'pragma': 'no-cache',
      'cache-control': 'no-cache, must-revalidate, post-check=0, pre-check=0'}
     >>> browser.contents
-    'This is a view!'
+    u'This is a view!'
 
 """
 

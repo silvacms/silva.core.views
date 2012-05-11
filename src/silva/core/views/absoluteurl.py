@@ -3,14 +3,14 @@
 # $Id$
 
 # Zope 3
-from zope.component import getMultiAdapter
+from zope.component import queryMultiAdapter
 from zope.interface import implements
 
 # Zope 2
 from Products.Five import BrowserView
 from Acquisition import aq_parent
 
-from silva.core.interfaces import IRoot, IContent
+from silva.core.interfaces import IRoot, IContent, IVersionedContent
 from silva.core.views.interfaces import IPreviewLayer, ISilvaURL
 from silva.core.views.interfaces import IDisableBreadcrumbTag
 
@@ -34,7 +34,10 @@ class AbsoluteURL(BrowserView):
     def __init__(self, context, request):
         self.context = context
         self.request = request
-        self._preview_ns = '++preview++'
+
+    def is_virtual_root(self, path):
+        virtual_path = self.request.physicalPathToVirtualPath(path)
+        return not virtual_path
 
     def title(self, preview=False):
         if preview:
@@ -53,8 +56,32 @@ class AbsoluteURL(BrowserView):
                 'VirtualRootPhysicalPath', ('',))
             preview_pos = max(len(root_path), len(virtual_path))
             path = list(path)
-            path.insert(preview_pos, self._preview_ns)
+            path.insert(preview_pos, "++preview++")
         return self.request.physicalPathToURL(path)
+
+    def ancestors(self, preview=False, skip=None):
+        name = minimize(self.title(preview=preview))
+        container = aq_parent(self.context)
+        if skip is not None:
+            while skip.providedBy(container):
+                container = aq_parent(container)
+
+        if (container is None or
+            IRoot.providedBy(self.context) or
+            self.is_virtual_root(self.context.getPhysicalPath())):
+            return ({'name': name, 'url': self.__str__()},)
+
+        base = tuple()
+        parent = queryMultiAdapter((container, self.request), ISilvaURL)
+        if parent is not None:
+            base = tuple(parent.ancestors(preview, skip))
+
+        if (not IDisableBreadcrumbTag.providedBy(self.context) and
+            (not IContent.providedBy(self.context) or
+             not self.context.is_default())):
+            base += ({'name': name, 'url': self.__str__()},)
+
+        return base
 
     def url(self, preview=False):
         return self.path2url(
@@ -62,36 +89,19 @@ class AbsoluteURL(BrowserView):
             preview=preview)
 
     def preview(self):
-        return self.url(preview=True)
+        return self.url(
+            preview=True)
 
     def __str__(self):
-        return self.url(preview=IPreviewLayer.providedBy(self.request))
+        return self.url(
+            preview=IPreviewLayer.providedBy(self.request))
 
     __call__ = __repr__ = __unicode__ = __str__
 
-    def is_virtual_root(self, path):
-        virtual_path = self.request.physicalPathToVirtualPath(path)
-        return not virtual_path
-
     def breadcrumbs(self):
-        container = aq_parent(self.context)
-        preview = IPreviewLayer.providedBy(self.request)
-        name = minimize(self.title(preview=preview))
-
-        if (container is None or
-            IRoot.providedBy(self.context) or
-            self.is_virtual_root(self.context.getPhysicalPath())):
-            return ({'name': name, 'url': self.__str__()},)
-
-        base = tuple(getMultiAdapter(
-            (container, self.request), name='absolute_url').breadcrumbs())
-
-        if (not IDisableBreadcrumbTag.providedBy(self.context) and
-            IContent.providedBy(self.context) and
-            not self.context.is_default()):
-            base += ({'name': name, 'url': self.__str__()},)
-
-        return base
+        return self.ancestors(
+            skip=None,
+            preview=IPreviewLayer.providedBy(self.request))
 
 
 class VersionAbsoluteURL(AbsoluteURL):
@@ -100,6 +110,11 @@ class VersionAbsoluteURL(AbsoluteURL):
 
     def title(self, preview=False):
         return self.context.get_short_title()
+
+    def breadcrumbs(self):
+        return self.ancestors(
+            skip=IVersionedContent,
+            preview=IPreviewLayer.providedBy(self.request))
 
 
 class ErrorAbsoluteURL(AbsoluteURL):
@@ -110,14 +125,12 @@ class ErrorAbsoluteURL(AbsoluteURL):
         # Set first Silva object as context
         self.context = context.get_silva_object()
         self.request = request
-        self._preview_ns = '++preview++'
 
 
 class TestAbsoluteURL(BrowserView):
     """An absolute URL provider for TestRequest. This is mainly to get
     test working.
     """
-
     implements(ISilvaURL)
 
     def __init__(self, context, request):

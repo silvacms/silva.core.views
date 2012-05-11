@@ -25,7 +25,7 @@
      'content-type': 'text/html;charset=utf-8',
      'cache-control': 'max-age=86400, must-revalidate'}
     >>> browser.contents
-    'Layout: this is a content page!, end of it.'
+    u'Layout: this is a content page!, end of it.'
 
  We can do HEAD requests:
 
@@ -36,7 +36,7 @@
      'content-type': 'text/html;charset=utf-8',
      'cache-control': 'max-age=86400, must-revalidate'}
     >>> browser.contents
-    ''
+    u''
 
  We now create a protected folder:
 
@@ -55,7 +55,7 @@
      'pragma': 'no-cache',
      'cache-control': 'no-cache, must-revalidate, post-check=0, pre-check=0'}
     >>> browser.contents
-    'Layout: this is a content page!, end of it.'
+    u'Layout: this is a content page!, end of it.'
 
 """
 
@@ -70,7 +70,7 @@ class IMySimpleLayout(ILayout):
 
 
 class MySimpleLayout(silvaviews.Layout):
-    layout(IMySimpleLayout)
+    grok.provides(IMySimpleLayout)
 
     def render(self):
         return "".join(("Layout: ", self.view.content(), ", end of it."))

@@ -14,15 +14,13 @@ from zope import component
 from zope.cachedescriptors.property import CachedProperty
 from zope.viewlet.interfaces import IViewletManager
 
-from silva.core.interfaces import ISilvaObject
+from silva.core.interfaces import IViewableObject
 from silva.core.views.interfaces import IContentProvider, IViewlet
 from silva.core.views.interfaces import IZMIView
 from silva.core.views.interfaces import IPreviewLayer
 from silva.core.views.interfaces import IView, IHTTPResponseHeaders
 
-
 # Simple views
-
 
 class HTTPHeaderView(object):
     """Support to set HTTP headers and support HEAD requests on views
@@ -76,14 +74,14 @@ class Layout(BaseLayout):
     """A layout object.
     """
     grok.baseclass()
-    grok.context(ISilvaObject)
+    grok.context(IViewableObject)
 
 
 class Page(HTTPHeaderView, BasePage):
     """A page class using a layout to render itself.
     """
     grok.baseclass()
-    grok.context(ISilvaObject)
+    grok.context(IViewableObject)
     grok.require('zope2.View')
 
 
@@ -93,7 +91,7 @@ class View(HTTPHeaderView, grok.View):
     """View on Silva object, support view and preview
     """
     grok.baseclass()
-    grok.context(ISilvaObject)
+    grok.context(IViewableObject)
     grok.implements(IView)
     grok.name(u'content.html')
     grok.require('zope2.View')
@@ -152,7 +150,7 @@ class ViewletManager(ViewletLayoutSupport, grok.ViewletManager):
     """A viewlet manager in Silva.
     """
     grok.baseclass()
-    grok.context(ISilvaObject)
+    grok.context(IViewableObject)
     grok.implements(IViewletManager)
 
 
@@ -161,7 +159,7 @@ class ContentProvider(ViewletManager):
     manager...
     """
     grok.baseclass()
-    grok.context(ISilvaObject)
+    grok.context(IViewableObject)
     grok.implements(IContentProvider)
 
     def default_namespace(self):
@@ -174,7 +172,7 @@ class Viewlet(ViewletLayoutSupport, grok.Viewlet):
     """A viewlet in Silva
     """
     grok.baseclass()
-    grok.context(ISilvaObject)
+    grok.context(IViewableObject)
     grok.implements(IViewlet)
     grok.require('zope2.View')
 
