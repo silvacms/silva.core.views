@@ -1,6 +1,7 @@
 <configure
-    xmlns="http://namespaces.zope.org/zope"
-    xmlns:grok="http://namespaces.zope.org/grok">
+   xmlns="http://namespaces.zope.org/zope"
+   xmlns:browser="http://namespaces.zope.org/browser"
+   xmlns:grok="http://namespaces.zope.org/grok">
 
   <include package="silva.core.views" />
 
@@ -18,12 +19,28 @@
      provides=".interfaces.ISilvaURL"
      />
 
+  <browser:page
+     for="zope.interface.Interface"
+     name="absolute_url"
+     class=".absoluteurl.TestAbsoluteURL"
+     permission="zope.Public"
+     allowed_interface=".interfaces.ISilvaURL"
+     />
+
   <view
      for="silva.core.interfaces.ISilvaObject"
      factory=".absoluteurl.TestAbsoluteURL"
      type="silva.core.views.interfaces.ITestRequest"
      permission="zope.Public"
      provides=".interfaces.ISilvaURL"
+     />
+
+  <browser:page
+     for="silva.core.interfaces.ISilvaObject"
+     name="absolute_url"
+     class=".absoluteurl.TestAbsoluteURL"
+     permission="zope.Public"
+     allowed_interface=".interfaces.ISilvaURL"
      />
 
 </configure>
