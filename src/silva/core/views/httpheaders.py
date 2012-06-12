@@ -4,7 +4,7 @@
 
 from five import grok
 from infrae.wsgi.interfaces import IPublicationAfterRender
-from zope.component import getMultiAdapter, queryMultiAdapter
+from zope.component import queryMultiAdapter
 from zope.publisher.interfaces.browser import IBrowserRequest
 from silva.core.interfaces import ISilvaObject
 from silva.core.interfaces.auth import IAccessSecurity
@@ -24,7 +24,7 @@ def set_headers(event):
 @grok.adapter(IBrowserRequest, IHTTPHeaderView)
 @grok.implementer(IHTTPResponseHeaders)
 def view_headers(request, view):
-    return getMultiAdapter((request, view.context), IHTTPResponseHeaders)
+    return queryMultiAdapter((request, view.context), IHTTPResponseHeaders)
 
 
 class ResponseHeaders(grok.MultiAdapter):
