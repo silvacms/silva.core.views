@@ -14,13 +14,6 @@ from zope.viewlet.interfaces import IViewlet as IBaseViewlet
 from silva.core.conf.martiansupport.directives import only_for
 from silva.core.interfaces.content import ICustomizable, IPublishable
 
-import zope.deferredimport
-zope.deferredimport.deprecated(
-    'Please import from silva.core.smi instead,'
-    'this import will be removed in Silva 2.4',
-    ISMIView='silva.core.smi.interfaces:ISMIView',
-    ISMITab='silva.core.smi.interfaces:ISMITab',)
-
 
 class ITestRequest(IBrowserRequest):
     """Marker interface to mark a TestRequest.
