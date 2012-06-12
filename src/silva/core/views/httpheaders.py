@@ -14,7 +14,6 @@ from .interfaces import IHTTPResponseHeaders, IHTTPHeaderView, INonCachedLayer
 
 @grok.subscribe(IPublicationAfterRender)
 def set_headers(event):
-    #print event.content
     headers = queryMultiAdapter(
         (event.request, event.content),
         IHTTPResponseHeaders)
@@ -90,9 +89,7 @@ class HTTPResponseHeaders(ResponseHeaders):
     grok.provides(IHTTPResponseHeaders)
 
     def cachable(self):
-        cachable = not (self._is_preview() or self._is_private())
-        #print 'Set cachable', self.context, cachable
-        return cachable
+        return not (self._is_preview() or self._is_private())
 
     def _is_preview(self):
         return INonCachedLayer.providedBy(self.request)
