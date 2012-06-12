@@ -56,6 +56,13 @@ class ITemplateNotCustomizable(Interface):
     """
 
 
+class IHTTPHeaderView(Interface):
+    """A rendered view where HTTP headers must be set after traversal.
+    """
+    request = Attribute(u"Request rendered")
+    context = Attribute(u"Context rendered")
+
+
 class IView(IGrokView):
     """A view in Silva.
     """

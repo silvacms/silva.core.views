@@ -14,6 +14,7 @@ from ZPublisher.BaseRequest import DefaultPublishTraverse
 from silva.core.interfaces import IPublication
 from silva.core.views.interfaces import IHTTPResponseHeaders
 from silva.core.views.interfaces import IPreviewLayer
+from silva.core.views.views import HEADView
 
 
 class UseParentByAcquisition(object):
@@ -51,33 +52,14 @@ class PreviewTraversable(grok.MultiAdapter):
         return UseParentByAcquisition()
 
 
-
 class SilvaPublishTraverse(DefaultPublishTraverse):
 
     def browserDefault(self, request):
         # We don't want to lookup five views if we have other than a
         # GET or POST request.
-        if request.method in ('GET', 'HEAD',):
-            response_headers = getMultiAdapter(
-                (self.request, self.context), IHTTPResponseHeaders)
-            response_headers()
         if request.method in ('GET', 'POST',):
             return super(SilvaPublishTraverse, self).browserDefault(request)
         if request.method == 'HEAD':
-            return SilvaHEADRequest(self.context, request), ('HEAD',)
+            return HEADView(self.context, request, self.context), tuple()
         return self.context, tuple()
-
-
-class SilvaHEADRequest(object):
-    """Reply to an HEAD request on a Silva object.
-    """
-
-    def __init__(self, context, request):
-        self.context = context
-        self.request = request
-
-    def HEAD(self, *args, **kw):
-        """Return empty response body
-        """
-        return u''
 

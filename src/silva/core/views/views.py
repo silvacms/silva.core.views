@@ -10,17 +10,33 @@ from five import grok
 from grokcore.layout import Layout as BaseLayout
 from grokcore.layout import Page as BasePage
 from grokcore.layout.interfaces import IPage
-from zope import component
 from zope.cachedescriptors.property import CachedProperty
 from zope.viewlet.interfaces import IViewletManager
 
 from silva.core.interfaces import IViewableObject
-from silva.core.views.interfaces import IContentProvider, IViewlet
-from silva.core.views.interfaces import IZMIView
-from silva.core.views.interfaces import IPreviewLayer
-from silva.core.views.interfaces import IView, IHTTPResponseHeaders
+from .interfaces import IContentProvider, IViewlet, IZMIView, IView
+from .interfaces import IPreviewLayer
+from .interfaces import IHTTPHeaderView
 
 # Simple views
+
+class HEADView(object):
+    """View returned as the implementation of an HEAD request.
+    """
+    grok.implements(IHTTPHeaderView)
+
+    def __init__(self, context, request, parent, name='HEAD'):
+        self.context = context
+        self.request = request
+        self.__parent__ = parent
+        self.__name__ = name
+
+    def getPhysicalPath(self):
+        return self.context.getPhysicalPath() + (self.__name__,)
+
+    def __call__(self, *args, **kwargs):
+        return u''
+
 
 class HTTPHeaderView(object):
     """Support to set HTTP headers and support HEAD requests on views
@@ -28,38 +44,20 @@ class HTTPHeaderView(object):
 
     This is not aimed to be use directly.
     """
+    grok.implements(IHTTPHeaderView)
 
     def getPhysicalPath(self):
         return self.context.getPhysicalPath() + (self.__name__,)
 
     def publishTraverse(self, request, name):
-        if request.method == name and hasattr(self, name):
-            return getattr(self, name)
+        if request.method == name and name in ['HEAD',]:
+            return HEADView(self.context, request, self)
         return super(HTTPHeaderView, self).publishTraverse(request, name)
 
     def browserDefault(self, request):
         if request.method in ('HEAD',):
-            if hasattr(self, request.method):
-                return self, (request.method,)
+            return HEADView(self.context, request, self), tuple()
         return super(HTTPHeaderView, self).browserDefault(request)
-
-    def setHTTPHeaders(self):
-        headers = component.queryMultiAdapter(
-            (self.request, self.context), IHTTPResponseHeaders)
-        if headers is not None:
-            headers.set_headers()
-
-    def HEAD(self):
-        """Reply to HEAD requests.
-        """
-        self.setHTTPHeaders()
-        return ''
-
-    def __call__(self):
-        """Render the view.
-        """
-        self.setHTTPHeaders()
-        return super(HTTPHeaderView, self).__call__()
 
 
 class ZMIView(HTTPHeaderView, grok.View):
