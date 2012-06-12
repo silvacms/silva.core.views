@@ -30,6 +30,8 @@ def view_headers(request, view):
 class ResponseHeaders(grok.MultiAdapter):
     """Default class to implement HTTP header settings.
     """
+    grok.implements(IHTTPResponseHeaders)
+    grok.provides(IHTTPResponseHeaders)
     grok.baseclass()
 
     max_age = 86400
@@ -74,8 +76,6 @@ class ErrorHeaders(ResponseHeaders):
     """Errors are not cached.
     """
     grok.adapts(IBrowserRequest, Exception)
-    grok.implements(IHTTPResponseHeaders)
-    grok.provides(IHTTPResponseHeaders)
 
     def cachable(self):
         return False
@@ -85,8 +85,6 @@ class HTTPResponseHeaders(ResponseHeaders):
     """Regular Silva content headers.
     """
     grok.adapts(IBrowserRequest, ISilvaObject)
-    grok.implements(IHTTPResponseHeaders)
-    grok.provides(IHTTPResponseHeaders)
 
     def cachable(self):
         return not (self._is_preview() or self._is_private())
