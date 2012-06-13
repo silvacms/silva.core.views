@@ -9,7 +9,7 @@ from silva.core.views.interfaces import IVirtualSite
 from zope.interface.verify import verifyObject
 from zope.component import getAdapter
 
-from Products.Silva.testing import FunctionalLayer
+from Products.Silva.testing import FunctionalLayer, TestRequest
 
 
 class VirtualSiteTestCase(unittest.TestCase):
@@ -19,7 +19,8 @@ class VirtualSiteTestCase(unittest.TestCase):
         self.root = self.layer.get_application()
 
     def test_virtualsite_root(self):
-        site = getAdapter(self.root.REQUEST, IVirtualSite)
+        request = TestRequest(application=self.root)
+        site = getAdapter(request, IVirtualSite)
         self.assertTrue(verifyObject(IVirtualSite, site))
         self.assertEqual(site.get_root(), self.root)
         self.assertEqual(site.get_root_url(), 'http://localhost/root')

@@ -9,18 +9,11 @@ from zope.interface import alsoProvides
 from zope.traversing.browser.interfaces import IAbsoluteURL
 from zope import component
 
-from Products.Silva.testing import FunctionalLayer
+from Products.Silva.testing import FunctionalLayer, TestRequest
 
 from silva.core.views.interfaces import IContentURL
 from silva.core.views.interfaces import IPreviewLayer
 from silva.core.views.interfaces import IDisableBreadcrumbTag
-
-
-def enable_preview(content):
-    """Enable preview mode.
-    """
-    if not IPreviewLayer.providedBy(content.REQUEST):
-        alsoProvides(content.REQUEST, IPreviewLayer)
 
 
 class PublicationAbsoluteURLTestCase(unittest.TestCase):
@@ -32,8 +25,9 @@ class PublicationAbsoluteURLTestCase(unittest.TestCase):
         factory.manage_addPublication('section', u'Test Publication')
 
     def test_url(self):
+        request = TestRequest(application=self.root)
         url = component.getMultiAdapter(
-            (self.root.section, self.root.REQUEST), IContentURL)
+            (self.root.section, request), IContentURL)
         self.assertTrue(verifyObject(IContentURL, url))
         self.assertTrue(IContentURL.extends(IAbsoluteURL))
 
@@ -53,7 +47,7 @@ class PublicationAbsoluteURLTestCase(unittest.TestCase):
             url.preview(),
             'http://localhost/root/++preview++/section')
 
-        enable_preview(self.root)
+        alsoProvides(request, IPreviewLayer)
         self.assertEqual(
             str(url),
             'http://localhost/root/++preview++/section')
@@ -62,8 +56,9 @@ class PublicationAbsoluteURLTestCase(unittest.TestCase):
             'http://localhost/root/++preview++/section')
 
     def test_breadcrumbs(self):
+        request = TestRequest(application=self.root)
         url = component.getMultiAdapter(
-            (self.root.section, self.root.REQUEST), IContentURL)
+            (self.root.section, request), IContentURL)
 
         self.assertEqual(
             url.breadcrumbs(),
@@ -72,7 +67,7 @@ class PublicationAbsoluteURLTestCase(unittest.TestCase):
              {'url': 'http://localhost/root/section',
               'name': u'Test Publication'}))
 
-        enable_preview(self.root)
+        alsoProvides(request, IPreviewLayer)
         self.assertEqual(
             url.breadcrumbs(),
             ({'url': 'http://localhost/root/++preview++',
@@ -92,8 +87,8 @@ class RootAbsoluteURLTestCase(unittest.TestCase):
         self.root = self.layer.get_application()
 
     def test_url(self):
-        url = component.getMultiAdapter(
-            (self.root, self.root.REQUEST), IContentURL)
+        request = TestRequest(application=self.root)
+        url = component.getMultiAdapter((self.root, request), IContentURL)
         self.assertTrue(verifyObject(IContentURL, url))
         self.assertTrue(IContentURL.extends(IAbsoluteURL))
 
@@ -113,7 +108,7 @@ class RootAbsoluteURLTestCase(unittest.TestCase):
             url.preview(),
             'http://localhost/root/++preview++')
 
-        enable_preview(self.root)
+        alsoProvides(request, IPreviewLayer)
         self.assertEqual(
             str(url),
             'http://localhost/root/++preview++')
@@ -122,15 +117,16 @@ class RootAbsoluteURLTestCase(unittest.TestCase):
             'http://localhost/root/++preview++')
 
     def test_breadcrumbs(self):
+        request = TestRequest(application=self.root)
         url = component.getMultiAdapter(
-            (self.root, self.root.REQUEST), IContentURL)
+            (self.root, request), IContentURL)
 
         self.assertEqual(
             url.breadcrumbs(),
             ({'url': 'http://localhost/root',
               'name': u'root'},))
 
-        enable_preview(self.root)
+        alsoProvides(request, IPreviewLayer)
         self.assertEqual(
             url.breadcrumbs(),
             ({'url': 'http://localhost/root/++preview++',
@@ -155,8 +151,9 @@ class VersionedContentAbsoluteURLTestCase(unittest.TestCase):
 
     def test_url(self):
         content = self.root.section.folder.link
+        request = TestRequest(application=self.root)
         url = component.getMultiAdapter(
-            (content, self.root.REQUEST), IContentURL)
+            (content, request), IContentURL)
         self.assertTrue(verifyObject(IContentURL, url))
         self.assertTrue(IContentURL.extends(IAbsoluteURL))
 
@@ -179,7 +176,7 @@ class VersionedContentAbsoluteURLTestCase(unittest.TestCase):
             url.preview(),
             'http://localhost/root/++preview++/section/folder/link')
 
-        enable_preview(self.root)
+        alsoProvides(request, IPreviewLayer)
         self.assertEqual(
             str(url),
             'http://localhost/root/++preview++/section/folder/link')
@@ -191,8 +188,9 @@ class VersionedContentAbsoluteURLTestCase(unittest.TestCase):
         """Test the breacrumb computation for a regular versioned content.
         """
         content = self.root.section.folder.link
+        request = TestRequest(application=self.root)
         url = component.getMultiAdapter(
-            (content, self.root.REQUEST),
+            (content, request),
             IContentURL)
 
         self.assertEqual(
@@ -206,7 +204,7 @@ class VersionedContentAbsoluteURLTestCase(unittest.TestCase):
              {'url': 'http://localhost/root/section/folder/link',
               'name': u'link'}))
 
-        enable_preview(self.root)
+        alsoProvides(request, IPreviewLayer)
         self.assertEqual(
             url.breadcrumbs(),
             ({'url': 'http://localhost/root/++preview++',
@@ -225,9 +223,8 @@ class VersionedContentAbsoluteURLTestCase(unittest.TestCase):
         alsoProvides(self.root.section, IDisableBreadcrumbTag)
         alsoProvides(self.root.section.folder, IDisableBreadcrumbTag)
         content = self.root.section.folder.link
-        url = component.getMultiAdapter(
-            (content, self.root.REQUEST),
-            IContentURL)
+        request = TestRequest(application=self.root)
+        url = component.getMultiAdapter((content, request), IContentURL)
 
         self.assertEqual(
             url.breadcrumbs(),
@@ -236,7 +233,7 @@ class VersionedContentAbsoluteURLTestCase(unittest.TestCase):
              {'url': 'http://localhost/root/section/folder/link',
               'name': u'link'}))
 
-        enable_preview(self.root)
+        alsoProvides(request, IPreviewLayer)
         self.assertEqual(
             url.breadcrumbs(),
             ({'url': 'http://localhost/root/++preview++',
@@ -266,8 +263,9 @@ class VersionAbsoluteURLTestCase(unittest.TestCase):
 
     def test_url(self):
         content = self.root.section.folder.link.get_editable()
+        request = TestRequest(application=self.root)
         url = component.getMultiAdapter(
-            (content, self.root.REQUEST),
+            (content, request),
             IContentURL)
         self.assertTrue(verifyObject(IContentURL, url))
         self.assertTrue(IContentURL.extends(IAbsoluteURL))
@@ -288,7 +286,7 @@ class VersionAbsoluteURLTestCase(unittest.TestCase):
             url.preview(),
             'http://localhost/root/++preview++/section/folder/link/0')
 
-        enable_preview(self.root)
+        alsoProvides(request, IPreviewLayer)
         self.assertEqual(
             str(url),
             'http://localhost/root/++preview++/section/folder/link/0')
@@ -301,8 +299,9 @@ class VersionAbsoluteURLTestCase(unittest.TestCase):
         given vesion.
         """
         content = self.root.section.folder.link.get_editable()
+        request = TestRequest(application=self.root)
         url = component.getMultiAdapter(
-            (content, self.root.REQUEST),
+            (content, request),
             IContentURL)
         self.assertEqual(
             url.breadcrumbs(),
@@ -315,7 +314,7 @@ class VersionAbsoluteURLTestCase(unittest.TestCase):
              {'url': 'http://localhost/root/section/folder/link/0',
               'name': u'Link with like a completely super long title to...'}))
 
-        enable_preview(self.root)
+        alsoProvides(request, IPreviewLayer)
         self.assertEqual(
             url.breadcrumbs(),
             ({'url': 'http://localhost/root/++preview++',
