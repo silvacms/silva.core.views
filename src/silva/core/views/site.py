@@ -4,11 +4,12 @@
 # $Id$
 
 from five import grok
-from zope.site.hooks import getSite
+from infrae.wsgi.interfaces import IRequest, IVirtualHosting
+from zope.component import queryMultiAdapter
 from zope.publisher.interfaces.http import IHTTPRequest
-from zope.traversing.browser import absoluteURL
+from zope.site.hooks import getSite
 
-from silva.core.views.interfaces import IVirtualSite
+from silva.core.views.interfaces import IVirtualSite, IContentURL
 
 
 class VirtualSite(grok.Adapter):
@@ -18,6 +19,14 @@ class VirtualSite(grok.Adapter):
 
     def __init__(self, request):
         self.request = request
+        self._url = None
+
+    def _get_url(self):
+        if self._url is None:
+            root = self.get_root()
+            if root is not None:
+                self._url = queryMultiAdapter((root, self.request), IContentURL)
+        return self._url
 
     def get_root(self):
         root = self.get_virtual_root()
@@ -26,12 +35,15 @@ class VirtualSite(grok.Adapter):
         return root
 
     def get_root_path(self):
-        return self.get_root().absolute_url_path()
+        url = self._get_url()
+        if url is not None:
+            return url.url(relative=True)
+        return u''
 
     def get_root_url(self):
-        root = self.get_root()
-        if root is not None:
-            return absoluteURL(root, self.request)
+        url = self._get_url()
+        if url is not None:
+            return url.url()
         return u''
 
     def get_silva_root(self):
@@ -41,21 +53,15 @@ class VirtualSite(grok.Adapter):
             return site.get_root()
         return None
 
-    def get_silva_path(self):
-        return '/'.join(self.get_silva_root().getPhysicalPath())
+    def get_virtual_root(self):
+        return None
+
+
+class WSGIVirtualSite(VirtualSite):
+    grok.context(IRequest)
 
     def get_virtual_root(self):
-        root_path = self.get_virtual_path()
-        if root_path is None:
-            return None
-
-        return getSite().restrictedTraverse(root_path, None)
-
-    def get_virtual_path(self):
-        try:
-            root_path = self.request['VirtualRootPhysicalPath']
-        except (AttributeError, KeyError):
-            root_path =  None
-
-        return root_path
-
+        plugin = self.request.get_plugin(IVirtualHosting)
+        if plugin is not None:
+            return plugin.root
+        return None

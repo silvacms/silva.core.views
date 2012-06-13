@@ -3,7 +3,6 @@
 # $Id$
 
 from five import grok
-from zope.component import getMultiAdapter
 from zope.interface import alsoProvides
 from zope.publisher.interfaces.browser import IBrowserRequest
 from zope.traversing.interfaces import ITraversable
@@ -11,8 +10,7 @@ from zope.traversing.interfaces import ITraversable
 from Acquisition.interfaces import IAcquirer
 from ZPublisher.BaseRequest import DefaultPublishTraverse
 
-from silva.core.interfaces import IPublication
-from silva.core.views.interfaces import IHTTPResponseHeaders
+from silva.core.interfaces import ISilvaObject
 from silva.core.views.interfaces import IPreviewLayer
 from silva.core.views.views import HEADView
 
@@ -38,7 +36,7 @@ class PreviewTraversable(grok.MultiAdapter):
 
     Add the preview layer on the request if needed.
     """
-    grok.adapts(IPublication, IBrowserRequest)
+    grok.adapts(ISilvaObject, IBrowserRequest)
     grok.implements(ITraversable)
     grok.name('preview')
 

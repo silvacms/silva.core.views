@@ -11,7 +11,7 @@ from zope import component
 
 from Products.Silva.testing import FunctionalLayer
 
-from silva.core.views.interfaces import ISilvaURL
+from silva.core.views.interfaces import IContentURL
 from silva.core.views.interfaces import IPreviewLayer
 from silva.core.views.interfaces import IDisableBreadcrumbTag
 
@@ -33,9 +33,9 @@ class PublicationAbsoluteURLTestCase(unittest.TestCase):
 
     def test_url(self):
         url = component.getMultiAdapter(
-            (self.root.section, self.root.REQUEST), ISilvaURL)
-        self.assertTrue(verifyObject(ISilvaURL, url))
-        self.assertTrue(ISilvaURL.extends(IAbsoluteURL))
+            (self.root.section, self.root.REQUEST), IContentURL)
+        self.assertTrue(verifyObject(IContentURL, url))
+        self.assertTrue(IContentURL.extends(IAbsoluteURL))
 
         self.assertEqual(
             str(url),
@@ -43,6 +43,12 @@ class PublicationAbsoluteURLTestCase(unittest.TestCase):
         self.assertEqual(
             url(),
             'http://localhost/root/section')
+        self.assertEqual(
+            url.url(relative=True),
+            '/root/section')
+        self.assertEqual(
+            url.url(relative=True, preview=True),
+            '/root/++preview++/section')
         self.assertEqual(
             url.preview(),
             'http://localhost/root/++preview++/section')
@@ -57,7 +63,7 @@ class PublicationAbsoluteURLTestCase(unittest.TestCase):
 
     def test_breadcrumbs(self):
         url = component.getMultiAdapter(
-            (self.root.section, self.root.REQUEST), ISilvaURL)
+            (self.root.section, self.root.REQUEST), IContentURL)
 
         self.assertEqual(
             url.breadcrumbs(),
@@ -76,7 +82,7 @@ class PublicationAbsoluteURLTestCase(unittest.TestCase):
 
     def test_traverse(self):
         url = self.root.section.restrictedTraverse('@@absolute_url')
-        self.assertTrue(verifyObject(ISilvaURL, url))
+        self.assertTrue(verifyObject(IContentURL, url))
 
 
 class RootAbsoluteURLTestCase(unittest.TestCase):
@@ -87,9 +93,9 @@ class RootAbsoluteURLTestCase(unittest.TestCase):
 
     def test_url(self):
         url = component.getMultiAdapter(
-            (self.root, self.root.REQUEST), ISilvaURL)
-        self.assertTrue(verifyObject(ISilvaURL, url))
-        self.assertTrue(ISilvaURL.extends(IAbsoluteURL))
+            (self.root, self.root.REQUEST), IContentURL)
+        self.assertTrue(verifyObject(IContentURL, url))
+        self.assertTrue(IContentURL.extends(IAbsoluteURL))
 
         self.assertEqual(
             str(url),
@@ -97,6 +103,12 @@ class RootAbsoluteURLTestCase(unittest.TestCase):
         self.assertEqual(
             url(),
             'http://localhost/root')
+        self.assertEqual(
+            url.url(relative=True),
+            '/root')
+        self.assertEqual(
+            url.url(relative=True, preview=True),
+            '/root/++preview++')
         self.assertEqual(
             url.preview(),
             'http://localhost/root/++preview++')
@@ -111,7 +123,7 @@ class RootAbsoluteURLTestCase(unittest.TestCase):
 
     def test_breadcrumbs(self):
         url = component.getMultiAdapter(
-            (self.root, self.root.REQUEST), ISilvaURL)
+            (self.root, self.root.REQUEST), IContentURL)
 
         self.assertEqual(
             url.breadcrumbs(),
@@ -126,7 +138,7 @@ class RootAbsoluteURLTestCase(unittest.TestCase):
 
     def test_traverse(self):
         url = self.root.restrictedTraverse('@@absolute_url')
-        self.assertTrue(verifyObject(ISilvaURL, url))
+        self.assertTrue(verifyObject(IContentURL, url))
 
 
 class VersionedContentAbsoluteURLTestCase(unittest.TestCase):
@@ -144,9 +156,9 @@ class VersionedContentAbsoluteURLTestCase(unittest.TestCase):
     def test_url(self):
         content = self.root.section.folder.link
         url = component.getMultiAdapter(
-            (content, self.root.REQUEST), ISilvaURL)
-        self.assertTrue(verifyObject(ISilvaURL, url))
-        self.assertTrue(ISilvaURL.extends(IAbsoluteURL))
+            (content, self.root.REQUEST), IContentURL)
+        self.assertTrue(verifyObject(IContentURL, url))
+        self.assertTrue(IContentURL.extends(IAbsoluteURL))
 
         self.assertEqual(
             str(url),
@@ -154,6 +166,15 @@ class VersionedContentAbsoluteURLTestCase(unittest.TestCase):
         self.assertEqual(
             url(),
             'http://localhost/root/section/folder/link')
+        self.assertEqual(
+            url.url(relative=True),
+            '/root/section/folder/link')
+        self.assertEqual(
+            url.url(relative=True, preview=True),
+            '/root/++preview++/section/folder/link')
+        self.assertEqual(
+            url.url(preview=True),
+            'http://localhost/root/++preview++/section/folder/link')
         self.assertEqual(
             url.preview(),
             'http://localhost/root/++preview++/section/folder/link')
@@ -170,7 +191,9 @@ class VersionedContentAbsoluteURLTestCase(unittest.TestCase):
         """Test the breacrumb computation for a regular versioned content.
         """
         content = self.root.section.folder.link
-        url = component.getMultiAdapter((content, self.root.REQUEST), ISilvaURL)
+        url = component.getMultiAdapter(
+            (content, self.root.REQUEST),
+            IContentURL)
 
         self.assertEqual(
             url.breadcrumbs(),
@@ -202,7 +225,9 @@ class VersionedContentAbsoluteURLTestCase(unittest.TestCase):
         alsoProvides(self.root.section, IDisableBreadcrumbTag)
         alsoProvides(self.root.section.folder, IDisableBreadcrumbTag)
         content = self.root.section.folder.link
-        url = component.getMultiAdapter((content, self.root.REQUEST), ISilvaURL)
+        url = component.getMultiAdapter(
+            (content, self.root.REQUEST),
+            IContentURL)
 
         self.assertEqual(
             url.breadcrumbs(),
@@ -222,7 +247,7 @@ class VersionedContentAbsoluteURLTestCase(unittest.TestCase):
     def test_traverse(self):
         content = self.root.section.folder.link
         url = content.restrictedTraverse('@@absolute_url')
-        self.assertTrue(verifyObject(ISilvaURL, url))
+        self.assertTrue(verifyObject(IContentURL, url))
 
 
 class VersionAbsoluteURLTestCase(unittest.TestCase):
@@ -241,9 +266,11 @@ class VersionAbsoluteURLTestCase(unittest.TestCase):
 
     def test_url(self):
         content = self.root.section.folder.link.get_editable()
-        url = component.getMultiAdapter((content, self.root.REQUEST), ISilvaURL)
-        self.assertTrue(verifyObject(ISilvaURL, url))
-        self.assertTrue(ISilvaURL.extends(IAbsoluteURL))
+        url = component.getMultiAdapter(
+            (content, self.root.REQUEST),
+            IContentURL)
+        self.assertTrue(verifyObject(IContentURL, url))
+        self.assertTrue(IContentURL.extends(IAbsoluteURL))
 
         self.assertEqual(
             str(url),
@@ -251,6 +278,12 @@ class VersionAbsoluteURLTestCase(unittest.TestCase):
         self.assertEqual(
             url(),
             'http://localhost/root/section/folder/link/0')
+        self.assertEqual(
+            url.url(relative=True),
+            '/root/section/folder/link/0')
+        self.assertEqual(
+            url.url(relative=True, preview=True),
+            '/root/++preview++/section/folder/link/0')
         self.assertEqual(
             url.preview(),
             'http://localhost/root/++preview++/section/folder/link/0')
@@ -268,7 +301,9 @@ class VersionAbsoluteURLTestCase(unittest.TestCase):
         given vesion.
         """
         content = self.root.section.folder.link.get_editable()
-        url = component.getMultiAdapter((content, self.root.REQUEST), ISilvaURL)
+        url = component.getMultiAdapter(
+            (content, self.root.REQUEST),
+            IContentURL)
         self.assertEqual(
             url.breadcrumbs(),
             ({'url': 'http://localhost/root',
@@ -295,7 +330,7 @@ class VersionAbsoluteURLTestCase(unittest.TestCase):
     def test_traverse(self):
         content = self.root.section.folder.link.get_editable()
         url = content.restrictedTraverse('@@absolute_url')
-        self.assertTrue(verifyObject(ISilvaURL, url))
+        self.assertTrue(verifyObject(IContentURL, url))
 
 
 def test_suite():

@@ -24,7 +24,7 @@
      factory=".absoluteurl.AbsoluteURL"
      type="zope.publisher.interfaces.http.IHTTPRequest"
      permission="zope.Public"
-     provides=".interfaces.ISilvaURL"
+     provides=".interfaces.IContentURL"
      />
 
   <browser:page
@@ -32,7 +32,7 @@
      name="absolute_url"
      class=".absoluteurl.AbsoluteURL"
      permission="zope.Public"
-     allowed_interface=".interfaces.ISilvaURL"
+     allowed_interface=".interfaces.IContentURL"
      />
 
   <view
@@ -40,7 +40,7 @@
      factory=".absoluteurl.VersionAbsoluteURL"
      type="zope.publisher.interfaces.http.IHTTPRequest"
      permission="zope.Public"
-     provides=".interfaces.ISilvaURL"
+     provides=".interfaces.IContentURL"
      />
 
   <browser:page
@@ -48,7 +48,7 @@
      name="absolute_url"
      class=".absoluteurl.VersionAbsoluteURL"
      permission="zope.Public"
-     allowed_interface=".interfaces.ISilvaURL"
+     allowed_interface=".interfaces.IContentURL"
      />
 
   <view
@@ -56,7 +56,7 @@
      factory=".absoluteurl.ErrorAbsoluteURL"
      type="zope.publisher.interfaces.http.IHTTPRequest"
      permission="zope.Public"
-     provides=".interfaces.ISilvaURL"
+     provides=".interfaces.IContentURL"
      />
 
   <browser:page
@@ -64,7 +64,7 @@
      name="absolute_url"
      class=".absoluteurl.ErrorAbsoluteURL"
      permission="zope.Public"
-     allowed_interface=".interfaces.ISilvaURL"
+     allowed_interface=".interfaces.IContentURL"
      />
 
   <!-- Default traverser for Silva views -->

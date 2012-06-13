@@ -29,13 +29,13 @@ class HEADTestCase(unittest.TestCase):
     def setUp(self):
         self.root = self.layer.get_application()
 
-    def check_headers(self, method, path, headers, expected_headers):
+    def check_headers(self, path, headers, expected_headers):
         with self.layer.get_browser() as browser:
             # Set request header
             for name, value in headers.items():
                 browser.set_request_header(name, value)
 
-            self.assertEqual(browser.open(path, method=method), 204)
+            self.assertEqual(browser.open(path, method='HEAD'), 204)
             self.assertEqual(browser.contents, '')
 
             # Check result headers
@@ -55,33 +55,30 @@ class SilvaHEADTestCase(HEADTestCase):
     """
 
     def test_root(self):
-        self.check_headers('HEAD', '/root', {}, PUBLIC_HEADERS_EXPECTED)
+        self.check_headers('/root', {}, PUBLIC_HEADERS_EXPECTED)
 
     def test_root_auth(self):
-        self.check_headers('HEAD', '/root', AUTH, PUBLIC_HEADERS_EXPECTED)
+        self.check_headers('/root', AUTH, PUBLIC_HEADERS_EXPECTED)
 
     def test_root_auth_private(self):
         self.set_private(self.root)
-        self.check_headers('HEAD', '/root', AUTH, PRIVATE_HEADERS_EXPECTED)
+        self.check_headers('/root', AUTH, PRIVATE_HEADERS_EXPECTED)
 
     def test_publication(self):
         factory = self.root.manage_addProduct['Silva']
         factory.manage_addPublication('publication', 'Publication')
-        self.check_headers(
-            'HEAD', '/root/publication', {}, PUBLIC_HEADERS_EXPECTED)
+        self.check_headers('/root/publication', {}, PUBLIC_HEADERS_EXPECTED)
 
     def test_publication_auth(self):
         factory = self.root.manage_addProduct['Silva']
         factory.manage_addPublication('publication', 'Publication')
-        self.check_headers(
-            'HEAD', '/root/publication', AUTH, PUBLIC_HEADERS_EXPECTED)
+        self.check_headers('/root/publication', AUTH, PUBLIC_HEADERS_EXPECTED)
 
     def test_publication_auth_private(self):
         factory = self.root.manage_addProduct['Silva']
         factory.manage_addPublication('publication', 'Publication')
         self.set_private(self.root.publication)
-        self.check_headers(
-            'HEAD', '/root/publication', AUTH, PRIVATE_HEADERS_EXPECTED)
+        self.check_headers('/root/publication', AUTH, PRIVATE_HEADERS_EXPECTED)
 
 
 def test_suite():

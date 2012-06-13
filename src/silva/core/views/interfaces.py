@@ -122,14 +122,21 @@ class IDisableNavigationTag(ICustomizableTag):
 
 # URL management / with preview
 
-class ISilvaURL(IAbsoluteURL):
+class IContentURL(IAbsoluteURL):
     """Extends the absolute URL mechanism to support preview and
     public URLs.
     """
 
-    def preview():
-        """Return URL for preview.
+    def url(preview=False, relative=False):
+        """Return an public URL to the content.
         """
+
+    def preview():
+        """Alias url(preview=True).
+        """
+
+#BBB
+ISilvaURL = IContentURL
 
 # Adapters
 
@@ -162,19 +169,9 @@ class IVirtualSite(Interface):
         """Return the Silva root.
         """
 
-    def get_silva_path():
-        """Return the path to the Silva root in zope.
-        """
-
     def get_virtual_root():
         """Return the virtual root object defined by the Virtual Host
         Monster or None if the Virtual Host Monster was not used.
-        """
-
-    def get_virtual_path():
-        """Return the path (as a tuple of identifier) to the virtual
-        defined by the Virtual Host Monster or None if the Virtual
-        Host Monster was not used.
         """
 
 
