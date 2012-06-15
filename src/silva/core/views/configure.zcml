@@ -91,13 +91,13 @@
      allowed_interface=".interfaces.IContentURL"
      />
 
-  <!-- <view -->
-  <!--    for="OFS.interfaces.ITraversable" -->
-  <!--    factory=".absoluteurl.AbsoluteURL" -->
-  <!--    type="zope.publisher.interfaces.http.IHTTPRequest" -->
-  <!--    permission="zope.Public" -->
-  <!--    provides=".interfaces.IContentURL" -->
-  <!--    /> -->
+  <view
+     for="OFS.interfaces.ITraversable"
+     factory=".absoluteurl.AbsoluteURL"
+     type="zope.publisher.interfaces.http.IHTTPRequest"
+     permission="zope.Public"
+     provides=".interfaces.IContentURL"
+     />
 
   <!-- <browser:page -->
   <!--    for="OFS.interfaces.ITraversable" -->
