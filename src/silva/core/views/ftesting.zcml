@@ -5,42 +5,4 @@
 
   <include package="silva.core.views" />
 
-  <!-- AbsoluteURL views for TestRequest -->
-  <class class="zope.publisher.browser.TestRequest">
-    <implements interface="silva.core.views.interfaces.ITestRequest" />
-    <implements interface="zope.annotation.interfaces.IAttributeAnnotatable" />
-  </class>
-
-  <view
-     for="zope.interface.Interface"
-     factory=".absoluteurl.TestAbsoluteURL"
-     type="silva.core.views.interfaces.ITestRequest"
-     permission="zope.Public"
-     provides=".interfaces.ISilvaURL"
-     />
-
-  <browser:page
-     for="zope.interface.Interface"
-     name="absolute_url"
-     class=".absoluteurl.TestAbsoluteURL"
-     permission="zope.Public"
-     allowed_interface=".interfaces.ISilvaURL"
-     />
-
-  <view
-     for="silva.core.interfaces.ISilvaObject"
-     factory=".absoluteurl.TestAbsoluteURL"
-     type="silva.core.views.interfaces.ITestRequest"
-     permission="zope.Public"
-     provides=".interfaces.ISilvaURL"
-     />
-
-  <browser:page
-     for="silva.core.interfaces.ISilvaObject"
-     name="absolute_url"
-     class=".absoluteurl.TestAbsoluteURL"
-     permission="zope.Public"
-     allowed_interface=".interfaces.ISilvaURL"
-     />
-
 </configure>

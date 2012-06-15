@@ -145,28 +145,6 @@ class ErrorAbsoluteURL(ContentAbsoluteURL):
         self.request = request
 
 
-class TestAbsoluteURL(ContentAbsoluteURL):
-    """An absolute URL provider for TestRequest. This is mainly to get
-    test working.
-    """
-
-    def url(self, preview=False, relative=False):
-        is_root = True
-        if self.context is not None:
-            path = list(self.context.getPhysicalPath())
-            is_root = len(path) < (preview is True and 4 or 3)
-            if preview is True:
-                path.insert(2, '++preview++')
-        if is_root:
-            url = u'/root'
-        else:
-            url = u'/'.join(path)
-        if relative:
-            return url
-        return u'http://localhost' + url
-
-
-
 def absolute_url(self, relative=0):
     return getMultiAdapter(
         (self, self.REQUEST), IContentURL).url(relative=bool(relative))

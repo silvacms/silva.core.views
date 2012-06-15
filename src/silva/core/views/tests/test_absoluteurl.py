@@ -11,9 +11,157 @@ from zope import component
 
 from Products.Silva.testing import FunctionalLayer, TestRequest
 
+from infrae.wsgi.interfaces import IVirtualHosting
+
 from silva.core.views.interfaces import IContentURL
 from silva.core.views.interfaces import IPreviewLayer
 from silva.core.views.interfaces import IDisableBreadcrumbTag
+
+
+class ServicesAbsoluteURLTestCase(unittest.TestCase):
+    # This test the ContentURL adapter on Zope object.
+    layer = FunctionalLayer
+
+    def setUp(self):
+        self.root = self.layer.get_application()
+
+    def test_url(self):
+        """Test IContentURL url computation. Preview is not available
+        on Zope object.
+        """
+        request = TestRequest(application=self.root)
+        url = component.getMultiAdapter(
+            (self.root.service_extensions, request), IContentURL)
+        self.assertTrue(verifyObject(IContentURL, url))
+        self.assertTrue(IContentURL.extends(IAbsoluteURL))
+
+        self.assertEqual(
+            str(url),
+            'http://localhost/root/service_extensions')
+        self.assertEqual(
+            url(),
+            'http://localhost/root/service_extensions')
+        self.assertEqual(
+            url.url(relative=True),
+            '/root/service_extensions')
+        self.assertEqual(
+            url.url(relative=True, preview=True),
+            '/root/service_extensions')
+        self.assertEqual(
+            url.preview(),
+            'http://localhost/root/service_extensions')
+
+        alsoProvides(request, IPreviewLayer)
+        self.assertEqual(
+            str(url),
+            'http://localhost/root/service_extensions')
+        self.assertEqual(
+            url(),
+            'http://localhost/root/service_extensions')
+
+    def test_vhm(self):
+        """Test IContentURL url computation while a VHM is used. Zope
+        object doesn't support the preview mode.
+        """
+        request = TestRequest(
+            application=self.root,
+            url='http://localhost/service_extension',
+            headers=[('X-VHM-Url', 'http://infrae.com'),
+                     ('X-VHM-Path', '/root')])
+        plugin = request.query_plugin(request.application, IVirtualHosting)
+        root, method, path = plugin(request.method, request.path)
+        self.assertEqual(root, self.root)
+        self.assertEqual(method, 'index_html')
+        self.assertEqual(path, ['service_extension'])
+
+        url = component.getMultiAdapter(
+            (self.root.service_extensions, request), IContentURL)
+        self.assertTrue(verifyObject(IContentURL, url))
+        self.assertTrue(IContentURL.extends(IAbsoluteURL))
+
+        self.assertEqual(
+            str(url),
+            'http://infrae.com/service_extensions')
+        self.assertEqual(
+            url(),
+            'http://infrae.com/service_extensions')
+        self.assertEqual(
+            url.url(relative=True),
+            '/service_extensions')
+        self.assertEqual(
+            url.url(relative=True, preview=True),
+            '/service_extensions')
+        self.assertEqual(
+            url.preview(),
+            'http://infrae.com/service_extensions')
+
+        alsoProvides(request, IPreviewLayer)
+        self.assertEqual(
+            str(url),
+            'http://infrae.com/service_extensions')
+        self.assertEqual(
+            url(),
+            'http://infrae.com/service_extensions')
+
+    def test_traverse(self):
+        url = self.root.restrictedTraverse('@@absolute_url')
+        self.assertTrue(verifyObject(IContentURL, url))
+
+
+class BrainsAbsoluteURLTestCase(unittest.TestCase):
+    layer = FunctionalLayer
+
+    def setUp(self):
+        self.root = self.layer.get_application()
+        factory = self.root.manage_addProduct['Silva']
+        factory.manage_addPublication('section', u'Test Publication')
+
+    def test_url(self):
+        """Test the IContentURL on Catalog brains object. Like for
+        Zope object, they don't support the preview mode.
+        """
+        brains = self.root.service_catalog(
+            meta_type="Silva Publication",
+            path="/root/section")
+        self.assertEqual(len(brains), 1)
+        brain = brains[0]
+
+        request = TestRequest(application=self.root)
+        url = component.getMultiAdapter(
+            (brain, request), IContentURL)
+        self.assertTrue(verifyObject(IContentURL, url))
+        self.assertTrue(IContentURL.extends(IAbsoluteURL))
+
+        self.assertEqual(
+            brain.getURL(),
+            'http://localhost/root/section')
+        self.assertEqual(
+            str(url),
+            'http://localhost/root/section')
+        self.assertEqual(
+            url(),
+            'http://localhost/root/section')
+        self.assertEqual(
+            url.url(relative=True),
+            '/root/section')
+        self.assertEqual(
+            url.url(relative=True, preview=True),
+            '/root/section')
+        self.assertEqual(
+            url.preview(),
+            'http://localhost/root/section')
+
+        alsoProvides(request, IPreviewLayer)
+        self.assertEqual(
+            str(url),
+            'http://localhost/root/section')
+        self.assertEqual(
+            url(),
+            'http://localhost/root/section')
+
+    def test_traverse(self):
+        url = self.root.restrictedTraverse('@@absolute_url')
+        self.assertTrue(verifyObject(IContentURL, url))
 
 
 class PublicationAbsoluteURLTestCase(unittest.TestCase):
@@ -25,6 +173,8 @@ class PublicationAbsoluteURLTestCase(unittest.TestCase):
         factory.manage_addPublication('section', u'Test Publication')
 
     def test_url(self):
+        """Verify the IContentURL on a Silva Publication.
+        """
         request = TestRequest(application=self.root)
         url = component.getMultiAdapter(
             (self.root.section, request), IContentURL)
@@ -54,6 +204,49 @@ class PublicationAbsoluteURLTestCase(unittest.TestCase):
         self.assertEqual(
             url(),
             'http://localhost/root/++preview++/section')
+
+    def test_vhm(self):
+        """Test IContentURL url computation while a VHM is used.
+        """
+        request = TestRequest(
+            application=self.root,
+            url='http://localhost/section',
+            headers=[('X-VHM-Url', 'http://infrae.com'),
+                     ('X-VHM-Path', '/root')])
+        plugin = request.query_plugin(request.application, IVirtualHosting)
+        root, method, path = plugin(request.method, request.path)
+        self.assertEqual(root, self.root)
+        self.assertEqual(method, 'index_html')
+        self.assertEqual(path, ['section'])
+
+        url = component.getMultiAdapter(
+            (self.root.section, request), IContentURL)
+        self.assertTrue(verifyObject(IContentURL, url))
+        self.assertTrue(IContentURL.extends(IAbsoluteURL))
+
+        self.assertEqual(
+            str(url),
+            'http://infrae.com/section')
+        self.assertEqual(
+            url(),
+            'http://infrae.com/section')
+        self.assertEqual(
+            url.url(relative=True),
+            '/section')
+        self.assertEqual(
+            url.url(relative=True, preview=True),
+            '/++preview++/section')
+        self.assertEqual(
+            url.preview(),
+            'http://infrae.com/++preview++/section')
+
+        alsoProvides(request, IPreviewLayer)
+        self.assertEqual(
+            str(url),
+            'http://infrae.com/++preview++/section')
+        self.assertEqual(
+            url(),
+            'http://infrae.com/++preview++/section')
 
     def test_breadcrumbs(self):
         request = TestRequest(application=self.root)
@@ -334,6 +527,8 @@ class VersionAbsoluteURLTestCase(unittest.TestCase):
 
 def test_suite():
     suite = unittest.TestSuite()
+    suite.addTest(unittest.makeSuite(ServicesAbsoluteURLTestCase))
+    suite.addTest(unittest.makeSuite(BrainsAbsoluteURLTestCase))
     suite.addTest(unittest.makeSuite(PublicationAbsoluteURLTestCase))
     suite.addTest(unittest.makeSuite(RootAbsoluteURLTestCase))
     suite.addTest(unittest.makeSuite(VersionedContentAbsoluteURLTestCase))

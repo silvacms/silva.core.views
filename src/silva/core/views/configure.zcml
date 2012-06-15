@@ -99,13 +99,15 @@
      provides=".interfaces.IContentURL"
      />
 
-  <!-- <browser:page -->
-  <!--    for="OFS.interfaces.ITraversable" -->
-  <!--    name="absolute_url" -->
-  <!--    class=".absoluteurl.AbsoluteURL" -->
-  <!--    permission="zope.Public" -->
-  <!--    allowed_interface="silva.core.views.interfaces.IContentURL" -->
-  <!--    /> -->
+  <!-- We can't set the adapter for Zope ITraversable, as there is
+       already one, but we can set it for Silva Zope objects. -->
+  <browser:page
+     for="silva.core.interfaces.IZMIObject"
+     name="absolute_url"
+     class=".absoluteurl.AbsoluteURL"
+     permission="zope.Public"
+     allowed_interface="silva.core.views.interfaces.IContentURL"
+     />
 
   <view
      for="Products.ZCatalog.interfaces.ICatalogBrain"

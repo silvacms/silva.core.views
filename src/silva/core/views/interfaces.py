@@ -15,11 +15,6 @@ from silva.core.conf.martiansupport.directives import only_for
 from silva.core.interfaces.content import ICustomizable, IPublishable
 
 
-class ITestRequest(IBrowserRequest):
-    """Marker interface to mark a TestRequest.
-    """
-
-
 # Preview layer
 
 class INonCachedLayer(IBrowserRequest):
