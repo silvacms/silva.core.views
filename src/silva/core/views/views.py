@@ -7,8 +7,6 @@ from AccessControl.security import checkPermission
 from AccessControl import Unauthorized
 
 from five import grok
-from grokcore.layout import Layout as BaseLayout
-from grokcore.layout import Page as BasePage
 from grokcore.layout.interfaces import IPage
 from zope.cachedescriptors.property import CachedProperty
 from zope.viewlet.interfaces import IViewletManager
@@ -68,14 +66,14 @@ class ZMIView(HTTPHeaderView, grok.View):
     grok.implements(IZMIView)
 
 
-class Layout(BaseLayout):
+class Layout(grok.Layout):
     """A layout object.
     """
     grok.baseclass()
     grok.context(IViewableObject)
 
 
-class Page(HTTPHeaderView, BasePage):
+class Page(HTTPHeaderView, grok.Page):
     """A page class using a layout to render itself.
     """
     grok.baseclass()

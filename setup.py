@@ -35,7 +35,7 @@ setup(name='silva.core.views',
       zip_safe=False,
       install_requires=[
         'Zope2',
-        'five.grok',
+        'five.grok [layout]',
         'grokcore.layout',
         'grokcore.view',
         'grokcore.viewlet',

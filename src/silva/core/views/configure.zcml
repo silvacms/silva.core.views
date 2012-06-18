@@ -11,7 +11,6 @@
   <include package="five.grok" />
   <include package="silva.core.conf" />
   <include package="infrae.wsgi" />
-  <include package="grokcore.layout" />
 
   <!-- Patch URL computation -->
   <include package="collective.monkeypatcher" />
