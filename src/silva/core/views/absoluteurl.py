@@ -67,8 +67,9 @@ class ContentAbsoluteURL(AbsoluteURL):
     """ContentURL for Silva objects
     """
 
-    def _virtual_root(self, path):
-        virtual_path = self.request.physicalPathToVirtualPath(path)
+    def _virtual_root(self, content):
+        virtual_path = self.request.physicalPathToVirtualPath(
+            content.getPhysicalPath())
         return not virtual_path
 
     def _title(self, preview=False):
@@ -101,7 +102,7 @@ class ContentAbsoluteURL(AbsoluteURL):
 
         if (container is None or
             IRoot.providedBy(self.context) or
-            self._virtual_root(self.context.getPhysicalPath())):
+            self._virtual_root(self.context)):
             return ({'name': name, 'url': self.__str__()},)
 
         base = tuple()
