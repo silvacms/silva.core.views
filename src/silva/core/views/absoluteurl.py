@@ -36,7 +36,10 @@ class AbsoluteURL(BrowserView):
         self.request = request
 
     def _url(self, path, preview=False, relative=False):
-        return self.request.physicalPathToURL(path, relative=relative)
+        url = self.request.physicalPathToURL(path, relative=relative)
+        if relative and not url:
+            return '/'
+        return url
 
     def url(self, preview=False, relative=False):
         path = self.context.getPhysicalPath()
@@ -91,7 +94,10 @@ class ContentAbsoluteURL(AbsoluteURL):
             preview_pos = max(len(root_path), len(virtual_path))
             path = list(path)
             path.insert(preview_pos, "++preview++")
-        return request.physicalPathToURL(path, relative=relative)
+        url = request.physicalPathToURL(path, relative=relative)
+        if relative and not url:
+            return '/'
+        return url
 
     def _breadcrumbs(self, preview=False, skip=None):
         name = minimize(self._title(preview=preview))
