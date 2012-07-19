@@ -8,12 +8,14 @@ from AccessControl import Unauthorized
 
 from five import grok
 from grokcore.layout.interfaces import IPage
+from zope.interface import Interface
+from zope.component import getMultiAdapter
 from zope.cachedescriptors.property import CachedProperty
 from zope.viewlet.interfaces import IViewletManager
 
 from silva.core.interfaces import IViewableObject
 from .interfaces import IContentProvider, IViewlet, IZMIView, IView
-from .interfaces import IPreviewLayer
+from .interfaces import IPreviewLayer, IRender
 from .interfaces import IHTTPHeaderView
 
 # Simple views
@@ -66,22 +68,45 @@ class ZMIView(HTTPHeaderView, grok.View):
     grok.implements(IZMIView)
 
 
-class Layout(grok.Layout):
-    """A layout object.
-    """
+class Render(object):
     grok.baseclass()
-    grok.context(IViewableObject)
+    grok.context(Interface)
+    grok.provides(IRender)
+    grok.implements(IRender)
+    grok.name('view')
+
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
 
 
-class Page(HTTPHeaderView, grok.Page):
-    """A page class using a layout to render itself.
-    """
-    grok.baseclass()
-    grok.context(IViewableObject)
-    grok.require('zope2.View')
+    def default_namespace(self):
+        return {}
 
+    def namespace(self):
+        return {'view': self,
+                'context': self.context,
+                'request': self.request}
+
+    def update(self, *args, **kwargs):
+        pass
+
+    def render(self, *args, **kwargs):
+        return self.template.render(self)
+
+    render.base_method = True
+
+    def __call__(self, *args, **kwargs):
+        self.update(*args, **kwargs)
+        return self.render(*args, **kwargs)
 
 _marker = object()
+
+
+def render(context, request, name="view"):
+    view =  getMultiAdapter((context, request), IRender, name)
+    return view()
+
 
 class View(HTTPHeaderView, grok.View):
     """View on Silva object, support view and preview
@@ -122,6 +147,21 @@ class View(HTTPHeaderView, grok.View):
 
     def namespace(self):
         return {'content': self.content}
+
+
+class Page(HTTPHeaderView, grok.Page):
+    """A page class using a layout to render itself.
+    """
+    grok.baseclass()
+    grok.context(IViewableObject)
+    grok.require('zope2.View')
+
+
+class Layout(grok.Layout):
+    """A layout object.
+    """
+    grok.baseclass()
+    grok.context(IViewableObject)
 
 
 class ViewletLayoutSupport(object):

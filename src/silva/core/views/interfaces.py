@@ -15,6 +15,10 @@ from silva.core.conf.martiansupport.directives import only_for
 from silva.core.interfaces.content import ICustomizable, IPublishable
 
 
+class IRender(Interface):
+    """Interface for a IRender.
+    """
+
 # Preview layer
 
 class INonCachedLayer(IBrowserRequest):
