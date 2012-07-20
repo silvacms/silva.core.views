@@ -103,9 +103,9 @@ class Render(object):
 _marker = object()
 
 
-def render(context, request, name="view"):
+def render(context, request, name="view", **kwargs):
     view =  getMultiAdapter((context, request), IRender, name)
-    return view()
+    return view(**kwargs)
 
 
 class View(HTTPHeaderView, grok.View):
