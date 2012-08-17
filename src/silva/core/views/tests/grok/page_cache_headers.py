@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2010-2012 Infrae. All rights reserved.
 # See also LICENSE.txt
-# $Id$
 """
  We grok this test file:
     >>> grok('silva.core.views.tests.grok.page_cache_headers')

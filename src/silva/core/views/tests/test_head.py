@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2009-2012 Infrae. All rights reserved.
 # See also LICENSE.txt
-# $Id$
 
 from Products.Silva.testing import FunctionalLayer
 from silva.core.interfaces.auth import IAccessSecurity
