@@ -125,8 +125,9 @@ class IContentURL(IAbsoluteURL):
     public URLs.
     """
 
-    def url(preview=False, relative=False):
-        """Return an public URL to the content.
+    def url(preview=False, relative=False, host=None):
+        """Return an public URL to the content, or the preview URL, or
+        the url with a different host prefix.
         """
 
     def preview():

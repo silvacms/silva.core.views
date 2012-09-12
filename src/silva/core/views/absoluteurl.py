@@ -2,6 +2,8 @@
 # Copyright (c) 2002-2012 Infrae. All rights reserved.
 # See also LICENSE.txt
 
+import urllib
+
 # Zope 3
 from five import grok
 from zope.component import queryMultiAdapter, getMultiAdapter
@@ -35,15 +37,22 @@ class AbsoluteURL(BrowserView):
         self.context = context
         self.request = request
 
-    def _url(self, path, preview=False, relative=False):
-        url = self.request.physicalPathToURL(path, relative=relative)
-        if relative and not url:
-            return '/'
-        return url
+    def _url(self, path, preview=False, relative=False, host=None):
+        path = map(lambda s: urllib.quote(s, '/+@'),
+                   self.request.physicalPathToVirtualPath(path))
+        if relative:
+            if not self.request._script and not path:
+                return '/'
+            prefix = [''] + self.request._script
+        elif host is None:
+            prefix = [self.request['SERVER_URL']] + self.request._script
+        else:
+            prefix = [host]
+        return '/'.join(prefix + path)
 
-    def url(self, preview=False, relative=False):
+    def url(self, preview=False, relative=False, host=None):
         path = self.context.getPhysicalPath()
-        return self._url(path, preview=preview, relative=relative)
+        return self._url(path, preview=preview, relative=relative, host=host)
 
     def preview(self):
         return self.url(preview=True)
@@ -61,9 +70,9 @@ class BrainAbsoluteURL(AbsoluteURL):
     """ContentURL for brains.
     """
 
-    def url(self, preview=False, relative=False):
+    def url(self, preview=False, relative=False, host=None):
         path = self.context.getPath().rstrip('/').split('/')
-        return self._url(path, preview=preview, relative=relative)
+        return self._url(path, preview=preview, relative=relative, host=host)
 
 
 class ContentAbsoluteURL(AbsoluteURL):
@@ -80,7 +89,7 @@ class ContentAbsoluteURL(AbsoluteURL):
             return self.context.get_previewable().get_short_title()
         return self.context.get_short_title()
 
-    def _url(self, path, preview=False, relative=False):
+    def _url(self, path, preview=False, relative=False, host=None):
         # Insert back the preview namespace. Maybe there is a better
         # way to do it, but have to do it by hand here since
         # ZPublisher.Request doesn't implements its interfaces
@@ -94,10 +103,17 @@ class ContentAbsoluteURL(AbsoluteURL):
             preview_pos = max(len(root_path), len(virtual_path))
             path = list(path)
             path.insert(preview_pos, "++preview++")
-        url = request.physicalPathToURL(path, relative=relative)
-        if relative and not url:
-            return '/'
-        return url
+        path = map(lambda s: urllib.quote(s, '/+@'),
+                   request.physicalPathToVirtualPath(path))
+        if relative:
+            if not request._script and not path:
+                return '/'
+            prefix = [''] + request._script
+        elif host is None:
+            prefix = [request['SERVER_URL']] + request._script
+        else:
+            prefix = [host]
+        return '/'.join(prefix + path)
 
     def _breadcrumbs(self, preview=False, skip=None):
         name = minimize(self._title(preview=preview))

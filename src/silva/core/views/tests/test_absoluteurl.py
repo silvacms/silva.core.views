@@ -94,6 +94,12 @@ class ServicesAbsoluteURLTestCase(unittest.TestCase):
         self.assertEqual(
             url.preview(),
             'http://infrae.com/service_extensions')
+        self.assertEqual(
+            url.url(host='http://silvacms.org'),
+            'http://silvacms.org/service_extensions')
+        self.assertEqual(
+            url.url(host='http://silvacms.org', preview=True),
+            'http://silvacms.org/service_extensions')
 
         alsoProvides(request, IPreviewLayer)
         self.assertEqual(
@@ -150,6 +156,12 @@ class BrainsAbsoluteURLTestCase(unittest.TestCase):
         self.assertEqual(
             url.preview(),
             'http://localhost/root/section')
+        self.assertEqual(
+            url.url(host='http://silvacms.org'),
+            'http://silvacms.org/root/section')
+        self.assertEqual(
+            url.url(host='http://silvacms.org', preview=True),
+            'http://silvacms.org/root/section')
 
         alsoProvides(request, IPreviewLayer)
         self.assertEqual(
@@ -196,6 +208,12 @@ class PublicationAbsoluteURLTestCase(unittest.TestCase):
         self.assertEqual(
             url.preview(),
             'http://localhost/root/++preview++/section')
+        self.assertEqual(
+            url.url(host='http://silvacms.org'),
+            'http://silvacms.org/root/section')
+        self.assertEqual(
+            url.url(host='http://silvacms.org', preview=True),
+            'http://silvacms.org/root/++preview++/section')
 
         alsoProvides(request, IPreviewLayer)
         self.assertEqual(
