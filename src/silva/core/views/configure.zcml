@@ -35,8 +35,15 @@
 
   <!-- Default page style -->
   <browser:page
-     for="silva.core.interfaces.IZMIObject"
+     for="zope.interface.Interface"
      template="templates/zmi_template.pt"
+     name="five_template"
+     permission="zope.Public"
+     />
+
+  <browser:page
+     for="silva.core.interfaces.ISilvaService"
+     template="templates/service_template.pt"
      name="five_template"
      permission="zope.Public"
      />
