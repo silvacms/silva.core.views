@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*- 
+# -*- coding: utf-8 -*-
 # Copyright (c) 2008-2012 Infrae. All rights reserved.
 # See also LICENSE.txt
 """
@@ -46,17 +46,24 @@
 
 """
 
-from zope.publisher.interfaces import INotFound
-from silva.core.views import views as silvaviews
 from five import grok
+from silva.core.views import views as silvaviews
+from silva.core.views.httpheaders import ErrorHeaders
+from zope.publisher.interfaces import INotFound
+from zope.publisher.interfaces.browser import IBrowserRequest
 
 
 class NotFoundError(silvaviews.View):
     grok.name('error.html')
     grok.context(INotFound)
 
-    def update(self):
-        self.response.setStatus(404)
-
     def render(self):
         return "This page doesn't exists"
+
+
+class NotFoundHeaders(ErrorHeaders):
+    grok.adapts(IBrowserRequest, INotFound)
+
+    def other_headers(self, headers):
+        super(ErrorHeaders, self).other_headers(headers)
+        self.response.setStatus(404)
