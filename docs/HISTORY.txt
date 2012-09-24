@@ -1,10 +1,21 @@
 Changelog
 =========
 
-3.0 (unreleased)
-----------------
+3.0c1 (2012/09/24)
+------------------
 
-* ...
+* Add some default customization marker to hide content from the
+  breadcrumbs, or navigation.
+
+* Review and improve ``absoluteURL`` adapters not to rely on the Zope
+  2 implementation. Monkey patch the implementation into Zope 2, so it
+  works for ZCatalog brains too.
+
+* Review and improve HTTP headers support.
+
+* Review and improve ``IVirtualSite``.
+
+* Move in the ``ILanguageProvider`` adapter from Silva.
 
 3.0b1 (2011/11/08)
 ------------------

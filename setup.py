@@ -5,7 +5,7 @@
 from setuptools import setup, find_packages
 import os
 
-version = '3.0dev'
+version = '3.0c1'
 
 tests_require = [
     'Products.Silva [test]',
@@ -34,10 +34,13 @@ setup(name='silva.core.views',
       zip_safe=False,
       install_requires=[
         'Zope2',
+        'collective.monkeypatcher',
         'five.grok [layout]',
+        'grokcore.component',
         'grokcore.layout',
         'grokcore.view',
         'grokcore.viewlet',
+        'infrae.wsgi',
         'setuptools',
         'silva.core.conf',
         'silva.core.interfaces',
@@ -46,6 +49,7 @@ setup(name='silva.core.views',
         'zope.container',
         'zope.contentprovider',
         'zope.deferredimport',
+        'zope.i18n',
         'zope.interface',
         'zope.publisher',
         'zope.site',
