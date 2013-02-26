@@ -165,12 +165,6 @@ class IVirtualSite(Interface):
         """Return the URL of the root object of the current site.
         """
 
-    def get_portal_path():
-        pass
-
-    def get_portal_url():
-        pass
-
     def get_silva_root():
         """Return the Silva root.
         """
