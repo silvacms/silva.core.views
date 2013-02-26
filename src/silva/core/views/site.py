@@ -45,6 +45,12 @@ class VirtualSite(grok.Adapter):
             return url.url()
         return u''
 
+    def get_portal_path(self):
+        return self.get_root_path()
+
+    def get_portal_url(self):
+        return self.get_root_url()
+
     def get_silva_root(self):
         # We call get_root to by pass any local site
         site = getSite()

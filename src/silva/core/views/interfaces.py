@@ -139,6 +139,7 @@ ISilvaURL = IContentURL
 
 # Adapters
 
+
 class IVirtualSite(Interface):
     """Adapter on a Zope request to retrieve the root object of the
     current site. If a Virtual Host Monster is used, the root object
@@ -163,6 +164,12 @@ class IVirtualSite(Interface):
     def get_root_url():
         """Return the URL of the root object of the current site.
         """
+
+    def get_portal_path():
+        pass
+
+    def get_portal_url():
+        pass
 
     def get_silva_root():
         """Return the Silva root.
