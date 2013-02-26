@@ -6,7 +6,7 @@ from five import grok
 from infrae.wsgi.interfaces import IPublicationAfterRender
 from zope.component import queryMultiAdapter
 from zope.publisher.interfaces.browser import IBrowserRequest
-from silva.core.interfaces import ISilvaObject
+from silva.core.interfaces import ISilvaObject, IVersion
 from silva.core.interfaces.auth import IAccessSecurity
 
 from .interfaces import IHTTPResponseHeaders, IHTTPHeaderView, INonCachedLayer
@@ -58,7 +58,12 @@ class ResponseHeaders(grok.MultiAdapter):
 
     def other_headers(self, headers):
         if 'Content-Type' not in headers:
-            headers['Content-Type'] = 'text/html;charset=utf-8'
+            current = self.response.headers.get('Content-Type')
+            if not current or current == 'text/html':
+                # Don't override existing content types, except for
+                # html that doesn't specify a charset (code source
+                # breakage).
+                headers['Content-Type'] = 'text/html;charset=utf-8'
         for key, value in headers.items():
             self.response.setHeader(key, value)
 
@@ -94,3 +99,13 @@ class HTTPResponseHeaders(ResponseHeaders):
 
     def _is_private(self):
         return IAccessSecurity(self.context).minimum_role is not None
+
+
+class HTTPResponseVersionHeaders(ResponseHeaders):
+    """Regular Silva version headers.
+    """
+    grok.adapts(IBrowserRequest, IVersion)
+
+    def cachable(self):
+        # Views on version are not cachable by default.
+        return False
