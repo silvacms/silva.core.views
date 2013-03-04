@@ -39,11 +39,15 @@ class VirtualSite(grok.Adapter):
             return url.url(relative=True)
         return u''
 
+    get_top_level_path = get_root_path
+
     def get_root_url(self):
         url = self._get_url()
         if url is not None:
             return url.url()
         return u''
+
+    get_top_level_url = get_root_url
 
     def get_silva_root(self):
         # We call get_root to by pass any local site

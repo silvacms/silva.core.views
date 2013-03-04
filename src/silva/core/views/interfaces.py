@@ -141,37 +141,67 @@ ISilvaURL = IContentURL
 
 
 class IVirtualSite(Interface):
-    """Adapter on a Zope request to retrieve the root object of the
-    current site. If a Virtual Host Monster is used, the root object
-    for your site might not be your Silva root, but a publication or a
-    folder.
+    """Adapter on a Zope request to retrieve the root object for the
+    current site. If url rewriting is used, the root object for your
+    site might not be your Silva Root object, but a Silva Publication
+    or a Silva Folder (where the url rewriting is done). It will be
+    called the virtual root object. If a rewriting rule is used, we
+    can have:
+
+    - http://example.com is a Silva Folder at /silva/folder
+
+    If you use different url rewriting rules inside the same site,
+    it is possible that the top level url and path to the site is not
+    the url and path to the root object of the site:
+
+    - http://example.com/site is the Silva Root at /silva
+
+    - http://example.com is a Silva Folder at /silva/folder
     """
 
     def get_root():
         """Return the root object of the current site, which can be
         either the virtual root object or the Silva root depending if
-        Virtual Host Monster rewriting is used for the request or not.
+        url rewriting is used for the request or not.
         """
 
     def get_root_path():
-        """Return the path to the root object from the public side
-        (meaning the path between the start of the url and either to
-        the Silva root or virtual root).
+        """Return the path to the root object. (Meaning the path
+        between the start of the url and either to the Silva root or
+        the virtual root).
 
-        This is usefull to set cookies to the root of the site.
+        This is usefull to set cookies on the root of the site.
         """
 
     def get_root_url():
         """Return the URL of the root object of the current site.
         """
 
+    def get_top_level_path():
+        """Return the path to the top level object representing the
+        site, that might be a different object than the root object if
+        multiple rewrite rules are used on the site and some of them
+        declare a path higher than the one declared for the root
+        object.
+
+        This is usefull to set cookies on the site.
+        """
+
+    def get_top_level_url():
+        """Return the url to the top level object representing the
+        site, that might be a different object than the root object if
+        multiple rewrite rules are used in the site and some of them
+        declare a url higher than the one declared for the root
+        object.
+        """
+
     def get_silva_root():
-        """Return the Silva root.
+        """Return the Silva Root object.
         """
 
     def get_virtual_root():
-        """Return the virtual root object defined by the Virtual Host
-        Monster or None if the Virtual Host Monster was not used.
+        """Return the virtual root object defined by the current url
+        rewriting rule or None if no url rewriting is done.
         """
 
 
