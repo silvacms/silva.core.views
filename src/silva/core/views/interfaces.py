@@ -150,9 +150,10 @@ class IVirtualSite(Interface):
 
     - http://example.com is a Silva Folder at /silva/folder
 
-    If you use different url rewriting rules inside the same site,
-    it is possible that the top level url and path to the site is not
-    the url and path to the root object of the site:
+    If you use different url rewriting rules inside the same site, it
+    is possible that the top level url and path to the site is not the
+    url and path to the root object of the site (if you are inside
+    /site):
 
     - http://example.com/site is the Silva Root at /silva
 

@@ -23,4 +23,4 @@ The code for this extension can be found in Mercurial:
 https://hg.infrae.com/silva.core.views
 
 .. _Grok: http://grok.zope.org/
-.. _Silva developer documentation: http://docs.infrae.com/silva/
+.. _Silva developer documentation: http://docs.silvacms.org/latest/

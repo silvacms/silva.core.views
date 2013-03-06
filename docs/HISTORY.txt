@@ -1,10 +1,11 @@
 Changelog
 =========
 
-3.0.1 (unreleased)
+3.0.1 (2013/03/06)
 ------------------
 
-* ...
+* Update ``IVirtualSite`` to include methods to return the site top
+  level path or URL (that can be different from the root).
 
 3.0 (2012/12/11)
 ----------------
