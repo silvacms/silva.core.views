@@ -11,10 +11,12 @@ AUTH = {
     'Authorization': 'Basic manager:manager'}
 
 PUBLIC_HEADERS_EXPECTED = {
+    'Last-Modified': None,
     'Content-Length': '0',
     'Content-Type': 'text/html;charset=utf-8',
     'Cache-Control': 'max-age=86400, must-revalidate'}
 PRIVATE_HEADERS_EXPECTED = {
+    'Last-Modified': None,
     'Content-Length': '0',
     'Expires': 'Mon, 26 Jul 1997 05:00:00 GMT',
     'Content-Type': 'text/html;charset=utf-8',
@@ -34,15 +36,18 @@ class HEADTestCase(unittest.TestCase):
             for name, value in headers.items():
                 browser.set_request_header(name, value)
 
-            self.assertEqual(browser.open(path, method='HEAD'), 204)
+            self.assertEqual(browser.open(path, method='HEAD'), 200)
             self.assertEqual(browser.contents, '')
 
             # Check result headers
             for name, value in expected_headers.items():
-                reply_value = browser.headers.get(name)
-                self.assertEquals(
-                    reply_value, value,
-                    'Invalid header for "%s", expected: "%s", was: "%s"' %
+                self.assertIn(name, browser.headers,
+                              'Missing header for "%s"' % name)
+                if value is not None:
+                    reply_value = browser.headers.get(name)
+                    self.assertEquals(
+                        reply_value, value,
+                        'Invalid header for "%s", expected: "%s", was: "%s"' %
                         (name, value, reply_value))
 
     def set_private(self, context):

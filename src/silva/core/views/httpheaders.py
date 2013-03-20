@@ -6,6 +6,7 @@ from five import grok
 from infrae.wsgi.interfaces import IPublicationAfterRender
 from zope.component import queryMultiAdapter
 from zope.publisher.interfaces.browser import IBrowserRequest
+from webdav.common import rfc1123_date
 from silva.core.interfaces import ISilvaObject, IVersion
 from silva.core.interfaces.auth import IAccessSecurity
 
@@ -99,6 +100,16 @@ class HTTPResponseHeaders(ResponseHeaders):
 
     def _is_private(self):
         return IAccessSecurity(self.context).minimum_role is not None
+
+    def other_headers(self, headers):
+        if 'Last-Modified' not in headers:
+            # If missing, add a last-modified header with the modification time.
+            modification = self.context.get_modification_datetime()
+            if modification is not None:
+                self.response.setHeader(
+                    'Last-Modified',
+                    rfc1123_date(modification))
+        super(HTTPResponseHeaders, self).other_headers(headers)
 
 
 class HTTPResponseVersionHeaders(ResponseHeaders):

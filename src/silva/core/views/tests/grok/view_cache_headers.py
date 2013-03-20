@@ -21,7 +21,8 @@
     >>> browser.open('http://localhost/root/myfolder/mytestview')
     200
     >>> browser.headers
-    {'content-length': '15',
+    {'last-modified': '...',
+     'content-length': '15',
      'content-type': 'text/html;charset=utf-8',
      'cache-control': 'max-age=86400, must-revalidate'}
     >>> browser.contents
@@ -30,9 +31,10 @@
  We can do HEAD requests:
 
     >>> browser.open('/root/myfolder/mytestview', method='HEAD')
-    204
+    200
     >>> browser.headers
-    {'content-length': '0',
+    {'last-modified': '...',
+     'content-length': '0',
      'content-type': 'text/html;charset=utf-8',
      'cache-control': 'max-age=86400, must-revalidate'}
     >>> browser.contents
@@ -51,9 +53,10 @@
     >>> browser.headers
     {'content-length': '15',
      'expires': 'Mon, 26 Jul 1997 05:00:00 GMT',
-     'content-type': 'text/html;charset=utf-8',
+     'last-modified': '...',
      'pragma': 'no-cache',
-     'cache-control': 'no-cache, must-revalidate, post-check=0, pre-check=0'}
+     'cache-control': 'no-cache, must-revalidate, post-check=0, pre-check=0',
+     'content-type': 'text/html;charset=utf-8'}
     >>> browser.contents
     u'This is a view!'
 
