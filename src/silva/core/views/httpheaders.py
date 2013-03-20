@@ -7,10 +7,12 @@ from infrae.wsgi.interfaces import IPublicationAfterRender
 from zope.component import queryMultiAdapter
 from zope.publisher.interfaces.browser import IBrowserRequest
 from webdav.common import rfc1123_date
+from silva.core.interfaces import IHTTPHeadersSettings
 from silva.core.interfaces import ISilvaObject, IVersion
 from silva.core.interfaces.auth import IAccessSecurity
 
-from .interfaces import IHTTPResponseHeaders, IHTTPHeaderView, INonCachedLayer
+from .interfaces import IHTTPResponseHeaders, IHTTPHeaderView
+from .interfaces import INonCachedLayer
 
 
 @grok.subscribe(IPublicationAfterRender)
@@ -92,7 +94,19 @@ class HTTPResponseHeaders(ResponseHeaders):
     """
     grok.adapts(IBrowserRequest, ISilvaObject)
 
+    def __init__(self, request, context):
+        settings = IHTTPHeadersSettings(context, None)
+        self._force_disable_cachable = False
+        self._include_last_modified = True
+        if settings is not None:
+            self.max_age = settings.http_max_age
+            self._force_disable_cachable = settings.http_disable_cache
+            self._include_last_modified = settings.http_last_modified
+        super(HTTPResponseHeaders, self).__init__(request, context)
+
     def cachable(self):
+        if self._force_disable_cachable:
+            return False
         return not (self._is_preview() or self._is_private())
 
     def _is_preview(self):
@@ -102,7 +116,7 @@ class HTTPResponseHeaders(ResponseHeaders):
         return IAccessSecurity(self.context).minimum_role is not None
 
     def other_headers(self, headers):
-        if 'Last-Modified' not in headers:
+        if self._include_last_modified and 'Last-Modified' not in headers:
             # If missing, add a last-modified header with the modification time.
             modification = self.context.get_modification_datetime()
             if modification is not None:
