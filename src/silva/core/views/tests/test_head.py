@@ -3,7 +3,8 @@
 # See also LICENSE.txt
 
 from Products.Silva.testing import FunctionalLayer
-from silva.core.interfaces.auth import IAccessSecurity
+from silva.core.interfaces import IAccessSecurity, IHTTPHeadersSettings
+from zope.interface.verify import verifyObject
 
 import unittest
 
@@ -30,7 +31,7 @@ class HEADTestCase(unittest.TestCase):
     def setUp(self):
         self.root = self.layer.get_application()
 
-    def check_headers(self, path, headers, expected_headers):
+    def assertHeadersEqual(self, path, headers, expected_headers):
         with self.layer.get_browser() as browser:
             # Set request header
             for name, value in headers.items():
@@ -50,6 +51,8 @@ class HEADTestCase(unittest.TestCase):
                         'Invalid header for "%s", expected: "%s", was: "%s"' %
                         (name, value, reply_value))
 
+    check_headers = assertHeadersEqual
+
     def set_private(self, context):
         IAccessSecurity(context).minimum_role = 'Authenticated'
 
@@ -59,30 +62,45 @@ class SilvaHEADTestCase(HEADTestCase):
     """
 
     def test_root(self):
-        self.check_headers('/root', {}, PUBLIC_HEADERS_EXPECTED)
+        self.assertHeadersEqual(
+            '/root', {}, PUBLIC_HEADERS_EXPECTED)
 
-    def test_root_auth(self):
-        self.check_headers('/root', AUTH, PUBLIC_HEADERS_EXPECTED)
+    def test_root_authorized(self):
+        self.assertHeadersEqual(
+            '/root', AUTH, PUBLIC_HEADERS_EXPECTED)
 
-    def test_root_auth_private(self):
+    def test_root_authorized_and_restriscted(self):
         self.set_private(self.root)
-        self.check_headers('/root', AUTH, PRIVATE_HEADERS_EXPECTED)
+        self.assertHeadersEqual(
+            '/root', AUTH, PRIVATE_HEADERS_EXPECTED)
 
     def test_publication(self):
         factory = self.root.manage_addProduct['Silva']
         factory.manage_addPublication('publication', 'Publication')
-        self.check_headers('/root/publication', {}, PUBLIC_HEADERS_EXPECTED)
+        self.assertHeadersEqual(
+            '/root/publication', {}, PUBLIC_HEADERS_EXPECTED)
 
-    def test_publication_auth(self):
+    def test_publication_settings(self):
         factory = self.root.manage_addProduct['Silva']
         factory.manage_addPublication('publication', 'Publication')
-        self.check_headers('/root/publication', AUTH, PUBLIC_HEADERS_EXPECTED)
+        settings = IHTTPHeadersSettings(self.root.publication)
+        settings.http_disable_cache = True
+        self.assertTrue(verifyObject(IHTTPHeadersSettings, settings))
+        self.assertHeadersEqual(
+            '/root/publication', {}, PRIVATE_HEADERS_EXPECTED)
 
-    def test_publication_auth_private(self):
+    def test_publication_authorized(self):
+        factory = self.root.manage_addProduct['Silva']
+        factory.manage_addPublication('publication', 'Publication')
+        self.assertHeadersEqual(
+            '/root/publication', AUTH, PUBLIC_HEADERS_EXPECTED)
+
+    def test_publication_authorized_and_restricted(self):
         factory = self.root.manage_addProduct['Silva']
         factory.manage_addPublication('publication', 'Publication')
         self.set_private(self.root.publication)
-        self.check_headers('/root/publication', AUTH, PRIVATE_HEADERS_EXPECTED)
+        self.assertHeadersEqual(
+            '/root/publication', AUTH, PRIVATE_HEADERS_EXPECTED)
 
 
 def test_suite():
