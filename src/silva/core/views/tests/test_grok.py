@@ -7,7 +7,15 @@ import doctest
 
 from Products.Silva.testing import FunctionalLayer, suite_from_package
 
+def display(headers):
+    """Display headers in a sorted manner.
+    """
+    for key in sorted(headers.keys()):
+        print '%r: %r' % (key, headers[key])
+
+
 globs = {'grok': FunctionalLayer.grok,
+         'display': display,
          'getBrowser': FunctionalLayer.get_browser,
          'getRootFolder': FunctionalLayer.get_application}
 

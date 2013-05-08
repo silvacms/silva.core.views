@@ -20,12 +20,13 @@
     >>> browser = getBrowser()
     >>> browser.open('http://localhost/root/myfolder/notexitingview')
     404
-    >>> browser.headers
-    {'content-length': '24',
-     'expires': 'Mon, 26 Jul 1997 05:00:00 GMT',
-     'content-type': 'text/html;charset=utf-8',
-     'pragma': 'no-cache',
-     'cache-control': 'no-cache, must-revalidate, post-check=0, pre-check=0'}
+    >>> display(browser.headers)
+    'cache-control': 'no-cache, must-revalidate, post-check=0, pre-check=0'
+    'content-length': '24'
+    'content-type': 'text/html;charset=utf-8'
+    'expires': 'Mon, 26 Jul 1997 05:00:00 GMT'
+    'pragma': 'no-cache'
+    'x-powered-by': 'SilvaCMS'
     >>> browser.contents
     u"This page doesn't exists"
 
@@ -35,12 +36,13 @@
     404
 
  This doesn't work as expected:
-    # browser.headers
-    {'content-length': '0',
-     'content-type': 'text/html;charset=utf-8',
-     'expires': 'Mon, 26 Jul 1997 05:00:00 GMT',
-     'pragma': 'no-cache',
-     'cache-control': 'no-cache, must-revalidate, post-check=0, pre-check=0'}
+    # display(browser.headers)
+    'cache-control': 'no-cache, must-revalidate, post-check=0, pre-check=0'
+    'content-length': '0'
+    'content-type': 'text/html;charset=utf-8'
+    'expires': 'Mon, 26 Jul 1997 05:00:00 GMT'
+    'pragma': 'no-cache'
+    'x-powered-by': 'SilvaCMS'
     >>> browser.contents
     u''
 

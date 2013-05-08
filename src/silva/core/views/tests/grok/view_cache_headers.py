@@ -20,11 +20,12 @@
     >>> browser = getBrowser()
     >>> browser.open('http://localhost/root/myfolder/mytestview')
     200
-    >>> browser.headers
-    {'last-modified': '...',
-     'content-length': '15',
-     'content-type': 'text/html;charset=utf-8',
-     'cache-control': 'max-age=86400, must-revalidate'}
+    >>> display(browser.headers)
+    'cache-control': 'max-age=86400, must-revalidate'
+    'content-length': '15'
+    'content-type': 'text/html;charset=utf-8'
+    'last-modified': '...'
+    'x-powered-by': 'SilvaCMS'
     >>> browser.contents
     u'This is a view!'
 
@@ -32,11 +33,12 @@
 
     >>> browser.open('/root/myfolder/mytestview', method='HEAD')
     200
-    >>> browser.headers
-    {'last-modified': '...',
-     'content-length': '0',
-     'content-type': 'text/html;charset=utf-8',
-     'cache-control': 'max-age=86400, must-revalidate'}
+    >>> display(browser.headers)
+    'cache-control': 'max-age=86400, must-revalidate'
+    'content-length': '0'
+    'content-type': 'text/html;charset=utf-8'
+    'last-modified': '...'
+    'x-powered-by': 'SilvaCMS'
     >>> browser.contents
     u''
 
@@ -50,13 +52,14 @@
     >>> browser.login('manager')
     >>> browser.open('http://localhost/root/myfolder/mytestview')
     200
-    >>> browser.headers
-    {'content-length': '15',
-     'expires': 'Mon, 26 Jul 1997 05:00:00 GMT',
-     'last-modified': '...',
-     'pragma': 'no-cache',
-     'cache-control': 'no-cache, must-revalidate, post-check=0, pre-check=0',
-     'content-type': 'text/html;charset=utf-8'}
+    >>> display(browser.headers)
+    'cache-control': 'no-cache, must-revalidate, post-check=0, pre-check=0'
+    'content-length': '15'
+    'content-type': 'text/html;charset=utf-8'
+    'expires': 'Mon, 26 Jul 1997 05:00:00 GMT'
+    'last-modified': '...'
+    'pragma': 'no-cache'
+    'x-powered-by': 'SilvaCMS'
     >>> browser.contents
     u'This is a view!'
 

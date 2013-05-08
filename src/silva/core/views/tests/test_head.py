@@ -13,11 +13,13 @@ AUTH = {
 
 PUBLIC_HEADERS_EXPECTED = {
     'Last-Modified': None,
+    'X-Powered-By': 'SilvaCMS',
     'Content-Length': '0',
     'Content-Type': 'text/html;charset=utf-8',
     'Cache-Control': 'max-age=86400, must-revalidate'}
 PRIVATE_HEADERS_EXPECTED = {
     'Last-Modified': None,
+    'X-Powered-By': 'SilvaCMS',
     'Content-Length': '0',
     'Expires': 'Mon, 26 Jul 1997 05:00:00 GMT',
     'Content-Type': 'text/html;charset=utf-8',

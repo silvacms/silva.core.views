@@ -78,6 +78,7 @@ class ResponseHeaders(grok.MultiAdapter):
 
     def __call__(self, **headers):
         self.set_headers(**headers)
+        self.response.setHeader('X-Powered-By', 'SilvaCMS')
 
 
 class ErrorHeaders(ResponseHeaders):
