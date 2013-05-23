@@ -1,10 +1,15 @@
 Changelog
 =========
 
-3.0.2 (unreleased)
+3.0.2 (2013/05/23)
 ------------------
 
-* ...
+* Add support for customization of the HTTP headers on specific
+  content via ``IHTTPHeadersSettings``.
+
+* Add an ``Last-Modified`` header on Silva content.
+
+* Add an ``X-Powered-By`` header on Silva content.
 
 3.0.1 (2013/03/06)
 ------------------
